@@ -10,6 +10,7 @@
  */
 
 @session_start();
+if(!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
 if(isset($_REQUEST['r'])) { // that's an AJAX request
 	require('inc/Ajax.class.php');
 	Ajax::ProcessRequest();
