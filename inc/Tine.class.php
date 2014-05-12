@@ -730,7 +730,7 @@ class Tine {
 		$req->cookies(true);
 		$req->binaryOutput(true); // directly output binary stream to client
 		$req->postFields('requestType=HTTP&method='.self::MAILMODULE.'.downloadAttachment&'.
-			"messageId=$messageId&partId=$partId" );
+			"messageId=$messageId&partId=$partId&getAsJson=false" );
 		$req->headers(array(
 			'Connection: keep-alive',
 			'DNT: 1',
