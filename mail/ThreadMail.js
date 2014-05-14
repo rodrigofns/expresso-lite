@@ -112,7 +112,7 @@ var ThreadMail = (function() {
 		return addressees;
 	};
 
-	exp.Process = function(headlines) {
+	exp.MakeThreads = function(headlines) {
 		for(var h = 0; h < headlines.length; ++h) {
 			headlines[h].subject2 = headlines[h].subject
 				.replace(/(auto: )|(enc: )|(fw: )|(fwd: )|(re: )|(res: )/gi, 'FWD: '); // everything becomes "FWD:"

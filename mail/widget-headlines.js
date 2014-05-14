@@ -344,34 +344,6 @@ $.fn.headlines = function(options) {
 		curFolder = folder; // cache
 		$targetDiv.empty();
 		if(!curFolder.messages.length) { // not cached yet
-
-			// http://www.dave-bond.com/blog/2010/01/JQuery-ajax-progress-HMTL5/
-			//~ $.ajax({
-				//~ xhr: function() {
-						//~ var xhr = new window.XMLHttpRequest();
-						//~ xhr.upload.addEventListener('progress', function(evt){
-						//~ if(evt.lengthComputable) {
-							//~ var percentComplete = evt.loaded / evt.total;
-							//~ console.log(percentComplete);
-						//~ }
-					//~ }, false);
-					//~ xhr.addEventListener('progress', function(evt){
-						//~ console.log(evt.loaded);
-						//~ if(evt.lengthComputable) {
-							//~ var percentComplete = evt.loaded / evt.total;
-							//~ console.log(percentComplete);
-						//~ }
-					//~ }, false);
-					//~ return xhr;
-				//~ },
-				//~ type: 'POST',
-				//~ url: '../',
-				//~ data: { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany },
-				//~ success: function(data){
-					//~ //Do something success-ish
-				//~ }
-			//~ });
-
 			_CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
 			$.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
 			.always(function() { $targetDiv.children('.loadingMessage').remove(); })
@@ -381,7 +353,7 @@ $.fn.headlines = function(options) {
 				curFolder.messages.length = 0;
 				$.merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
 				curFolder.threads.length = 0;
-				$.merge(curFolder.threads, ThreadMail.Process(headlines)); // in thread: oldest first
+				$.merge(curFolder.threads, ThreadMail.MakeThreads(headlines)); // in thread: oldest first
 				$targetDiv.append(_BuildAllThreadsDivs());
 				exp.buildContextMenu();
 				if(onDone !== undefined && onDone !== null)
@@ -400,14 +372,14 @@ $.fn.headlines = function(options) {
 		var $divLoading = _CreateDivLoading('Carregando mensagens...')
 		$divLoading.appendTo($targetDiv);
 
-		$.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:curFolder.messages.length, limit:howMany }).always(function() { $targetDiv.children('.loadingMessage').remove(); })
+		$.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
 		.always(function() { $divLoading.remove(); })
 		.fail(function(resp) {
 			window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
 		}).done(function(mails2) {
-			$.merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
+			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
 			curFolder.threads.length = 0;
-			$.merge(curFolder.threads, ThreadMail.Process(curFolder.messages)); // rebuild
+			$.merge(curFolder.threads, ThreadMail.MakeThreads(curFolder.messages)); // rebuild
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
 			exp.buildContextMenu();
 			if(onDone !== undefined && onDone !== null)
@@ -433,7 +405,7 @@ $.fn.headlines = function(options) {
 				'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
 		}).done(function(headlines) {
 			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
-			curFolder.threads = ThreadMail.Process(curFolder.messages);
+			curFolder.threads = ThreadMail.MakeThreads(curFolder.messages);
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
 			exp.buildContextMenu();
 			if(headl0 !== null)
