@@ -9,14 +9,15 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-require(dirname(__FILE__).'/Tine.class.php');
+require_once(dirname(__FILE__).'/../conf.php');
+require_once(dirname(__FILE__).'/Tine.class.php');
 
 class Ajax {
 	private static $tine = null;
 
 	public static function InitTine() {
 		// This method is called at the end of this script.
-		self::$tine = new Tine('https://expressov3.serpro.gov.br/index.php');
+		self::$tine = new Tine(BACKEND_URL);
 	}
 
 	public static function ProcessRequest() {

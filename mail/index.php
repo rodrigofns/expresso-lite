@@ -10,7 +10,8 @@
  */
 
 @session_start();
-require('../inc/Ajax.class.php');
+require_once(dirname(__FILE__).'/../conf.php');
+require_once(dirname(__FILE__).'/../inc/Ajax.class.php');
 if(!Tine::isLogged()) header('location: ../');
 ?>
 <!DOCTYPE html>
@@ -105,6 +106,7 @@ if(!Tine::isLogged()) header('location: ../');
 		<div class="icoCheck1" title="Desselecionar mensagem"></div>
 	</div>
 	<div id="info">
+		<input type="hidden" id="mailBatch" value="<?=MAIL_BATCH?>"/>
 		<input type="hidden" id="mailAddress" value="<?=$_SESSION['user_email']?>"/>
 		<input type="hidden" id="mailSignature" value="<?=$_SESSION['user_signature']?>"/>
 	</div>

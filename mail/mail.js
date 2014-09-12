@@ -10,7 +10,7 @@
 
 (function( $, Contacts, UrlStack ) {
 	var Cache = { // global page cache with all objects
-		MAILBATCH: 50,
+		MAILBATCH: 50, // overwritten with value from conf in document.ready
 		folders: [], // all folder objects
 		lstFolder: null, // folder rendering widget
 		lstHeadline: null, // headline rendering widget
@@ -19,6 +19,8 @@
 	};
 
 	$(document).ready(function() {
+		Cache.MAILBATCH = $('#mailBatch').val();
+
 		// Init widget objects.
 		Cache.wndCompose = $.compose();
 		Cache.lstFolder = $('#foldersArea').folders({ folderCache:Cache.folders });
