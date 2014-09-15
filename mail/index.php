@@ -100,6 +100,7 @@ if(!Tine::isLogged()) header('location: ../');
 		<div class="icoImportant" title="O remetente deste email o marcou como importante"></div>
 		<div class="icoAttach" title="Este email contém anexo(s)"></div>
 		<div class="icoForwarded" title="Você já encaminhou este email"></div>
+		<div class="icoSigned" title="Esta mensagem foi assinada digitalmente"></div>
 		<div class="icoHigh0" title="Mensagem não destacada"></div>
 		<div class="icoHigh1" title="Mensagem destacada"></div>
 		<div class="icoCheck0" title="Selecionar mensagem"></div>

@@ -105,6 +105,7 @@ $.fn.headlines = function(options) {
 		var hasAttachment = false;
 		var hasImportant  = false;
 		var hasUnread     = false;
+		var hasSigned     = false;
 		var wantConfirm   = false;
 		for(var i = 0; i < thread.length; ++i) { // a thread is an array of headlines
 			var msg = thread[i];
@@ -112,6 +113,7 @@ $.fn.headlines = function(options) {
 			if(msg.hasAttachment) hasAttachment = true;
 			if(msg.important)     hasImportant = true;
 			if(msg.unread)        hasUnread = true;
+			if(msg.signed)        hasSigned = true;
 			if(msg.replied)       hasReplied = true;
 			if(msg.forwarded)     hasForwarded = true
 			if(msg.unread && msg.wantConfirm) wantConfirm = true; // confirmation only if unread
@@ -131,6 +133,7 @@ $.fn.headlines = function(options) {
 				(hasReplied    ? $('#icons .icoReplied').serialize()   : '')+' ' +
 				(wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
 				(hasImportant  ? $('#icons .icoImportant').serialize() : '')+' ' +
+				(hasSigned     ? $('#icons .icoSigned').serialize()    : '')+' ' +
 				(hasAttachment ? $('#icons .icoAttach').serialize()    : '')+' ' +
 				(hasForwarded  ? $('#icons .icoForwarded').serialize() : '')+' ' +
 			'</div>' +

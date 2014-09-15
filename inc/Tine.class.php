@@ -427,6 +427,7 @@ class Tine {
 				'replied'       => in_array("\\Answered", $mail->flags),
 				'forwarded'     => in_array("Passed", $mail->flags),
 				'important'     => $mail->importance,
+				'signed'        => $mail->structure->contentType === 'multipart/signed',
 				'wantConfirm'   => $mail->reading_conf,
 				'received'      => strtotime($mail->received), // timestamp
 				'size'          => (int)$mail->size, // bytes

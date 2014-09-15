@@ -53,6 +53,7 @@ $.fn.messages = function(options) {
 		return (headline.replied       ? $('#icons .icoReplied').serialize()   : '')+' ' +
 			(headline.wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
 			(headline.important     ? $('#icons .icoImportant').serialize() : '')+' ' +
+			(headline.signed        ? $('#icons .icoSigned').serialize()    : '')+' ' +
 			(headline.hasAttachment ? $('#icons .icoAttach').serialize()    : '')+' ' +
 			(headline.forwarded     ? $('#icons .icoForwarded').serialize() : '')+' ';
 	}
