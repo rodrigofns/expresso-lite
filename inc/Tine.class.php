@@ -155,10 +155,23 @@ class Tine {
 		}
 		$contacts = array();
 		foreach($jreq->result->results as $cont) {
+			$contactsEmail = null;
+			if(isset($cont->emails)) { // this contact is actually a group with many emails
+				$contactsEmail = array();
+				$addrs = explode(',', $cont->emails);
+				foreach($addrs as $addr) {
+					if(strpos($addr, '<') !== false) {
+						$contactsEmail[] = substr($addr,
+							strpos($addr, '<') + 1,
+							strrpos($addr, '>') - strpos($addr, '<') - 1 );
+					}
+				}
+			} else {
+				$contactsEmail = array($cont->email); // ordinary contact, 1 address
+			}
 			$contacts[] = (object)array(
 				'name'   => $cont->n_fn,
-				'emails' => isset($cont->emails) ? explode(',', $cont->emails) : // contact group
-					array($cont->email) // ordinary contact
+				'emails' => $contactsEmail
 			);
 		}
 		return $contacts; // both collected and personal contacts, merged
