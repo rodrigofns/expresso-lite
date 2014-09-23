@@ -112,38 +112,44 @@ var ThreadMail = (function() {
 		return addressees;
 	};
 
-	exp.MakeThreads = function(headlines) {
-		for(var h = 0; h < headlines.length; ++h) {
-			headlines[h].subject2 = headlines[h].subject
-				.replace(/(auto: )|(enc: )|(fw: )|(fwd: )|(re: )|(res: )/gi, 'FWD: '); // everything becomes "FWD:"
-		}
-		headlines.reverse(); // now sorted oldest first
-
-		var threads = []; // each thread will be a flat array of headlines; if no thread, an array of 1 headline
-		HEADS: for(var h = 0; h < headlines.length; ++h) {
-			for(var t = 0; t < threads.length; ++t) {
-				var canBeThreaded = headlines[h].subject2.indexOf('FWD: ') > -1;
-				var hasSameSubject = headlines[h].subject2.replace(/^(FWD: )+/, '') ===
-					threads[t][0].subject2.replace(/^(FWD: )+/, '');
-				if(canBeThreaded && hasSameSubject) {
-					threads[t].push(headlines[h]); // push into thread
-					continue HEADS;
-				}
+	exp.MakeThreads = function(headlines, isForDrafts) {
+		var threads = [];
+		if(isForDrafts) {
+			for(var i = 0; i < headlines.length; ++i)
+				threads.push([ headlines[i] ]); // drafts folder actually has no threads
+		} else {
+			for(var h = 0; h < headlines.length; ++h) {
+				headlines[h].subject2 = headlines[h].subject
+					.replace(/(auto: )|(enc: )|(fw: )|(fwd: )|(re: )|(res: )/gi, 'FWD: '); // everything becomes "FWD:"
 			}
-			threads.push([ headlines[h] ]); // new thread with 1 headline
+			headlines.reverse(); // now sorted oldest first
+
+			var threads = []; // each thread will be a flat array of headlines; if no thread, an array of 1 headline
+			HEADS: for(var h = 0; h < headlines.length; ++h) {
+				for(var t = 0; t < threads.length; ++t) {
+					var canBeThreaded = headlines[h].subject2.indexOf('FWD: ') > -1;
+					var hasSameSubject = headlines[h].subject2.replace(/^(FWD: )+/, '') ===
+						threads[t][0].subject2.replace(/^(FWD: )+/, '');
+					if(canBeThreaded && hasSameSubject) {
+						threads[t].push(headlines[h]); // push into thread
+						continue HEADS;
+					}
+				}
+				threads.push([ headlines[h] ]); // new thread with 1 headline
+			}
+
+			for(var t = 0; t < threads.length; ++t) {
+				for(var i = 0; i < threads[t].length; ++i)
+					delete threads[t][i].subject2; // normalized subject was added just for our internal processing
+				threads[t].reverse(); // thread now sorted newest first
+			}
+
+			threads.sort(function(a, b) { // now all threads sorted newest first
+				return b[0].received.getTime() - a[0].received.getTime(); // compare timestamps
+			});
+
+			headlines.reverse(); // sorted newest first, as it came to us
 		}
-
-		for(var t = 0; t < threads.length; ++t) {
-			for(var i = 0; i < threads[t].length; ++i)
-				delete threads[t][i].subject2; // normalized subject was added just for our internal processing
-			threads[t].reverse(); // thread now sorted newest first
-		}
-
-		threads.sort(function(a, b) { // now all threads sorted newest first
-			return b[0].received.getTime() - a[0].received.getTime(); // compare timestamps
-		});
-
-		headlines.reverse(); // sorted newest first, as it came to us
 		return threads;
 	}
 
@@ -193,12 +199,16 @@ var ThreadMail = (function() {
 		}
 	};
 
-	exp.FindTrashFolder = function(folderCache) {
-		for(var i = 0; i < folderCache.length; ++i) // the global array with all top folders
-			if(folderCache[i].globalName === 'INBOX')
-				for(var j = 0; j < folderCache[i].subfolders.length; ++j)
-					if(folderCache[i].subfolders[j].globalName === 'INBOX/Trash')
-						return folderCache[i].subfolders[j];
+	exp.FindFolderByGlobalName = function(name, folderCache) {
+		for(var i = 0; i < folderCache.length; ++i) { // the global array with all top folders
+			if(folderCache[i].globalName === name) {
+				return folderCache[i];
+			} else if(folderCache[i].subfolders.length) {
+				var folder = exp.FindFolderByGlobalName(name, folderCache[i].subfolders);
+				if(folder !== null)
+					return folder;
+			}
+		}
 		return null;
 	};
 

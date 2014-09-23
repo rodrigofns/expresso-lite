@@ -95,7 +95,7 @@ $.fn.messages = function(options) {
 		if(!$div.children('.messages_content').is(':visible')) {
 			window.alert('Abra a mensagem antes de '+(action==='fwd'?'encaminhá':'respondê')+'-la.');
 		} else {
-			var opts = { };
+			var opts = { curFolder:curFolder };
 
 			if(action === 'fwd') opts.forward = $div.data('headline');
 			else if(action === 're') opts.reply = $div.data('headline');
@@ -182,7 +182,7 @@ $.fn.messages = function(options) {
 		var headline = $elem.data('headline');
 
 		if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
-			_MoveMessage($elem, ThreadMail.FindTrashFolder(userOpts.folderCache));
+			_MoveMessage($elem, ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
 		} else if(window.confirm('Deseja apagar esta mensagem?')) { // we're in trash folder, add deleted flag
 			function ProceedDeleting() {
 				$elem.find('.messages_fromName').hide();
@@ -331,7 +331,7 @@ $.fn.messages = function(options) {
 		return exp;
 	};
 
-	$targetDiv.on('click', '.messages_top1,.messages_top2', function(ev, onDone) {
+	$targetDiv.on('click', '.messages_top1,.messages_top2', function(ev, onDone) { // open message
 		var $divUnit = $(this).closest('.messages_unit');
 		var headline = $divUnit.data('headline');
 		if(!$divUnit.find('.messages_top2').is(':visible')) { // will expand
@@ -387,7 +387,7 @@ $.fn.messages = function(options) {
 		return false;
 	});
 
-	$targetDiv.on('click', '.messages_attachs a', function() {
+	$targetDiv.on('click', '.messages_attachs a', function() { // click attachment
 		var $lnk = $(this);
 		$lnk.blur();
 		var idx = $lnk.parent('span').index(); // child index; 0 is "<b>Anexo</b>", others are the link spans

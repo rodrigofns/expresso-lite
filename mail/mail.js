@@ -22,7 +22,7 @@
 		Cache.MAILBATCH = $('#mailBatch').val();
 
 		// Init widget objects.
-		Cache.wndCompose = $.compose();
+		Cache.wndCompose = $.compose({ folderCache:Cache.folders });
 		Cache.lstFolder = $('#foldersArea').folders({ folderCache:Cache.folders });
 		Cache.lstHeadline = $('#headlinesArea').headlines({ folderCache:Cache.folders });
 		Cache.lstMessage = $('#messagesArea').messages({ folderCache:Cache.folders,
@@ -66,7 +66,7 @@
 		});
 
 		$('.logoff').on('click', DoLogoff);
-		$('.compose').on('click', function() { Cache.wndCompose.show(); });
+		$('.compose').on('click', function() { Cache.wndCompose.show({ curFolder:Cache.lstFolder.getCurrent() }); });
 		$('#headerMenu').on('click', FoldersMenuClick);
 		$('#loadMore').on('click', LoadMoreHeadlines);
 		$('#closeMessages,#headerCloseMessage').on('click', CloseMailView);
@@ -183,9 +183,14 @@
 	}
 
 	function HeadlineClicked(thread) {
-		OpenMailView();
-		$('#subjectText').text(thread[thread.length - 1].subject);
-		Cache.lstMessage.render(thread, Cache.lstFolder.getCurrent()); // headlines sorted newest first
+		var curFolder = Cache.lstFolder.getCurrent();
+		if(curFolder.globalName === 'INBOX/Drafts') {
+			Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
+		} else {
+			OpenMailView();
+			$('#subjectText').text(thread[thread.length - 1].subject);
+			Cache.lstMessage.render(thread, curFolder); // headlines sorted newest first
+		}
 
 		var cyPos = Cache.lstHeadline.calcScrollTopOf(thread), // scroll headlines to have selected at center
 			cyHalf = $('#centerColumn').outerHeight() / 2;
@@ -234,19 +239,8 @@
 		UrlStack.pop('#mailView');
 	}
 
-	function MailSent(reMsg, fwdMsg) {
-		var sentFolder = null;
-		FINDSENT: for(var i = 0; i < Cache.folders.length; ++i) {
-			if(Cache.folders[i].globalName === 'INBOX') {
-				for(var j = 0; j < Cache.folders[i].subfolders.length; ++j) {
-					if(Cache.folders[i].subfolders[j].globalName === 'INBOX/Sent') {
-						sentFolder = Cache.folders[i].subfolders[j];
-						break FINDSENT;
-					}
-				}
-			}
-		}
-
+	function MailSent(reMsg, fwdMsg, draftMsg) {
+		var sentFolder = ThreadMail.FindFolderByGlobalName('INBOX/Sent', Cache.folders);
 		++sentFolder.totalMails;
 		Cache.lstFolder.redraw(sentFolder);
 
@@ -260,38 +254,32 @@
 
 		if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Sent') {
 			Cache.lstHeadline.loadNew(1);
-			UpdateHeadlineFooter();
 		} else {
 			sentFolder.messages.length = 0; // force cache rebuild
 			sentFolder.threads.length = 0;
 		}
 
+		if(draftMsg !== null) { // a draft was sent
+			var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
+			Cache.lstFolder.redraw(draftFolder);
+			draftFolder.messages.length = 0; // force cache rebuild
+			draftFolder.threads.length = 0;
+			if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
+				LoadFirstHeadlines(draftFolder);
+		}
+
+		UpdateHeadlineFooter();
+
 		//~ Compose.SaveNewPersonalContacts(message);
 	}
 
 	function DraftSaved() {
-		var draftFolder = null;
-		FINDDRAFT: for(var i = 0; i < Cache.folders.length; ++i) {
-			if(Cache.folders[i].globalName === 'INBOX') {
-				for(var j = 0; j < Cache.folders[i].subfolders.length; ++j) {
-					if(Cache.folders[i].subfolders[j].globalName === 'INBOX/Drafts') {
-						draftFolder = Cache.folders[i].subfolders[j];
-						break FINDDRAFT;
-					}
-				}
-			}
-		}
-
+		var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
 		++draftFolder.totalMails;
-		++draftFolder.unreadMails;
 		Cache.lstFolder.redraw(draftFolder);
-
-		if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts') {
-			Cache.lstHeadline.loadNew(1);
-			UpdateHeadlineFooter();
-		} else {
-			draftFolder.messages.length = 0; // force cache rebuild
-			draftFolder.threads.length = 0;
-		}
+		draftFolder.messages.length = 0; // force cache rebuild
+		draftFolder.threads.length = 0;
+		if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
+			LoadFirstHeadlines(draftFolder);
 	}
 })( jQuery, Contacts, UrlStack );

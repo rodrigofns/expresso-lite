@@ -104,7 +104,7 @@ class Tine {
 		} catch(Exception $e) {
 			throw new Exception('Tinebase.getAllRegistryData: '.$e->getMessage());
 		}
-		if($validateLogin) {
+		if($validateLogin) {error_log($jreq->result->Tinebase->currentAccount->accountLoginName);
 			if(!isset($jreq->result->{self::MAILMODULE}))
 				throw new Exception('Tinebase.getAllRegistryData: Mail info not returned.');
 			$_SESSION['ourtine_id'] = $jreq->result->{self::MAILMODULE}->accounts->results[0]->id;
@@ -113,9 +113,9 @@ class Tine {
 				'id'           => $jreq->result->{self::MAILMODULE}->accounts->results[0]->id,
 				'email'        => $jreq->result->{self::MAILMODULE}->accounts->results[0]->email,
 				'organization' => $jreq->result->{self::MAILMODULE}->accounts->results[0]->organization,
-				'user'         => $jreq->result->{self::MAILMODULE}->accounts->results[0]->user,
 				'from'         => $jreq->result->{self::MAILMODULE}->accounts->results[0]->from,
 				'signature'    => $jreq->result->{self::MAILMODULE}->accounts->results[0]->signature,
+				'user'         => $jreq->result->Tinebase->currentAccount->accountLoginName,
 				'lastLogin'    => $jreq->result->Tinebase->currentAccount->accountLastLogin,
 				'jsonKey'      => $jreq->result->Tinebase->jsonKey
 			);
@@ -781,10 +781,13 @@ class Tine {
 		return $jreq->result;
 	}
 
-	public function saveMessage($subject, $body, array $to, array $cc, array $bcc, $isImportant=false, $replyToId=null, $forwardFromId=null, array $attachs=array()) {
+	public function saveMessage($subject, $body, array $to, array $cc, array $bcc,
+		$isImportant=false, $replyToId=null, $forwardFromId=null, $origDraftId=null, array $attachs=array() )
+	{
 		try { // this method sends the email
 			$jreq = $this->_jsonRpc(self::MAILMODULE.'.saveMessage', (object)array(
-				'recordData' => $this->_buildMessageForSaving($subject, $body, $to, $cc, $bcc, $isImportant, $replyToId, $forwardFromId, $attachs)
+				'recordData' => $this->_buildMessageForSaving($subject, $body, $to, $cc, $bcc,
+					$isImportant, $replyToId, $forwardFromId, $origDraftId, $attachs)
 			));
 		} catch(Exception $e) {
 			throw new Exception(self::MAILMODULE.'.saveMessage: '.$e->getMessage());
@@ -792,19 +795,26 @@ class Tine {
 		return $jreq->result;
 	}
 
-	public function saveMessageDraft($subject, $body, array $to, array $cc, array $bcc, $isImportant=false, $replyToId=null, $forwardFromId=null, array $attachs=array()) {
+	public function saveMessageDraft($draftFolderId, $subject, $body, array $to, array $cc, array $bcc,
+		$isImportant=false, $replyToId=null, $forwardFromId=null, $origDraftId=null, array $attachs=array() )
+	{
 		try {
-			$jreq = $this->_jsonRpc(self::MAILMODULE.'.saveMessageInFolder', (object)array(
+			$this->_jsonRpc(self::MAILMODULE.'.saveMessageInFolder', (object)array(
 				'folderName' => 'INBOX/Drafts',
-				'recordData' => $this->_buildMessageForSaving($subject, $body, $to, $cc, $bcc, $isImportant, $replyToId, $forwardFromId, $attachs)
+				'recordData' => $this->_buildMessageForSaving($subject, $body, $to, $cc, $bcc,
+					$isImportant, $replyToId, $forwardFromId, $origDraftId, $attachs)
 			));
+			$draftMsg = $this->getFolderHeadlines($draftFolderId, 0, 1); // newest draft
+			return $this->markMessageRead(true, array($draftMsg[0]->id)); // because Tine saves new draft as unread
 		} catch(Exception $e) {
 			throw new Exception(self::MAILMODULE.'.saveMessageInFolder: '.$e->getMessage());
 		}
-		return $jreq->result;
+		return (object)array('DraftSaved' => 'ok', 'origDraftId' => $origDraftId);
 	}
 
-	private function _buildMessageForSaving($subject, $body, array $to, array $cc, array $bcc, $isImportant=false, $replyToId=null, $forwardFromId=null, array $attachs=array()) {
+	private function _buildMessageForSaving($subject, $body, array $to, array $cc, array $bcc,
+		$isImportant=false, $replyToId=null, $forwardFromId=null, $origDraftId=null, array $attachs=array() )
+	{
 		$recordData = (object)array(
 			'note'            => '0',
 			'content_type'    => 'text/html',
@@ -827,6 +837,9 @@ class Tine {
 		} else if($forwardFromId !== null) { // this email is being forwarded
 			$recordData->original_id = $forwardFromId;
 			$recordData->flags = 'Passed';
+		}
+		if($origDraftId !== null) {
+			$recordData->original_id = $origDraftId; // editing an existing draft
 		}
 		return $recordData;
 	}

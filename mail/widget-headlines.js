@@ -160,6 +160,28 @@ $.fn.headlines = function(options) {
 		exp.buildContextMenu();
 	}
 
+	function _FetchDraftMessage($div, headline, onDone) {
+		if(headline.body === null) { // message content not fetched yet
+			var htmlCheck = $div.find('.headlines_check > [class^=icoCheck]').serialize(); // keep
+			$div.find('.headlines_check > [class^=icoCheck]').replaceWith(
+				$('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
+
+			$.post('../', { r:'getMessage', id:headline.id })
+			.always(function() {
+				$div.find('.throbber').replaceWith(htmlCheck); // restore checkbox
+			}).fail(function(resp) {
+				window.alert('Erro ao carregar email.\n' +
+					'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+			}).done(function(msg) {
+				headline.attachments = msg.attachments; // cache
+				headline.body = msg.body;
+				if(onDone !== undefined) onDone();
+			});
+		} else {
+			if(onDone !== undefined) onDone();
+		}
+	}
+
 	function _MarkRead($elem, asRead) {
 		var relevantHeadlines = [];
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
@@ -181,12 +203,12 @@ $.fn.headlines = function(options) {
 		} else {
 			var htmlCheck = $checkedDivs.find('.icoCheck1:first').serialize(); // keep
 			$checkedDivs.find('.icoCheck1').replaceWith(
-				$('#icons .throbber').clone().css('padding', '8px') );
+				$('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
 			var relevantIds = $.map(relevantHeadlines, function(elem) { return elem.id; });
 
 			$.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:relevantIds.join(',') })
 			.always(function() {
-				$checkedDivs.find('.throbber').replaceWith(htmlCheck);
+				$checkedDivs.find('.throbber').replaceWith(htmlCheck); // restore checkbox
 			}).fail(function(resp) {
 				window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
 					'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -269,7 +291,7 @@ $.fn.headlines = function(options) {
 
 	function _DeleteMessages($elem) {
 		if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
-			_MoveMessages(ThreadMail.FindTrashFolder(userOpts.folderCache));
+			_MoveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
 		} else if(window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
 			var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 			if($checkedDivs.find('.throbber').length) // already working?
@@ -356,7 +378,8 @@ $.fn.headlines = function(options) {
 				curFolder.messages.length = 0;
 				$.merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
 				curFolder.threads.length = 0;
-				$.merge(curFolder.threads, ThreadMail.MakeThreads(headlines)); // in thread: oldest first
+				$.merge(curFolder.threads,
+					ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
 				$targetDiv.append(_BuildAllThreadsDivs());
 				exp.buildContextMenu();
 				if(onDone !== undefined && onDone !== null)
@@ -382,7 +405,8 @@ $.fn.headlines = function(options) {
 		}).done(function(mails2) {
 			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
 			curFolder.threads.length = 0;
-			$.merge(curFolder.threads, ThreadMail.MakeThreads(curFolder.messages)); // rebuild
+			$.merge(curFolder.threads,
+				ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts')); // rebuild
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
 			exp.buildContextMenu();
 			if(onDone !== undefined && onDone !== null)
@@ -408,7 +432,7 @@ $.fn.headlines = function(options) {
 				'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
 		}).done(function(headlines) {
 			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
-			curFolder.threads = ThreadMail.MakeThreads(curFolder.messages);
+			curFolder.threads = ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts'); // in thread: oldest first
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
 			exp.buildContextMenu();
 			if(headl0 !== null)
@@ -503,18 +527,27 @@ $.fn.headlines = function(options) {
 		return exp;
 	};
 
-	$targetDiv.on('click', '.headlines_entry', function(ev) {
+	$targetDiv.on('click', '.headlines_entry', function(ev) { // click on headline
 		if(!ev.shiftKey) {
-			var thread = $(this).data('thread');
-			$targetDiv.find('.headlines_entryCurrent').removeClass('headlines_entryCurrent');
-			$(this).addClass('headlines_entryCurrent');
-			if(onClickCB !== null)
-				onClickCB(thread);
+			var $div = $(this);
+			var thread = $div.data('thread');
+			if(curFolder.globalName === 'INBOX/Drafts') {
+				var headline = thread[0]; // drafts are not supposed to be threaded, so message is always 1st
+				_FetchDraftMessage($div, headline, function() { // get content and remove div from list
+					if(onClickCB !== null)
+						onClickCB([ headline ]); // create a new thread, because the original is destroyed
+				});
+			} else {
+				$targetDiv.find('.headlines_entryCurrent').removeClass('headlines_entryCurrent');
+				$div.addClass('headlines_entryCurrent');
+				if(onClickCB !== null)
+					onClickCB(thread);
+			}
 		}
 		return false;
 	});
 
-	$targetDiv.on('click', '.headlines_check > div', function(ev) {
+	$targetDiv.on('click', '.headlines_check > div', function(ev) { // click on checkbox
 		ev.stopImmediatePropagation();
 		var $chk = $(this);
 		var $divClicked = $chk.closest('div.headlines_entry');

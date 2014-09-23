@@ -273,13 +273,16 @@ class Ajax {
 		else if($_REQUEST['r'] === 'saveMessage')
 		{
 			try {
-				$status = self::$tine->saveMessage($_REQUEST['subject'], $_REQUEST['body'],
+				$status = self::$tine->saveMessage(
+					$_REQUEST['subject'],
+					$_REQUEST['body'],
 					($_REQUEST['to'] != '') ? explode(',', $_REQUEST['to']) : array(),
 					($_REQUEST['cc'] != '') ? explode(',', $_REQUEST['cc']) : array(),
 					($_REQUEST['bcc'] != '') ? explode(', ', $_REQUEST['bcc']) : array(),
 					($_REQUEST['isImportant'] == '1'),
 					($_REQUEST['replyToId'] != '') ? $_REQUEST['replyToId'] : null,
 					($_REQUEST['forwardFromId'] != '') ? $_REQUEST['forwardFromId'] : null,
+					($_REQUEST['origDraftId'] != '') ? $_REQUEST['origDraftId'] : null, // if sending an existing draft
 					($_REQUEST['attachs'] != '') ? json_decode($_REQUEST['attachs']) : array() // array of tempFile objects
 				);
 			} catch(Exception $e) {
@@ -290,13 +293,17 @@ class Ajax {
 		else if($_REQUEST['r'] === 'saveMessageDraft')
 		{
 			try {
-				$status = self::$tine->saveMessageDraft($_REQUEST['subject'], $_REQUEST['body'],
+				$status = self::$tine->saveMessageDraft(
+					$_REQUEST['draftFolderId'],
+					$_REQUEST['subject'],
+					$_REQUEST['body'],
 					($_REQUEST['to'] != '') ? explode(',', $_REQUEST['to']) : array(),
 					($_REQUEST['cc'] != '') ? explode(',', $_REQUEST['cc']) : array(),
 					($_REQUEST['bcc'] != '') ? explode(', ', $_REQUEST['bcc']) : array(),
 					($_REQUEST['isImportant'] == '1'),
 					($_REQUEST['replyToId'] != '') ? $_REQUEST['replyToId'] : null,
 					($_REQUEST['forwardFromId'] != '') ? $_REQUEST['forwardFromId'] : null,
+					($_REQUEST['origDraftId'] != '') ? $_REQUEST['origDraftId'] : null, // if editing an existing draft
 					($_REQUEST['attachs'] != '') ? json_decode($_REQUEST['attachs']) : array() // array of tempFile objects
 				);
 			} catch(Exception $e) {
