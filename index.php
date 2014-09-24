@@ -10,6 +10,7 @@
  */
 
 @session_start();
+require_once(dirname(__FILE__).'/conf.php');
 if(!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
 if(isset($_REQUEST['r'])) { // that's an AJAX request
 	require('inc/Ajax.class.php');
@@ -45,13 +46,14 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 	@media (max-width:767px) { /* phones */
 		#credent { margin:10% auto; }
 		#topgray,#thebg,#blue,#versionInfo { z-index:-1; }
+		#links { position:absolute; bottom:90px; left:12px; width:90%; font-size:90%; text-align:center; }
 	}
 	@media (min-width:768px) { /* everyone else */
 		#credent { position:absolute; right:20%; top:17%; }
+		#links { position:absolute; bottom:20px; left:12px; font-size:90%; }
 	}
 	input[type=text],input[type=password] { height:2.2em; margin:6px; width:180px; }
-	#versionInfo { position:absolute; width:99%; bottom:10px; font-size:80%; text-align:right;
-		color:#AAA; margin:60px auto 0 auto; }
+	#versionInfo { position:absolute; bottom:10px; right:8px; font-size:80%; text-align:right; color:#AAA; }
 	input[type=text]:focus, input[type=password]:focus { box-shadow:0 0 6px #6EA2DE; border:1px solid #6EA2DE; }
 	</style>
 </head>
@@ -67,6 +69,9 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 			<input type="submit" id="btnLogin" value="login"/>
 			<div id="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
 		</form>
+	</div>
+	<div id="links">
+		<a href="<?php echo CLASSIC_URL;?>">Ir para a versão clássica do Expresso</a>
 	</div>
 	<div id="versionInfo"></div>
 </body>
