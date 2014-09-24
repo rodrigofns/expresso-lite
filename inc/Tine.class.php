@@ -425,7 +425,7 @@ class Tine {
 		foreach($jreq->result->results as $mail) {
 			$headlines[] = (object)array(
 				'id'            => $mail->id,
-				'subject'       => $mail->subject !== null ? $mail->subject : '',
+				'subject'       => $mail->subject !== null ? htmlspecialchars($mail->subject) : '',
 				'to'            => $mail->to !== null ? $mail->to : array(),
 				'cc'            => $mail->cc !== null ? $mail->cc : array(),
 				'bcc'           => $mail->bcc !== null ? $mail->bcc : array(), // brings only 1 email
