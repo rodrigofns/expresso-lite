@@ -46,7 +46,7 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 	@media (max-width:767px) { /* phones */
 		#credent { margin:10% auto; }
 		#topgray,#thebg,#blue,#versionInfo { z-index:-1; }
-		#links { position:absolute; bottom:90px; left:12px; width:90%; font-size:90%; text-align:center; }
+		#links { position:absolute; bottom:80px; left:12px; width:90%; font-size:90%; text-align:center; }
 	}
 	@media (min-width:768px) { /* everyone else */
 		#credent { position:absolute; right:20%; top:17%; }
@@ -71,6 +71,15 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 		</form>
 	</div>
 	<div id="links">
+		<?php if(ANDROID_URL != '') { ?>
+		<a href="<?php echo ANDROID_URL?>" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
+		<!-- Google Play é uma marca registrada da Google Inc. -->
+		<?php } ?>
+		<?php if(IOS_URL != '') { ?>
+		<a href="<?php echo IOS_URL?>" title="Baixe na Apple Store™"><img src="img/store-apple.png"/></a>
+		<!-- Apple Store é uma marca registrada da Apple Inc. -->
+		<?php } ?>
+		<br/>
 		<a href="<?php echo CLASSIC_URL;?>">Ir para a versão clássica do Expresso</a>
 	</div>
 	<div id="versionInfo"></div>
