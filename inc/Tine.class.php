@@ -17,7 +17,6 @@ require(dirname(__FILE__).'/JsonRpc.class.php');
 
 class Tine {
 	const MAILMODULE = 'Expressomail'; // Felamimail dropped in Kristina
-	const USERAGENT = 'Mozilla/5.0 (X11; Linux i686; rv:28.0) Gecko/20100101 Firefox/28.0';
 
 	private function _jsonRpc($method, $params=array(), $ignoreErrors=false) {
 		if(!isset($_SESSION['ourtine_url']))
@@ -31,7 +30,7 @@ class Tine {
 		$jsonRpc->headers(array(
 			'Content-Type: application/json; charset=UTF-8',
 			'Connection: Keep-Alive',
-			'User-Agent: '.self::USERAGENT,
+			'User-Agent: '.$_SERVER['HTTP_USER_AGENT'],
 			'DNT: 1',
 			'X-Requested-With: XMLHttpRequest',
 			'X-Tine20-JsonKey: '.(isset($_SESSION['ourtine_jsonkey']) ? $_SESSION['ourtine_jsonkey'] : 'undefined'),
@@ -658,7 +657,7 @@ class Tine {
 		$req->headers(array(
 			'Connection: keep-alive',
 			'DNT: 1',
-			'User-Agent: '.self::USERAGENT,
+			'User-Agent: '.$_SERVER['HTTP_USER_AGENT'],
 			'Pragma: no-cache',
 			'Cache-Control: no-cache'
 		));
@@ -748,7 +747,7 @@ class Tine {
 		$req->headers(array(
 			'Connection: keep-alive',
 			'DNT: 1',
-			'User-Agent: '.self::USERAGENT,
+			'User-Agent: '.$_SERVER['HTTP_USER_AGENT'],
 			'Pragma: no-cache',
 			'Cache-Control: no-cache'
 		));
@@ -762,7 +761,7 @@ class Tine {
 		$req->postFields($rawData);
 		$req->headers(array(
 			'DNT: 1',
-			'User-Agent: '.self::USERAGENT,
+			'User-Agent: '.$_SERVER['HTTP_USER_AGENT'],
 			'X-File-Name: '.$fileDisplayName,
 			'X-File-Size: 0',
 			'X-File-Type: '.$mimeType,

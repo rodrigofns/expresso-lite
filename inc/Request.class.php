@@ -63,11 +63,11 @@ class Request
 
 	private function _currentCookies()
 	{
-		$str = '';
+		$vals = array();
 		foreach($_COOKIE as $name => $val)
 			if(strcmp($name, 'PHPSESSID') !== 0)
-				$str .= $name.'='.$val.';';
-		return rtrim($str, ';');
+				$vals[] = ($name.'='.$val);
+		return implode('; ', $vals);
 	}
 
 	private function _isImage($res)
@@ -106,6 +106,7 @@ class Request
 					switch($pair[0]) {
 					case 'path':     $coo->path = $pair[1]; break;
 					case 'HttpOnly': $coo->httpOnly = true; break;
+					case 'secure':   $coo->secure = true;   break;
 					case 'expires':
 						$dtt = DateTime::createFromFormat('D, d-M-Y H:i:s T', $pair[1]);
 						$coo->expires = $dtt->getTimestamp();
@@ -115,8 +116,7 @@ class Request
 						$coo->value = $pair[1];
 					}
 				}
-				setcookie($coo->name, $coo->value, $coo->expires, $coo->path,
-					$coo->domain, $coo->secure, $coo->httpOnly);
+				setcookie($coo->name, $coo->value, $coo->expires); // ignore other cookie information
 			}
 		}
 		return json_decode($lines[count($lines) - 1]);
