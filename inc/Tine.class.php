@@ -104,7 +104,7 @@ class Tine {
 		} catch(Exception $e) {
 			throw new Exception('Tinebase.getAllRegistryData: '.$e->getMessage());
 		}
-		if($validateLogin) {error_log($jreq->result->Tinebase->currentAccount->accountLoginName);
+		if($validateLogin) {
 			if(!isset($jreq->result->{self::MAILMODULE}))
 				throw new Exception('Tinebase.getAllRegistryData: Mail info not returned.');
 			$_SESSION['ourtine_id'] = $jreq->result->{self::MAILMODULE}->accounts->results[0]->id;
@@ -116,6 +116,7 @@ class Tine {
 				'from'         => $jreq->result->{self::MAILMODULE}->accounts->results[0]->from,
 				'signature'    => $jreq->result->{self::MAILMODULE}->accounts->results[0]->signature,
 				'user'         => $jreq->result->Tinebase->currentAccount->accountLoginName,
+				'addrCatalog'  => '/personal/'.$jreq->result->Tinebase->currentAccount->accountId,
 				'lastLogin'    => $jreq->result->Tinebase->currentAccount->accountLastLogin,
 				'jsonKey'      => $jreq->result->Tinebase->jsonKey
 			);
@@ -124,7 +125,7 @@ class Tine {
 		}
 	}
 
-	public function getPersonalContacts($personalId) {
+	public function getPersonalContacts($addrCatalog) {
 		try {
 			$jreq = $this->_jsonRpc('Addressbook.searchEmailAddresss', (object)array(
 				'filter' => array(
@@ -141,7 +142,7 @@ class Tine {
 					(object)array(
 						'field'    => 'container_id',
 						'operator' => 'equals',
-						'value'    => '/personal/'.$personalId
+						'value'    => $addrCatalog
 					)
 				),
 				'paging' => (object)array(

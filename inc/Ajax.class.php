@@ -61,11 +61,12 @@ class Ajax {
 				self::_HttpError(500, $e->getMessage());
 			}
 			if($_REQUEST['validateLogin'] == 1) {
-				$_SESSION['user_email']     = $ud->email;
-				$_SESSION['user_login']     = $ud->user; // cpf
-				$_SESSION['user_name']      = $ud->from;
-				$_SESSION['user_org']       = $ud->organization;
-				$_SESSION['user_signature'] = htmlspecialchars($ud->signature);
+				$_SESSION['user_email']       = $ud->email;
+				$_SESSION['user_login']       = $ud->user; // cpf
+				$_SESSION['user_name']        = $ud->from;
+				$_SESSION['user_org']         = $ud->organization;
+				$_SESSION['user_signature']   = htmlspecialchars($ud->signature);
+				$_SESSION['user_addrCatalog'] = $ud->addrCatalog; // path to addressbook contacts
 			}
 			self::_EchoJson($ud);
 		}
@@ -86,8 +87,7 @@ class Ajax {
 		else if($_REQUEST['r'] === 'getPersonalContacts')
 		{
 			try {
-				$personalId = ltrim(substr($_SESSION['user_login'], 0, 9), '0'); // cpf without last two digits
-				$contacts = self::$tine->getPersonalContacts($personalId);
+				$contacts = self::$tine->getPersonalContacts($_SESSION['user_addrCatalog']);
 			} catch(Exception $e) {
 				self::_HttpError(500, $e->getMessage());
 			}
