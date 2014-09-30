@@ -126,9 +126,7 @@ $.fn.headlines = function(options) {
 		'<div class="headlines_check"><div class="icoCheck0" role="checkbox"></div></div>' +
 			'<div class="headlines_sender">'+_BuildSendersText(thread, isSentFolder)+'</div>' +
 			'<div class="headlines_highlight">'+$elemHl.serialize()+'</div>' +
-			'<div class="headlines_subject">' +
-				(thread[thread.length-1].subject != '' ? thread[thread.length-1].subject : '(sem assunto)') +
-			'</div>' +
+			'<div class="headlines_subject"></div>' +
 			'<div class="headlines_icons">' +
 				(hasReplied    ? $('#icons .icoReplied').serialize()   : '')+' ' +
 				(wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
@@ -139,6 +137,8 @@ $.fn.headlines = function(options) {
 			'</div>' +
 			'<div class="headlines_when">'+DateFormat.Humanize(thread[0].received)+'</div>' +
 			'</div>');
+		$div.find('.headlines_subject').text(thread[thread.length-1].subject != '' ?
+			thread[thread.length-1].subject : '(sem assunto)');
 		$div.data('thread', thread); // keep thread object within DIV
 		return $div;
 	}
