@@ -129,7 +129,7 @@ $.fn.folders = function(options) {
 					'Atualize a página para tentar novamente.\n' + resp.responseText);
 			}).done(function(folders) {
 				userOpts.folderCache.length = 0;
-				$.merge(userOpts.folderCache, folders); // cache
+				userOpts.folderCache.push.apply(userOpts.folderCache, folders); // cache
 				_BuildUl(folders, true).appendTo($targetDiv);
 				_BuildContextMenu();
 				if(onDone !== undefined && onDone !== null) onDone();
@@ -145,7 +145,7 @@ $.fn.folders = function(options) {
 					resp.responseText);
 			}).done(function(subfolders) {
 				parentFolder.subfolders.length = 0;
-				$.merge(parentFolder.subfolders, subfolders); // cache
+				parentFolder.subfolders.push.apply(parentFolder.subfolders, subfolders); // cache
 				_BuildUl(subfolders, false).appendTo($li);
 				_BuildContextMenu();
 				if(onDone !== undefined && onDone !== null) onDone();

@@ -185,16 +185,15 @@ var ThreadMail = (function() {
 	exp.RemoveHeadlinesFromFolder = function(msgIds, folder) {
 		for(var i = folder.messages.length - 1; i >= 0; --i) {
 			if(msgIds.indexOf(folder.messages[i].id) !== -1)
-				folder.messages.splice(i, 1); // remove headline from flat headlines array
+				folder.messages.splice(i, 1); // remove headline from flat headlines array of folder
 		}
 		for(var i = folder.threads.length - 1; i >= 0; --i) {
-			for(var j = folder.threads[i].length - 1; j >= 0; --j) {
-				if(msgIds.indexOf(folder.threads[i][j].id) !== -1) {
-					folder.threads[i].splice(j, 1); // remove headline from thread
-					break;
-				}
+			var thread = folder.threads[i]; // a thread is an array of headlines
+			for(var j = thread.length - 1; j >= 0; --j) {
+				if(msgIds.indexOf(thread[j].id) !== -1)
+					thread.splice(j, 1); // remove headline from thread
 			}
-			if(!folder.threads[i].length) // thread is empty now, remove it from folder
+			if(!thread.length) // thread is empty now, remove it from folder
 				folder.threads.splice(i, 1);
 		}
 	};

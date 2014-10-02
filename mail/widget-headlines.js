@@ -209,6 +209,8 @@ $.fn.headlines = function(options) {
 			$.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:relevantIds.join(',') })
 			.always(function() {
 				$checkedDivs.find('.throbber').replaceWith(htmlCheck); // restore checkbox
+				if(onMarkReadCB !== null)
+					onMarkReadCB(curFolder);
 			}).fail(function(resp) {
 				window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
 					'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -217,8 +219,6 @@ $.fn.headlines = function(options) {
 					_RedrawDiv($(elem));
 				});
 			});
-
-			if(onMarkReadCB !== null) onMarkReadCB(curFolder);
 		}
 	}
 
@@ -226,10 +226,10 @@ $.fn.headlines = function(options) {
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 		if($checkedDivs.find('.throbber').length) // already working?
 			return;
-		var headlines = [];
-		$checkedDivs.each(function(idx, elem) {
-			var thread = $(elem).data('thread');
-			$.merge(headlines, thread);
+		var headlines = []; // will hold all individual headlines
+		$checkedDivs.each(function(idx, elem) { // each selected row
+			var thread = $(elem).data('thread'); // thread to be moved, a thread is an array of headlines
+			headlines.push.apply(headlines, thread);
 			$(elem).children('.headlines_sender').html($('#icons .throbber').serialize() +
 				'&nbsp; <i>Movendo para '+destFolder.localName+'...</i>');
 
@@ -299,7 +299,7 @@ $.fn.headlines = function(options) {
 			var headlines = [];
 			$checkedDivs.each(function(idx, elem) {
 				var thread = $(elem).data('thread');
-				$.merge(headlines, thread);
+				headlines.push.apply(headlines, thread);
 				$(elem).children('.headlines_sender').html($('#icons .throbber').serialize() +
 					'&nbsp; <i>Excluindo...</i>');
 
@@ -376,9 +376,9 @@ $.fn.headlines = function(options) {
 				window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
 			}).done(function(headlines) {
 				curFolder.messages.length = 0;
-				$.merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
+				curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
 				curFolder.threads.length = 0;
-				$.merge(curFolder.threads,
+				curFolder.threads.push.apply(curFolder.threads,
 					ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
 				$targetDiv.append(_BuildAllThreadsDivs());
 				exp.buildContextMenu();
@@ -405,7 +405,7 @@ $.fn.headlines = function(options) {
 		}).done(function(mails2) {
 			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
 			curFolder.threads.length = 0;
-			$.merge(curFolder.threads,
+			curFolder.threads.push.apply(curFolder.threads,
 				ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts')); // rebuild
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
 			exp.buildContextMenu();

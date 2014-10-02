@@ -75,7 +75,7 @@
 		Cache.lstFolder.onTreeChanged(function() { Cache.lstHeadline.buildContextMenu(); });
 		Cache.lstFolder.onFolderUpdated(LoadNewHeadlines);
 		Cache.lstHeadline.onClick(HeadlineClicked);
-		Cache.lstHeadline.onMarkRead(function(folder) { CloseMailView(); Cache.lstFolder.redraw(folder); });
+		Cache.lstHeadline.onMarkRead(function(folder) { CloseMailView(); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
 		Cache.lstHeadline.onMove(ThreadMoved);
 		Cache.lstMessage.onView(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
 		Cache.lstMessage.onMarkRead(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
