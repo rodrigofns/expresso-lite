@@ -25,7 +25,7 @@ if(!Tine::isLogged()) header('location: ../');
 	<script src="../inc/UrlStack.js"></script>
 	<script src="../inc/DateFormat.js"></script>
 	<script src="../inc/sprintf.min.js"></script>
-	<script src="../inc/jquery-2.1.0.min.js"></script>
+	<script src="../inc/jquery-2.1.1.min.js"></script>
 	<script src="../inc/toe.min.js"></script>
 	<script src="../inc/jquery-serialize.js"></script>
 	<script src="../inc/jquery-contextMenu.js"></script>

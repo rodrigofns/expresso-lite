@@ -29,7 +29,7 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1"/>
 	<link rel="stylesheet" href="inc/general.css"/>
 	<title>Expresso Lite</title>
-	<script src="inc/jquery-2.1.0.min.js"></script>
+	<script src="inc/jquery-2.1.1.min.js"></script>
 	<script src="inc/jquery-serialize.js"></script>
 	<script src="login.js"></script>
 	<style>
