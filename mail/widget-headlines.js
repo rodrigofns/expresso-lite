@@ -156,7 +156,10 @@ $.fn.headlines = function(options) {
 			$newDiv.find('.headlines_check').hide();
 		if($div.hasClass('headlines_entryCurrent'))
 			$newDiv.addClass('headlines_entryCurrent');
+		var isChecked = $div.hasClass('headlines_entryChecked');
 		$div.replaceWith($newDiv);
+		if(isChecked)
+			$newDiv.find('.headlines_check > div').trigger('click');
 		exp.buildContextMenu();
 	}
 
@@ -183,12 +186,12 @@ $.fn.headlines = function(options) {
 	}
 
 	function _MarkRead($elem, asRead) {
-		var relevantHeadlines = [];
+		var relevantHeadlines = []; // headlines to have their flag actually changed
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 
 		$checkedDivs.each(function(idx, elem) {
 			var $div = $(elem);
-			var thread = $div.data('thread');
+			var thread = $div.data('thread'); // a thread is an array of messages
 			for(var i = 0; i < thread.length; ++i) {
 				if((asRead && thread[i].unread) || (!asRead && !thread[i].unread)) {
 					thread[i].unread = !thread[i].unread; // update cache

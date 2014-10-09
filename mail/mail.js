@@ -78,7 +78,7 @@
 		Cache.lstHeadline.onMarkRead(function(folder) { CloseMailView(); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
 		Cache.lstHeadline.onMove(ThreadMoved);
 		Cache.lstMessage.onView(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
-		Cache.lstMessage.onMarkRead(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
+		Cache.lstMessage.onMarkRead(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
 		Cache.lstMessage.onMove(MailMoved);
 		Cache.wndCompose.onClose(function() { $('#composeFoldersSlot').show(); });
 		Cache.wndCompose.onSend(MailSent);
@@ -203,6 +203,7 @@
 			Cache.lstFolder.redraw(destFolder);
 		Cache.lstFolder.redraw(Cache.lstFolder.getCurrent());
 		UpdateHeadlineFooter();
+		UpdatePageTitle();
 	}
 
 	function MailMoved(destFolder, origThread) {
