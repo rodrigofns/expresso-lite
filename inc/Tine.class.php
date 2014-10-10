@@ -306,7 +306,7 @@ class Tine {
 	private static function _BreakQuotedMessage($message) {
 		$patterns = array(
 			'/--+\s?((Mensagem encaminhada)|(Mensagem original)|(Original message)|(Originalnachricht))\s?--+/',
-			'/(<((div)|(font))(.{1,50})>)?Em \d+(\/|\.|-)\d+(\/|\.|-)\d+,? (a|à)s \d+:\d+( horas)?, (.{1,256})escreveu:/',
+			'/(<((div)|(font))(.{1,50})>)?Em \d+(\/|\.|-)\d+(\/|\.|-)\d+,? (a|à)(s|\(s\)) \d+:\d+( horas)?, (.{1,256})escreveu:/',
 			'/(<((div)|(font))(.{1,50})>)?Em \d+(\/|\.|-)\d+(\/|\.|-)\d+ \d+:\d+(:\d+)?, (.{1,256})escreveu:/',
 			'/(<((div)|(font))(.{1,50})>)?Em \d+ de (.{1,9}) de \d+ \d+:\d+(:\d+)?, (.{1,256})escreveu:/',
 			'/((On)|(Am)) \d{1,2}(\/|\.|-)\d{1,2}(\/|\.|-)\d{4} \d\d:\d\d(:\d\d)?, (.{1,256})((wrote)|(schrieb)):?/'
