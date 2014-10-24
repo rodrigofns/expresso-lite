@@ -28,34 +28,11 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1"/>
 	<link rel="stylesheet" href="inc/general.css"/>
+	<link rel="stylesheet" href="login.css"/>
 	<title>Expresso Lite</title>
 	<script src="inc/jquery-2.1.1.min.js"></script>
 	<script src="inc/jquery-serialize.js"></script>
 	<script src="login.js"></script>
-	<style>
-	#topgray { position:absolute; top:0; height:70%; width:100%; background-color:#DADADA; }
-	#thebg { position:absolute; top:30%; height:40%; width:100%;
-		background-image:url("img/fondo.jpg"); background-position:50% 70%; background-size:100%;
-		border-top:1px solid #CDCDCD; }
-	#blue { position:absolute; top:70%; width:100%; height:8px; background:#005A97; }
-	#credent { max-width:240px; background-color:rgba(255,255,255,.88); text-align:center;
-		border:1px solid #E2E2E2; padding:10px; box-shadow:2px 2px 6px #999; }
-	#btnLogin { margin:3px 0; }
-	#throbber { display:none; margin:6px 0; }
-	#throbber > span { font-style:italic; color:#666; -moz-user-select:none; -webkit-user-select:none; }
-	@media (max-width:767px) { /* phones */
-		#credent { margin:10% auto; }
-		#topgray,#thebg,#blue,#versionInfo { z-index:-1; }
-		#links { position:absolute; bottom:80px; left:12px; width:90%; font-size:90%; text-align:center; }
-	}
-	@media (min-width:768px) { /* everyone else */
-		#credent { position:absolute; right:20%; top:17%; }
-		#links { position:absolute; bottom:20px; left:12px; font-size:90%; }
-	}
-	input[type=text],input[type=password] { height:2.2em; margin:6px; width:180px; }
-	#versionInfo { position:absolute; bottom:10px; right:8px; font-size:80%; text-align:right; color:#AAA; }
-	input[type=text]:focus, input[type=password]:focus { box-shadow:0 0 6px #6EA2DE; border:1px solid #6EA2DE; }
-	</style>
 </head>
 <body>
 	<div id="topgray"></div>
