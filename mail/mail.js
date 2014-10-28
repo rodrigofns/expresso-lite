@@ -15,6 +15,7 @@
 		lstFolder: null, // folder rendering widget
 		lstHeadline: null, // headline rendering widget
 		lstMessage: null, // message bodies rendering widget
+		menuHeadlines: null, // dropdown menu for headlines actions
 		wndCompose: null // compose modeless popup
 	};
 
@@ -27,6 +28,7 @@
 		Cache.lstHeadline = $('#headlinesArea').headlines({ folderCache:Cache.folders });
 		Cache.lstMessage = $('#messagesArea').messages({ folderCache:Cache.folders,
 			contactsCache:Cache.contacts, wndCompose:Cache.wndCompose });
+		Cache.menuHeadlines = $('#headerHeadlinesDropdown').dropdownMenu({ });
 
 		// Setup all page events.
 		SetupEvents();
@@ -36,11 +38,11 @@
 		$(window).trigger('resize');
 		$('#leftColumn').addClass('foldersShown'); // show folders popup in phones
 		$('#headerCloseMessage').addClass('headerElemHidden'); // initally hidden; phones
-		$('#update,#headlinesFooter').hide();
+		$('#headerHeadlinesMenu,#updateFolders,#headlinesFooter').hide();
 
 		Cache.lstFolder.loadRoot(function() {
-			$('#update').show();
 			CloseFoldersMenu();
+			$('#updateFolders').show();
 			Cache.lstFolder.expand(Cache.folders[0]); // expand 1st folder (probably inbox)
 			Cache.lstFolder.setCurrent(Cache.folders[0], 'noClickEvent'); // ...and select it
 			Contacts.loadPersonal();
@@ -52,8 +54,8 @@
 			window.clearTimeout(AjaxComplete.timer);
 		AjaxComplete.timer = window.setTimeout(function() {
 			AjaxComplete.timer = null;
-			Cache.lstFolder.updateAll();
-		}, 10 * 60 * 1000); // 10 minutes
+			$('#updateFolders').trigger('click');
+		}, 10 * 60 * 1000); // 10 minutes after the last request, an update will be performed (keep-alive)
 	});
 
 	function SetupEvents() {
@@ -66,15 +68,17 @@
 		});
 
 		$('.logoff').on('click', DoLogoff);
+		$('#updateFolders').on('click', UpdateFolders);
 		$('.compose').on('click', function() { Cache.wndCompose.show({ curFolder:Cache.lstFolder.getCurrent() }); });
 		$('#headerMenu').on('click', FoldersMenuClick);
 		$('#loadMore').on('click', LoadMoreHeadlines);
 		$('#closeMessages,#headerCloseMessage').on('click', CloseMailView);
 
 		Cache.lstFolder.onClick(LoadFirstHeadlines);
-		Cache.lstFolder.onTreeChanged(function() { Cache.lstHeadline.buildContextMenu(); });
+		//~ Cache.lstFolder.onTreeChanged(function() { Cache.lstHeadline.buildContextMenu(); });
 		Cache.lstFolder.onFolderUpdated(LoadNewHeadlines);
 		Cache.lstHeadline.onClick(HeadlineClicked);
+		Cache.lstHeadline.onCheck(HeadlineChecked);
 		Cache.lstHeadline.onMarkRead(function(folder) { CloseMailView(); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
 		Cache.lstHeadline.onMove(ThreadMoved);
 		Cache.lstMessage.onView(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
@@ -109,6 +113,15 @@
 		var folder = Cache.lstFolder.getCurrent();
 		var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
 		document.title = folder.localName+' '+counter+'- '+$('.userAddr:first').text()+' - Expresso Lite';
+	}
+
+	function UpdateFolders() {
+		$('#updateFolders').hide();
+		$('#updateFoldersWait').show();
+		Cache.lstFolder.updateAll(function() {
+			$('#updateFoldersWait').hide();
+			$('#updateFolders').show();
+		});
 	}
 
 	function FoldersMenuClick() {
@@ -168,11 +181,13 @@
 	}
 
 	function OpenMailView() {
-		if(!$('#rightColumn').hasClass('messagesShown')) {
+		var isMessagesOpened = $('#rightColumn').hasClass('messagesShown');
+		if(!isMessagesOpened) {
 			CloseFoldersMenu();
 			$('#leftColumn').addClass('foldersForReading'); // folder tree is hidden both in desktop and phone
 			$('#headerMenu').addClass('headerElemHidden'); // in phones, hide folders menu
 			$('#headerCloseMessage').removeClass('headerElemHidden'); // ...and show specific back button
+			$('#headerHeadlinesMenu').hide();
 
 			$('#centerColumn').addClass('headlinesForReading'); // desktop, goes left and small; phone, hides
 			$('#rightColumn').addClass('messagesShown'); // desktop, gets 1/3 of screen; phone, whole screen
@@ -188,13 +203,40 @@
 			Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
 		} else {
 			OpenMailView();
-			$('#subjectText').text(thread[thread.length - 1].subject);
+			$('#subjectText').text(thread[thread.length-1].subject);
 			Cache.lstMessage.render(thread, curFolder); // headlines sorted newest first
 		}
 
 		var cyPos = Cache.lstHeadline.calcScrollTopOf(thread), // scroll headlines to have selected at center
 			cyHalf = $('#centerColumn').outerHeight() / 2;
 		$('#centerColumn').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
+	}
+
+	function HeadlineChecked() {
+		var isMessagesOpened = $('#rightColumn').hasClass('messagesShown');
+		$('#headerHeadlinesMenu').toggle(!isMessagesOpened && Cache.lstHeadline.getChecked().length > 0); // show dropdown button if any checked
+		Cache.menuHeadlines.purge(); // rebuild context dropdown menu
+
+		Cache.menuHeadlines
+			.addOption('Desselecionar todas', Cache.lstHeadline.clearChecked)
+			.addOption('Marcar como lida', function() { Cache.lstHeadline.markRead(true); })
+			.addOption('Marcar como não lida', function() { Cache.lstHeadline.markRead(false); })
+			.addOption('Alterar destaque', Cache.lstHeadline.toggleStarred)
+			.addOption('Apagar', Cache.lstHeadline.deleteMessages)
+			.addHeader('Mover para...');
+
+		var curFolder = Cache.lstFolder.getCurrent();
+		var MenuRenderFolderLevel = function(folders, level) {
+			$.each(folders, function(idx, folder) {
+				if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
+					Cache.menuHeadlines.addOption(folder.localName, function() {
+						Cache.lstHeadline.moveMessages(folder); // pass folder object
+					}, level); // indentation
+				}
+				MenuRenderFolderLevel(folder.subfolders, level + 1);
+			});
+		};
+		MenuRenderFolderLevel(Cache.folders, 0);
 	}
 
 	function ThreadMoved(destFolder) {
@@ -222,6 +264,7 @@
 
 		$('#headerCloseMessage').addClass('headerElemHidden'); // in phones, hide back button
 		$('#headerMenu').removeClass('headerElemHidden'); // ...and show folders menu
+		$('#headerHeadlinesMenu').toggle(Cache.lstHeadline.getChecked().length > 0);
 
 		$('#leftColumn').removeClass('foldersForReading');
 		$('#centerColumn').removeClass('headlinesForReading');

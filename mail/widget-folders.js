@@ -108,14 +108,6 @@ $.fn.folders = function(options) {
 		});
 	}
 
-	function _BuildContextMenu() {
-		(menu === null) ?
-			menu = $targetDiv.contextMenu({ selector:'.folders_text' }) : // create menu object
-			menu.purge();
-		menu.add('Atualizar pasta', function($elem) { _UpdateOneFolder($elem); });
-		menu.add('Atualizar subpastas', function($elem) { _UpdateSubfolders($elem); });
-	}
-
 	function _LoadSubfolders(parentFolder, onDone) {
 		var $divLoading = $('<div class="loadingMessage">' +
 			'Carregando pastas... '+$('#icons .throbber').serialize()+'</div>');
@@ -131,7 +123,6 @@ $.fn.folders = function(options) {
 				userOpts.folderCache.length = 0;
 				userOpts.folderCache.push.apply(userOpts.folderCache, folders); // cache
 				_BuildUl(folders, true).appendTo($targetDiv);
-				_BuildContextMenu();
 				if(onDone !== undefined && onDone !== null) onDone();
 			});
 		} else { // non-root folder
@@ -147,7 +138,6 @@ $.fn.folders = function(options) {
 				parentFolder.subfolders.length = 0;
 				parentFolder.subfolders.push.apply(parentFolder.subfolders, subfolders); // cache
 				_BuildUl(subfolders, false).appendTo($li);
-				_BuildContextMenu();
 				if(onDone !== undefined && onDone !== null) onDone();
 				if(onTreeChangedCB !== null) onTreeChangedCB();
 			});
@@ -177,7 +167,6 @@ $.fn.folders = function(options) {
 		if($div.hasClass('folders_current'))
 			$newDiv.addClass('folders_current');
 		$div.replaceWith($newDiv);
-		_BuildContextMenu();
 		return exp;
 	};
 

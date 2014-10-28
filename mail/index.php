@@ -26,9 +26,8 @@ if(!Tine::isLogged()) header('location: ../');
 	<script src="../inc/DateFormat.js"></script>
 	<script src="../inc/sprintf.min.js"></script>
 	<script src="../inc/jquery-2.1.1.min.js"></script>
-	<script src="../inc/toe.min.js"></script>
 	<script src="../inc/jquery-serialize.js"></script>
-	<script src="../inc/jquery-contextMenu.js"></script>
+	<script src="../inc/jquery-dropdownMenu.js"></script>
 	<script src="../inc/jquery-modelessDialog.js"></script>
 	<script src="../inc/jquery-uploadFile.js"></script>
 	<script src="Contacts.js"></script>
@@ -43,17 +42,20 @@ if(!Tine::isLogged()) header('location: ../');
 </head>
 <body>
 	<header id="bigheader">
-		<div id="headerStatic"><img style="width:120px;" src="../img/logo-lite-165.png"/></div>
+		<div id="headerLogo"><img src="../img/logo-lite-165.png"/></div>
 		<div id="headerMenu">&laquo; <span id="headerMenuFolderName"></span>
 			<span id="headerFolderCounter" class="folders_counter"></span></div>
 		<div id="headerCloseMessage">&laquo; <span>voltar &nbsp;</span></div>
 		<div id="headerCompose"><input type="button" class="compose" value="escrever" title="Escrever um novo email"/></div>
 		<div id="headerLogoff"><div class="userAddr"><?=$_SESSION['user_email']?></div> &nbsp;
 			<input type="button" class="logoff" value="logoff"/></div>
+		<div id="headerHeadlinesMenu"><input id="headerHeadlinesDropdown" type="button" value="menu"/></div>
 	</header>
 	<section id="bigbody">
 		<aside id="leftColumn">
-			<div id="composeFoldersSlot"><input type="button" class="compose" value="escrever" title="Escrever um novo email"/></div>
+			<input type="button" id="updateFolders" value="atualizar" title="Atualizar lista de pastas"/>
+			<span id="updateFoldersWait">... &nbsp;</span>
+			<span id="composeFoldersSlot"><input type="button" class="compose" value="escrever" title="Escrever um novo email"/></span>
 			<div id="foldersArea"></div>
 			<div id="logoffFoldersSlot"><span class="userAddr"><?=$_SESSION['user_email']?></span><br/><br/>
 				<input type="button" class="logoff" value="logoff" title="Sair do Expresso Lite"/></div>
@@ -73,7 +75,46 @@ if(!Tine::isLogged()) header('location: ../');
 			<div id="messagesArea"></div>
 		</section>
 	</section>
-	<section id="composePanel">
+	<section id="templates">
+		<div class="headlines_entry"><!-- template for each headline -->
+			<div class="headlines_check"><div class="icoCheck0"></div></div>
+			<div class="headlines_sender"></div>
+			<div class="headlines_highlight"></div>
+			<div class="headlines_subject"></div>
+			<div class="headlines_icons"></div>
+			<div class="headlines_when"></div>
+		</div>
+		<div class="messages_unit"><!-- template for each message -->
+			<div class="messages_top1">
+				<div class="messages_mugshot"><img src=""/></div>
+				<div class="messages_from">
+					<div class="messages_fromName"></div>
+					<div class="messages_fromMail"></div>
+				</div>
+				<div class="messages_icons"></div>
+				<div class="messages_when"></div>
+			</div>
+			<div class="messages_top2">
+				<input class="messages_dropdown" type="button" value="menu"/>
+				<div class="messages_people">
+					<div class="messages_addr"><b>Para:</b> <span class="messages_addrTo"></span></div>
+					<div class="messages_addr"><b>Cc:</b> <span class="messages_addrCc"></span></div>
+					<div class="messages_addr"><b>Bcc:</b> <span class="messages_addrBcc"></span></div>
+				</div>
+			</div>
+			<div class="messages_attachs"></div>
+			<div class="messages_content">
+				<div class="messages_body"></div>
+				<input class="messages_showQuote" type="button" value="citações" title="Ver citações encaminhadas na mensagem"/>
+				<div class="messages_quote"></div>
+			</div>
+		</div>
+		<span class="messages_addrPerson"><!-- template for an address in message grey top header -->
+			<span class="messages_addrName"></span>
+			<span class="messages_addrDomain"></span>
+		</span>
+	</section>
+	<section id="composePanel"><!-- will be shown into a non-modal window -->
 		<div><input type="text" id="composePanel_subject" placeholder="Assunto..."/></div>
 		<div id="composePanel_toggs">
 			<a id="composePanel_toBtn" href="#" title="Adicionar destinatários do email">Para...</a> &nbsp;
@@ -93,7 +134,7 @@ if(!Tine::isLogged()) header('location: ../');
 				class="icoImportant" title="Marcar esta mensagem como importante"></div></label>
 		</div>
 	</section>
-	<div id="icons">
+	<div id="icons"><!-- icon templates -->
 		<img class="throbber" src="../img/chromiumthrobber.svg"/>
 		<div class="icoReplied" title="Você respondeu este email"></div>
 		<div class="icoConfirm" title="O remetente deste email receberá uma confirmação de leitura"></div>

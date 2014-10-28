@@ -42,11 +42,33 @@ $.fn.messages = function(options) {
 		if(!addrs.length) return '<i>(ninguém)</i>';
 		var ret = '';
 		for(var i = 0; i < addrs.length; ++i) {
+			var $span = $('#templates .messages_addrPerson').clone();
 			var ad = addrs[i].toLowerCase();
-			ret += '<span class="messages_addrName">'+ad.substr(0, ad.indexOf('@'))+'</span>' +
-				'<span class="messages_addrDomain">'+ad.substr(ad.indexOf('@'))+'</span>, ';
+			ret += $span.find('.messages_addrName').text( ad.substr(0, ad.indexOf('@')) ).serialize() +
+				$span.find('.messages_addrDomain').text( ad.substr(ad.indexOf('@')) ).serialize() + ', ';
 		}
 		return ret.substr(0, ret.length - 2);
+	}
+
+	function _BuildDropdownMenu($divUnit) {
+		var menu = $divUnit.find('.messages_dropdown').dropdownMenu({ });
+		menu.addOption('Marcar como não lida', function() { _MarkRead($divUnit, false); })
+			.addOption('Responder', function() { _NewMail($divUnit, 're'); })
+			.addOption('Encaminhar', function() { _NewMail($divUnit, 'fwd'); })
+			.addOption('Apagar', function() { _DeleteMessage($divUnit); })
+			.addHeader('Mover para...');
+
+		var MenuRenderFolderLevel = function(folders, level) {
+			$.each(folders, function(idx, folder) {
+				if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
+					menu.addOption(folder.localName, function() {
+						_MoveMessage($divUnit, folder); // pass folder object
+					}, level); // indentation
+				}
+				MenuRenderFolderLevel(folder.subfolders, level + 1);
+			});
+		};
+		MenuRenderFolderLevel(userOpts.folderCache, 0);
 	}
 
 	function _BuildIcons(headline) {
@@ -62,29 +84,27 @@ $.fn.messages = function(options) {
 		var mugshot = Contacts.getMugshotSrc(headline.from.email);
 		if(mugshot === '')
 			mugshot = userOpts.genericMugshot;
-		var $div = $('<div class="messages_unit">' +
-			'<div class="messages_top1 messages_'+(headline.unread?'unread':'read')+'">' +
-				'<div class="messages_mugshot"><img src="'+mugshot+'"/></div>' +
-				'<div class="messages_from">' +
-					'<div class="messages_fromName">'+headline.from.name+'</div> ' +
-					'<div class="messages_fromMail">('+headline.from.email+')</div>' +
-				'</div>' +
-				'<div class="messages_icons">'+_BuildIcons(headline)+'</div>' +
-				'<div class="messages_when">'+DateFormat.Long(headline.received)+'</div>' +
-			'</div>' +
-			'<div class="messages_top2 messages_'+(headline.unread?'unread':'read')+'">' +
-				'<div class="messages_addr"><b>Para:</b> '+_FormatManyAddresses(headline.to)+'</div>' +
-				(headline.cc.length ?
-				'<div class="messages_addr"><b>Cc:</b> '+_FormatManyAddresses(headline.cc)+'</div>' : '') +
-				(headline.bcc.length ?
-				'<div class="messages_addr"><b>Bcc:</b> '+_FormatManyAddresses(headline.bcc)+'</div>' : '') +
-			'</div>' +
-			'<div class="messages_attachs"></div>' +
-			'<div class="messages_content">' +
-				'<div class="messages_body"></div>' +
-				'<input class="messages_showQuote" type="button" value="citações" title="Ver citações encaminhadas na mensagem"/>' +
-				'<div class="messages_quote"></div>' +
-			'</div>');
+
+		var unreadClass = headline.unread ? 'messages_unread' : 'messages_read';
+
+		var $div = $('#templates .messages_unit').clone();
+		$div.find('.messages_top1').addClass(unreadClass);
+		$div.find('.messages_mugshot > img').attr('src', mugshot);
+		$div.find('.messages_fromName').text(headline.from.name);
+		$div.find('.messages_fromMail').text('('+headline.from.email+')');
+		$div.find('.messages_icons').html(_BuildIcons(headline));
+		$div.find('.messages_when').text(DateFormat.Long(headline.received));
+		$div.find('.messages_top2').addClass(unreadClass);
+		$div.find('.messages_addrTo').html(_FormatManyAddresses(headline.to));
+		headline.cc.length ?
+			$div.find('.messages_addrCc').html(_FormatManyAddresses(headline.cc)) :
+			$div.find('.messages_addrCc').parent().remove();
+		headline.bcc.length ?
+			$div.find('.messages_addrBcc').html(_FormatManyAddresses(headline.bcc)) :
+			$div.find('.messages_addrBcc').parent().remove();
+
+		_BuildDropdownMenu($div);
+
 		$div.data('headline', headline); // keep object
 		return $div;
 	}
@@ -215,31 +235,6 @@ $.fn.messages = function(options) {
 		}
 	}
 
-	function _BuildContextMenu() {
-		(menu === null) ?
-			menu = $targetDiv.contextMenu({ selector:'.messages_top1,.messages_top2' }) : // create menu object
-			menu.purge();
-		menu.add('Marcar como lida', function($elem) { _MarkRead($elem, true); });
-		menu.add('Marcar como não lida', function($elem) { _MarkRead($elem, false); });
-		menu.add('Responder', function($elem) { _NewMail($elem, 're'); });
-		menu.add('Encaminhar', function($elem) { _NewMail($elem, 'fwd'); });
-		menu.add('Apagar', function($elem) { _DeleteMessage($elem); });
-		menu.addSeparator();
-		menu.addLabel('Mover para...');
-
-		var RenderFolderLevel = function(folders, level) {
-			$.each(folders, function(idx, folder) {
-				if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
-					var pad = '';
-					for(var p = 0; p < level; ++p) pad += '&nbsp; ';
-					menu.add(pad+folder.localName, function($elem) { _MoveMessage($elem, folder); });
-				}
-				RenderFolderLevel(folder.subfolders, level + 1);
-			});
-		};
-		RenderFolderLevel(userOpts.folderCache, 0);
-	}
-
 	function _LoadMugshots(thread, unitDivs, onDone) {
 		var mugshotAddrs = []; // email addresses to have mugshot fetched
 		for(var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
@@ -285,7 +280,6 @@ $.fn.messages = function(options) {
 		}
 		thread.reverse(); // headlines now sorted newest first again
 		$targetDiv.append(divs);
-		_BuildContextMenu();
 		firstUnread = (firstUnread !== -1) ? firstUnread : thread.length - 1; // open 1st unread, or last
 		$targetDiv.find('.messages_top1:eq('+firstUnread+')').trigger('click', function() {
 			_LoadMugshots(thread, divs);

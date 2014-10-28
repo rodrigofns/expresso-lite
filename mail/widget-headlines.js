@@ -20,6 +20,7 @@ $.fn.headlines = function(options) {
 	var curFolder     = null; // folder object currently loaded
 	var menu          = null; // context menu object
 	var onClickCB     = null; // user callbacks
+	var onCheckCB     = null;
 	var onMarkReadCB  = null;
 	var onMoveCB      = null;
 	var $prevClick    = null; // used in checkbox click event, modified by buildContextMenu()
@@ -122,23 +123,22 @@ $.fn.headlines = function(options) {
 		var unreadClass = hasUnread ? 'headlines_entryUnread' : 'headlines_entryRead';
 		var $elemHl = hasHighlight ? $('#icons .icoHigh1') : $('#icons .icoHigh0');
 
-		var $div = $('<div class="headlines_entry '+unreadClass+'" role="button">' +
-		'<div class="headlines_check"><div class="icoCheck0" role="checkbox"></div></div>' +
-			'<div class="headlines_sender">'+_BuildSendersText(thread, isSentFolder)+'</div>' +
-			'<div class="headlines_highlight">'+$elemHl.serialize()+'</div>' +
-			'<div class="headlines_subject"></div>' +
-			'<div class="headlines_icons">' +
-				(hasReplied    ? $('#icons .icoReplied').serialize()   : '')+' ' +
-				(wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
-				(hasImportant  ? $('#icons .icoImportant').serialize() : '')+' ' +
-				(hasSigned     ? $('#icons .icoSigned').serialize()    : '')+' ' +
-				(hasAttachment ? $('#icons .icoAttach').serialize()    : '')+' ' +
-				(hasForwarded  ? $('#icons .icoForwarded').serialize() : '')+' ' +
-			'</div>' +
-			'<div class="headlines_when">'+DateFormat.Humanize(thread[0].received)+'</div>' +
-			'</div>');
+		var $div = $('#templates .headlines_entry').clone();
+		$div.addClass(unreadClass);
+		$div.find('.headlines_sender').html(_BuildSendersText(thread, isSentFolder));
+		$div.find('.headlines_highlight').html($elemHl.serialize());
 		$div.find('.headlines_subject').text(thread[thread.length-1].subject != '' ?
 			thread[thread.length-1].subject : '(sem assunto)');
+		$div.find('.headlines_icons').html(
+			(hasReplied    ? $('#icons .icoReplied').serialize()   : '')+' ' +
+			(wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
+			(hasImportant  ? $('#icons .icoImportant').serialize() : '')+' ' +
+			(hasSigned     ? $('#icons .icoSigned').serialize()    : '')+' ' +
+			(hasAttachment ? $('#icons .icoAttach').serialize()    : '')+' ' +
+			(hasForwarded  ? $('#icons .icoForwarded').serialize() : '')+' '
+		);
+		$div.find('.headlines_when').text(DateFormat.Humanize(thread[0].received));
+
 		$div.data('thread', thread); // keep thread object within DIV
 		return $div;
 	}
@@ -160,7 +160,6 @@ $.fn.headlines = function(options) {
 		$div.replaceWith($newDiv);
 		if(isChecked)
 			$newDiv.find('.headlines_check > div').trigger('click');
-		exp.buildContextMenu();
 	}
 
 	function _FetchDraftMessage($div, headline, onDone) {
@@ -185,7 +184,7 @@ $.fn.headlines = function(options) {
 		}
 	}
 
-	function _MarkRead($elem, asRead) {
+	exp.markRead = function(asRead) {
 		var relevantHeadlines = []; // headlines to have their flag actually changed
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 
@@ -223,9 +222,10 @@ $.fn.headlines = function(options) {
 				});
 			});
 		}
-	}
+		return exp;
+	};
 
-	function _MoveMessages(destFolder) {
+	exp.moveMessages = function(destFolder) {
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 		if($checkedDivs.find('.throbber').length) // already working?
 			return;
@@ -261,9 +261,10 @@ $.fn.headlines = function(options) {
 					onMoveCB(destFolder);
 			});
 		});
-	}
+		return exp;
+	};
 
-	function _MarkStarred($elem) {
+	exp.toggleStarred = function() {
 		var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 		var headlines = [];
 		var willStar = false;
@@ -290,11 +291,12 @@ $.fn.headlines = function(options) {
 			window.alert('Erro ao alterar o flag de destaque das mensagens.\n' +
 				'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
 		});
-	}
+		return exp;
+	};
 
-	function _DeleteMessages($elem) {
+	exp.deleteMessages = function() {
 		if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
-			_MoveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
+			exp.moveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
 		} else if(window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
 			var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 			if($checkedDivs.find('.throbber').length) // already working?
@@ -326,45 +328,6 @@ $.fn.headlines = function(options) {
 				});
 			});
 		}
-	}
-
-	exp.buildContextMenu = function() {
-		if(menu === null) {
-			menu = $targetDiv.contextMenu({ selector:'.headlines_entry' }); // create menu object
-			menu.onShow(function($elem) {
-				var $checkedEntries = $targetDiv.find('.headlines_entryChecked');
-				if(!$checkedEntries.length) { // shift+click complications, see check click
-					lastCheckWith = 'rightClick';
-				} else if(lastCheckWith === 'rightClick') {
-					exp.clearChecked();
-					$checkedEntries.removeClass('headlines_entryChecked');
-				}
-				if(!$elem.hasClass('headlines_entry'))
-					$elem = $elem.closest('.headlines_entry');
-				$elem.find('.icoCheck0').removeClass('icoCheck0').addClass('icoCheck1');
-				$prevClick = $elem.closest('.headlines_entry').addClass('headlines_entryChecked'); // keep
-			});
-		} else {
-			menu.purge();
-		}
-		menu.add('Marcar como lida', function($elem) { _MarkRead($elem, true); });
-		menu.add('Marcar como não lida', function($elem) { _MarkRead($elem, false); });
-		menu.add('Alterar destaque', function($elem) { _MarkStarred($elem); });
-		menu.add('Apagar', function($elem) { _DeleteMessages($elem); });
-		menu.addSeparator();
-		menu.addLabel('Mover para...');
-
-		var RenderFolderLevel = function(folders, level) {
-			$.each(folders, function(idx, folder) {
-				if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
-					var pad = '';
-					for(var p = 0; p < level; ++p) pad += '&nbsp; ';
-					menu.add(pad+folder.localName, function($elem) { _MoveMessages(folder); });
-				}
-				RenderFolderLevel(folder.subfolders, level + 1);
-			});
-		};
-		RenderFolderLevel(userOpts.folderCache, 0);
 		return exp;
 	};
 
@@ -384,13 +347,11 @@ $.fn.headlines = function(options) {
 				curFolder.threads.push.apply(curFolder.threads,
 					ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
 				$targetDiv.append(_BuildAllThreadsDivs());
-				exp.buildContextMenu();
 				if(onDone !== undefined && onDone !== null)
 					onDone();
 			});
 		} else {
 			$targetDiv.append(_BuildAllThreadsDivs());
-			exp.buildContextMenu();
 			if(onDone !== undefined && onDone !== null)
 				onDone();
 		}
@@ -411,7 +372,6 @@ $.fn.headlines = function(options) {
 			curFolder.threads.push.apply(curFolder.threads,
 				ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts')); // rebuild
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
-			exp.buildContextMenu();
 			if(onDone !== undefined && onDone !== null)
 				onDone();
 		});
@@ -437,7 +397,6 @@ $.fn.headlines = function(options) {
 			ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
 			curFolder.threads = ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts'); // in thread: oldest first
 			$targetDiv.empty().append(_BuildAllThreadsDivs());
-			exp.buildContextMenu();
 			if(headl0 !== null)
 				_FindHeadlineDiv(headl0).addClass('headlines_entryCurrent');
 
@@ -461,10 +420,21 @@ $.fn.headlines = function(options) {
 		return exp;
 	};
 
+	exp.getChecked = function() {
+		var $checkeds = $targetDiv.find('.headlines_entryChecked');
+		var chThreads = [];
+		$checkeds.each(function(idx, chDiv) {
+			chThreads.push($(chDiv).data('thread')); // each thread is an array of headlines
+		});
+		return chThreads;
+	};
+
 	exp.clearChecked = function() {
 		var $checkeds = $targetDiv.find('.headlines_entryChecked');
 		$checkeds.removeClass('headlines_entryChecked');
 		$checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
+		if(onCheckCB !== null)
+			onCheckCB(); // invoke user callback
 		return exp;
 	};
 
@@ -517,6 +487,11 @@ $.fn.headlines = function(options) {
 
 	exp.onClick = function(callback) {
 		onClickCB = callback; // onClick(thread)
+		return exp;
+	};
+
+	exp.onCheck = function(callback) {
+		onCheckCB = callback; // onCheck()
 		return exp;
 	};
 
@@ -583,6 +558,8 @@ $.fn.headlines = function(options) {
 		}
 
 		$prevClick = $divClicked; // keep
+		if(onCheckCB !== null)
+			onCheckCB(); // invoke user callback
 	});
 
 	return exp;
