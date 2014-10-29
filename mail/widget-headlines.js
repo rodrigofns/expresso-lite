@@ -334,26 +334,32 @@ $.fn.headlines = function(options) {
 	exp.loadFolder = function(folder, howMany, onDone) {
 		curFolder = folder; // cache
 		$targetDiv.empty();
-		if(!curFolder.messages.length) { // not cached yet
-			_CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
-			$.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
-			.always(function() { $targetDiv.children('.loadingMessage').remove(); })
-			.fail(function(resp) {
-				window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
-			}).done(function(headlines) {
-				curFolder.messages.length = 0;
-				curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
-				curFolder.threads.length = 0;
-				curFolder.threads.push.apply(curFolder.threads,
-					ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
+
+		if(!curFolder.totalMails) { // no messages on this folder
+			if(onDone !== undefined && onDone !== null)
+				onDone();
+		} else {
+			if(!curFolder.messages.length) { // not cached yet
+				_CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
+				$.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
+				.always(function() { $targetDiv.children('.loadingMessage').remove(); })
+				.fail(function(resp) {
+					window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
+				}).done(function(headlines) {
+					curFolder.messages.length = 0;
+					curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
+					curFolder.threads.length = 0;
+					curFolder.threads.push.apply(curFolder.threads,
+						ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
+					$targetDiv.append(_BuildAllThreadsDivs());
+					if(onDone !== undefined && onDone !== null)
+						onDone();
+				});
+			} else {
 				$targetDiv.append(_BuildAllThreadsDivs());
 				if(onDone !== undefined && onDone !== null)
 					onDone();
-			});
-		} else {
-			$targetDiv.append(_BuildAllThreadsDivs());
-			if(onDone !== undefined && onDone !== null)
-				onDone();
+			}
 		}
 		return exp;
 	};
