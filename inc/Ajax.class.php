@@ -44,6 +44,19 @@ class Ajax {
 
 			self::_EchoJson($logged);
 		}
+		else if($_REQUEST['r'] === 'changeExpiredPassword')
+		{
+			try {
+				$changed = self::$tine->changeExpiredPassword(
+					$_REQUEST['userName'],
+					$_REQUEST['oldPassword'],
+					$_REQUEST['newPassword']
+				);
+			} catch(Exception $e) {
+				self::_HttpError(400, $e->getMessage());
+			}
+			self::_EchoJson($changed);
+		}
 		else if($_REQUEST['r'] === 'setLocale')
 		{
 			try {
