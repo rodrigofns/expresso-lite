@@ -69,7 +69,8 @@ function DoLogin() {
 
 	$.post('.', { r:'login', user:$('#user').val(), pwd:$('#pwd').val() })
 	.fail(function(resp) {
-		window.alert('Erro de login.\n'+resp.responseText);
+		window.alert('Não foi possível efetuar login.\n' +
+			'O usuário ou a senha estão incorretos.');
 		RestoreLoginState();
 	}).done(function(data) {
 		$('#throbber').children('span').text('Autenticando...');
