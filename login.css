@@ -8,6 +8,8 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
+#templates { display:none; }
+
 #topgray { position:absolute; top:0; height:70%; width:100%; background-color:#DADADA; }
 #thebg { position:absolute; top:30%; height:40%; width:100%;
 	background-image:url("img/fondo.jpg"); background-position:50% 70%; background-size:100%;
@@ -16,8 +18,8 @@
 #credent { max-width:240px; background-color:rgba(255,255,255,.88); text-align:center;
 	border:1px solid #E2E2E2; padding:10px; box-shadow:2px 2px 6px #999; }
 #btnLogin { margin:3px 0; }
-#throbber { display:none; margin:6px 0; }
-#throbber > span { font-style:italic; color:#666; -moz-user-select:none; -webkit-user-select:none; }
+.throbber { display:none; margin:6px 0; }
+.throbber > span { font-style:italic; color:#666; -moz-user-select:none; -webkit-user-select:none; }
 @media (max-width:767px) { /* phones */
 	#credent { margin:10% auto; }
 	#topgray,#thebg,#blue,#versionInfo { z-index:-1; }
