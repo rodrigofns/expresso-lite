@@ -94,11 +94,11 @@ function DoLogin() {
 
 function ValidateLogin() {
 	if($('#user').val() == '') {
-		window.alert('Que tal digitar um nome de usuário?');
+		window.alert('Por favor, digite seu nome de usuário.');
 		$('#user').focus();
 		return false;
 	} else if($('#pwd').val() == '') {
-		window.alert('Tentando entrar sem senha, hacker?');
+		window.alert('Por favor, digite sua senha.');
 		$('#pwd').focus();
 		return false;
 	}
