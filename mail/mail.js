@@ -154,7 +154,7 @@
 		CloseFoldersMenu();
 		$('#headerMenuFolderName').text(folder.localName);
 		$('#headerFolderCounter').text(' ('+folder.unreadMails+'/'+folder.totalMails+')');
-		$('#headlinesFooter').hide();
+		$('#headerHeadlinesMenu,#headlinesFooter').hide();
 		UpdatePageTitle();
 		Cache.lstHeadline.loadFolder(folder, Cache.MAILBATCH, function() {
 			$('#centerColumn').scrollTop(0);
@@ -164,7 +164,7 @@
 	}
 
 	function LoadMoreHeadlines() {
-		$('#headlinesFooter').hide();
+		$('#headerHeadlinesMenu,#headlinesFooter').hide();
 		CloseMailView();
 		Cache.lstHeadline.loadMore(Cache.MAILBATCH, function() {
 			$('#headlinesFooter').show();
