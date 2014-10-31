@@ -25,7 +25,6 @@ $(document).ready(function() {
 	$.post('.', { r:'setLocale' }); // default to PT/BR
 	$('#user').focus();
 	$('#frmLogin').submit(DoLogin);
-	$('#frmChangePwd').submit(DoChangePassword);
 });
 
 function ValidateBrowser(minBrowsers) {
@@ -58,15 +57,15 @@ function LoadServerStatus() {
 function DoLogin() {
 	if(!ValidateLogin()) return false;
 	$('#btnLogin').hide();
-	$('#frmLogin input').prop('disabled', true);
-	$('#frmLogin .throbber').show().children('span').text('Efetuando login...');
+	$('#credent input').prop('disabled', true);
+	$('#throbber').show().children('span').text('Efetuando login...');
 
-	function RestoreLoginState() {
+	var RestoreLoginState = function() {
 		$('#btnLogin').show();
-		$('#frmLogin input').prop('disabled', false);
-		$('#frmLogin .throbber').hide();
+		$('#credent input').prop('disabled', false);
+		$('#throbber').hide();
 		$('#user').focus();
-	}
+	};
 
 	$.post('.', { r:'login', user:$('#user').val(), pwd:$('#pwd').val() })
 	.fail(function(resp) {
@@ -74,72 +73,23 @@ function DoLogin() {
 			'O usuário ou a senha estão incorretos.');
 		RestoreLoginState();
 	}).done(function(data) {
-		if(data.expired) {
-			RestoreLoginState();
-			window.alert('Sua senha expirou, é necessário trocá-la.');
-			var $frmLogin = $('#frmLogin').replaceWith($('#frmChangePwd')).appendTo('#templates');
-			$('#cpNewPwd').focus();
-		} else {
-			$('#frmLogin .throbber').children('span').text('Autenticando...');
+		$('#throbber').children('span').text('Autenticando...');
 
-			$.post('.', { r:'getAllRegistryData', validateLogin:1 })
-			.fail(function(resp) {
-				window.alert('Erro na consulta aos dados do usuário.\n'+resp.responseText);
-				RestoreLoginState();
-			}).done(function(data) {
-				$('#frmLogin .throbber').remove();
-				$('#credent').hide();
-				$('#thebg').fadeOut({ duration:400, queue:false });
-				$('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
-				$('#blue').animate({ top:'7.5%' }, { duration:500, queue:false, complete:function() {
-					location.href = './mail';
-				} });
-			});
-		}
+		$.post('.', { r:'getAllRegistryData', validateLogin:1 })
+		.fail(function(resp) {
+			window.alert('Erro na consulta aos dados do usuário.\n'+resp.responseText);
+			RestoreLoginState();
+		}).done(function(data) {
+			$('#throbber').remove();
+			$('#credent').hide();
+			$('#thebg').fadeOut({ duration:400, queue:false });
+			$('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
+			$('#blue').animate({ top:'7.5%' }, { duration:500, queue:false, complete:function() {
+				location.href = './mail';
+			} });
+		});
 	});
 	return false;
-}
-
-function DoChangePassword() {
-	if($('#cpNewPwd').val() !== $('#cpNewPwd2').val()) {
-		window.alert('As novas senha não coincidem, por favor digite-as novamente.');
-		$('#cpNewPwd,#cpNewPwd2').val('');
-		$('#cpNewPwd').focus();
-	} else {
-		$('#btnNewPwd').hide();
-		$('#frmChangePwd input').prop('disabled', true);
-		$('#frmChangePwd .throbber').show().children('span').text('Trocando senha...');
-
-		function RestoreChangePasswordState() {
-			$('#btnNewPwd').show();
-			$('#frmChangePwd input').prop('disabled', false);
-			$('#frmChangePwd .throbber').hide();
-			$('#cpNewPwd,#cpNewPwd2').val('');
-			$('#cpNewPwd').focus();
-		}
-
-		$.post('.', { r: 'changeExpiredPassword',
-			userName: $('#user').val(), // from login form
-			oldPassword: $('#cpOldPwd').val(),
-			newPassword: $('#cpNewPwd').val()
-		}).fail(function(resp) {
-			window.alert(UglyTineFormatMsg(resp.responseText));
-			RestoreChangePasswordState();
-		}).done(function(data) {
-			window.alert('Senha alterada com sucesso.\nEfetue login com sua nova senha.');
-			location.reload();
-		});
-	}
-	return false;
-}
-
-function UglyTineFormatMsg(errorMessage) {
-	// Ugly formatting function copied straight from Tine source.
-	var title  = errorMessage.substr(0, (errorMessage.indexOf(':') + 1));
-	var errorFull = errorMessage.substr((errorMessage.indexOf(':') + 1));
-	var errorTitle = errorFull.substr(0, (errorFull.indexOf(':') + 1));
-	var errors = errorFull.substr((errorFull.indexOf(':') + 1));
-	return errorTitle+'\n\n'+errors.replace(/, /g, '\n').replace(/^\s/, '');
 }
 
 function ValidateLogin() {

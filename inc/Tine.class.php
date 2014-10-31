@@ -64,16 +64,12 @@ class Tine {
 			unset($_SESSION['ourtine_url']);
 			throw new Exception('Tinebase.login: '.$e->getMessage());
 		}
-
-		$res = $jreq->result;
-		if($res->success === false && strpos($res->errorMessage, 'Your password has expired. You must change it.') === 0) {
-			$res->expired = true;
-		} else if(isset($res->success) && $res->success === false)
-			throw new Exception('Tinebase.login: '.$res->errorMessage);
-		$_SESSION['ourtine_jsonkey'] = $res->jsonKey;
+		if(isset($jreq->result->success) && $jreq->result->success === false)
+			throw new Exception('Tinebase.login: '.$jreq->result->errorMessage);
+		$_SESSION['ourtine_jsonkey'] = $jreq->result->jsonKey;
 		// For some weird reason, calling getAllRegistryData() here will return an incomplete
 		//  object. It demands another $.post() from the page in order to work.
-		return $res;
+		return $jreq->result;
 	}
 
 	public function logoff() {
@@ -127,21 +123,6 @@ class Tine {
 		} else {
 			return $jreq->result;
 		}
-	}
-
-	public function changeExpiredPassword($userName, $oldPassword, $newPassword) {
-		try {
-			$jreq = $this->_jsonRpc('Tinebase.changeExpiredPassword', (object)array(
-				'userName'    => $userName,
-				'oldPassword' => $oldPassword,
-				'newPassword' => $newPassword
-			));
-		} catch(Exception $e) {
-			throw new Exception('Tinebase.changeExpiredPassword: '.$e->getMessage());
-		}
-		if($jreq->result->success === false)
-			throw new Exception($jreq->result->errorMessage);
-		return $jreq->result;
 	}
 
 	public function getPersonalContacts($addrCatalog) {

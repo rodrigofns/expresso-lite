@@ -44,18 +44,9 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
 			<input type="text" id="user" placeholder="usuário" value="<?php echo $lastLogin;?>"/>
 			<input type="password" id="pwd" placeholder="senha"/>
 			<input type="submit" id="btnLogin" value="login"/>
-			<div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
+			<div id="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
 		</form>
 	</div>
-	<section id="templates">
-		<form id="frmChangePwd">
-			<input type="password" id="cpOldPwd" placeholder="senha antiga"/>
-			<input type="password" id="cpNewPwd" placeholder="nova senha"/>
-			<input type="password" id="cpNewPwd2" placeholder="repetir nova senha"/>
-			<input type="submit" id="btnNewPwd" value="trocar"/>
-			<div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
-		</form>
-	</section>
 	<div id="links">
 		<?php if(ANDROID_URL != '') { ?>
 		<a href="<?php echo ANDROID_URL?>" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
