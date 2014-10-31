@@ -11,8 +11,8 @@
 (function( $ ) {
 $(document).ready(function() {
 	// Browser validation.
-	if(!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25} ])) {
-		$('#frmLogin').html('Os browsers mínimos suportados são Firefox 24 e Chrome 25.<br/>' +
+	if(!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
+		$('#frmLogin').html('Os browsers mínimos suportados são Firefox 24, Chrome 25 e Safari 7.<br/>' +
 			'Utilize o webmail padrão do Expresso em:<br/>' +
 			'<a href="http://expressov3.serpro.gov.br">http://expressov3.serpro.gov.br</a>');
 		return false;
@@ -33,9 +33,24 @@ function ValidateBrowser(minBrowsers) {
 	for(var m = 0; m < minBrowsers.length; ++m) {
 		var bname = minBrowsers[m].name,
 			bver = minBrowsers[m].version;
-		if(ua.indexOf(bname+'/') !== -1) {
-			var ver = ua.substr(ua.indexOf(bname+'/') + (bname+'/').length);
-			if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+		var browserPrefixIndex = ua.indexOf(bname+'/');
+		if( browserPrefixIndex !== -1) {
+			//we found the browser within the user agent, let's check its version
+			var ver;
+			if (bname !== 'Safari') {
+				ver = ua.substr(browserPrefixIndex + (bname+'/').length);
+				if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+			} else {
+				//Safari is a bit of a special case, its major version is
+				//expressed after the Version\ prefix
+				var versionPrefixIndex = ua.indexOf('Version/');
+				if( versionPrefixIndex !== -1) {
+					ver = ua.substr(versionPrefixIndex + 'Version/'.length);
+					if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+				} else {
+					bver = '-1'; //may happen when using Google Chrome on iPhone
+				}
+			}
 			return (bver <= parseInt(ver));
 		}
 	}
