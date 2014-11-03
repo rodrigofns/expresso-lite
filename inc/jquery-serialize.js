@@ -10,7 +10,7 @@
 
 (function( $ ) {
 $.fn.serialize = function() {
-	// http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
-	return this[0].outerHTML || (new XMLSerializer().serializeToString(this[0]));
+    // http://stackoverflow.com/questions/1700870/how-do-i-do-outerhtml-in-firefox
+    return this[0].outerHTML || (new XMLSerializer().serializeToString(this[0]));
 };
 })( jQuery );
