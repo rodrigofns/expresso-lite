@@ -8,20 +8,19 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, ThreadMail, DateFormat ) {
-$.compose = function(options) {
+(function( $, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat ) {
+window.WidgetCompose = function(options) {
     var userOpts = $.extend({
         folderCache: []
     }, options);
 
-    var exp = { };
-
+    var obj       = this;
     var onCloseCB = null; // user callbacks
     var onSendCB  = null;
     var onDraftCB = null;
     var popup     = null; // $().modelessDialog() object, created on show()
-    var attacher  = null; // $().attacher() widget, created on show()
-    var autocomp  = null; // $().searchAddr() widget, created on keydown
+    var attacher  = null; // WidgetAttacher object, created on show()
+    var autocomp  = null; // WidgetSearchAddr object, created on keydown
     var msg       = { fwd:null, re:null, draft:null }; // we have a forwarded/replied/draft message
     var isSending = false; // a "send" async request is running
 
@@ -220,14 +219,14 @@ $.compose = function(options) {
         popup.onClose(_PopupClosed); // when dialog is being dismissed
         popup.onResize(_ResizeWriteField);
 
-        attacher = $('#composePanel_attacher').attacher();
+        attacher = new WidgetAttacher({ elem:'#composePanel_attacher' });
         attacher.onContentChange(function() {
             $('#composePanel_attacher').toggle(attacher.getAll().length > 0);
             _ResizeWriteField();
         });
     }
 
-    exp.show = function(showOptions) {
+    obj.show = function(showOptions) {
         var showOpts = $.extend({
             forward: null, // headline object; this email is a forwarding
             reply: null, // this email is a replying
@@ -288,22 +287,22 @@ $.compose = function(options) {
             _ResizeWriteField();
         }
 
-        return exp;
+        return obj;
     };
 
-    exp.onClose = function(callback) {
+    obj.onClose = function(callback) {
         onCloseCB = callback; // onClose()
-        return exp;
+        return obj;
     };
 
-    exp.onSend = function(callback) {
+    obj.onSend = function(callback) {
         onSendCB = callback;
-        return exp;
+        return obj;
     };
 
-    exp.onDraft = function(callback) {
+    obj.onDraft = function(callback) {
         onDraftCB = callback;
-        return exp;
+        return obj;
     };
 
     $('#composePanel_toggs a').on('click', function(ev) { // click To, Cc or Bcc link
@@ -413,7 +412,7 @@ $.compose = function(options) {
             }
             var $textarea = $(this);
             KeyHandle.timer = window.setTimeout(function() { // so that keydown process completes
-                autocomp = $textarea.searchAddr();
+                autocomp = new WidgetSearchAddr({ $elem:$textarea });
                 autocomp.onClick(function(token, ct) {
                     var newtxt = $textarea.val();
                     newtxt = newtxt.substr(0, newtxt.length - token.length) + ct.emails.join(', ');
@@ -431,7 +430,5 @@ $.compose = function(options) {
             return false;
         }
     });
-
-    return exp;
 };
-})( jQuery, ThreadMail, DateFormat );
+})( jQuery, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat );

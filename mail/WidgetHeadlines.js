@@ -9,14 +9,14 @@
  */
 
 (function( $, ThreadMail, DateFormat ) {
-$.fn.headlines = function(options) {
+window.WidgetHeadlines = function(options) {
     var userOpts = $.extend({
+        elem: '', // jQuery selector for the target DIV
         folderCache: []
     }, options);
 
-    var exp = { };
-
-    var $targetDiv    = this;
+    var obj           = this;
+    var $targetDiv    = $(userOpts.elem);
     var curFolder     = null; // folder object currently loaded
     var menu          = null; // context menu object
     var onClickCB     = null; // user callbacks
@@ -184,7 +184,7 @@ $.fn.headlines = function(options) {
         }
     }
 
-    exp.markRead = function(asRead) {
+    obj.markRead = function(asRead) {
         var relevantHeadlines = []; // headlines to have their flag actually changed
         var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
 
@@ -222,10 +222,10 @@ $.fn.headlines = function(options) {
                 });
             });
         }
-        return exp;
+        return obj;
     };
 
-    exp.moveMessages = function(destFolder) {
+    obj.moveMessages = function(destFolder) {
         var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
         if($checkedDivs.find('.throbber').length) // already working?
             return;
@@ -261,10 +261,10 @@ $.fn.headlines = function(options) {
                     onMoveCB(destFolder);
             });
         });
-        return exp;
+        return obj;
     };
 
-    exp.toggleStarred = function() {
+    obj.toggleStarred = function() {
         var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
         var headlines = [];
         var willStar = false;
@@ -291,12 +291,12 @@ $.fn.headlines = function(options) {
             window.alert('Erro ao alterar o flag de destaque das mensagens.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
         });
-        return exp;
+        return obj;
     };
 
-    exp.deleteMessages = function() {
+    obj.deleteMessages = function() {
         if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
-            exp.moveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
+            obj.moveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
         } else if(window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
             var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
             if($checkedDivs.find('.throbber').length) // already working?
@@ -328,10 +328,10 @@ $.fn.headlines = function(options) {
                 });
             });
         }
-        return exp;
+        return obj;
     };
 
-    exp.loadFolder = function(folder, howMany, onDone) {
+    obj.loadFolder = function(folder, howMany, onDone) {
         curFolder = folder; // cache
         $targetDiv.empty();
 
@@ -361,10 +361,10 @@ $.fn.headlines = function(options) {
                     onDone();
             }
         }
-        return exp;
+        return obj;
     };
 
-    exp.loadMore = function(howMany, onDone) {
+    obj.loadMore = function(howMany, onDone) {
         var $divLoading = _CreateDivLoading('Carregando mensagens...')
         $divLoading.appendTo($targetDiv);
 
@@ -382,10 +382,10 @@ $.fn.headlines = function(options) {
                 onDone();
         });
 
-        return exp;
+        return obj;
     };
 
-    exp.loadNew = function(howMany, onDone) {
+    obj.loadNew = function(howMany, onDone) {
         var $divLoading = _CreateDivLoading('Carregando mensagens...');
         $targetDiv.prepend($divLoading);
 
@@ -410,10 +410,10 @@ $.fn.headlines = function(options) {
                 onDone(); // invoke user callback
         });
 
-        return exp;
+        return obj;
     };
 
-    exp.getCurrent = function() {
+    obj.getCurrent = function() {
         var curThread = null;
         var $cur = $targetDiv.find('.headlines_entryCurrent');
         if($cur.length)
@@ -421,12 +421,12 @@ $.fn.headlines = function(options) {
         return curThread;
     };
 
-    exp.clearCurrent = function() {
+    obj.clearCurrent = function() {
         $targetDiv.find('.headlines_entryCurrent').removeClass('headlines_entryCurrent');
-        return exp;
+        return obj;
     };
 
-    exp.getChecked = function() {
+    obj.getChecked = function() {
         var $checkeds = $targetDiv.find('.headlines_entryChecked');
         var chThreads = [];
         $checkeds.each(function(idx, chDiv) {
@@ -435,23 +435,23 @@ $.fn.headlines = function(options) {
         return chThreads;
     };
 
-    exp.clearChecked = function() {
+    obj.clearChecked = function() {
         var $checkeds = $targetDiv.find('.headlines_entryChecked');
         $checkeds.removeClass('headlines_entryChecked');
         $checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
         if(onCheckCB !== null)
             onCheckCB(); // invoke user callback
-        return exp;
+        return obj;
     };
 
-    exp.redraw = function(headline) {
+    obj.redraw = function(headline) {
         var $div = _FindHeadlineDiv(headline); // the DIV which contains the headline
         if($div !== null)
             _RedrawDiv($div);
-        return exp;
+        return obj;
     };
 
-    exp.redrawByThread = function(thread, onDone) {
+    obj.redrawByThread = function(thread, onDone) {
         $targetDiv.children('div').each(function(idx, div) {
             var $div = $(div);
             if($div.data('thread') === thread) { // compare references
@@ -474,10 +474,10 @@ $.fn.headlines = function(options) {
                 return false; // break
             }
         });
-        return exp;
+        return obj;
     };
 
-    exp.calcScrollTopOf = function(thread) {
+    obj.calcScrollTopOf = function(thread) {
         var cy = 0;
         $targetDiv.children('div').each(function(idx, div) {
             var $div = $(div);
@@ -491,24 +491,24 @@ $.fn.headlines = function(options) {
         return cy;
     };
 
-    exp.onClick = function(callback) {
+    obj.onClick = function(callback) {
         onClickCB = callback; // onClick(thread)
-        return exp;
+        return obj;
     };
 
-    exp.onCheck = function(callback) {
+    obj.onCheck = function(callback) {
         onCheckCB = callback; // onCheck()
-        return exp;
+        return obj;
     };
 
-    exp.onMarkRead = function(callback) {
+    obj.onMarkRead = function(callback) {
         onMarkReadCB = callback; // onMarkRead(folder)
-        return exp;
+        return obj;
     };
 
-    exp.onMove = function(callback) {
+    obj.onMove = function(callback) {
         onMoveCB = callback; // onMove(destFolder)
-        return exp;
+        return obj;
     };
 
     $targetDiv.on('click', '.headlines_entry', function(ev) { // click on headline
@@ -567,7 +567,5 @@ $.fn.headlines = function(options) {
         if(onCheckCB !== null)
             onCheckCB(); // invoke user callback
     });
-
-    return exp;
 };
 })( jQuery, ThreadMail, DateFormat );

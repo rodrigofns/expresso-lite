@@ -32,12 +32,12 @@ if(!Tine::isLogged()) header('location: ../');
     <script src="../inc/jquery-uploadFile.js"></script>
     <script src="Contacts.js"></script>
     <script src="ThreadMail.js"></script>
-    <script src="widget-folders.js"></script>
-    <script src="widget-headlines.js"></script>
-    <script src="widget-messages.js"></script>
-    <script src="widget-attacher.js"></script>
-    <script src="widget-compose.js"></script>
-    <script src="widget-searchAddr.js"></script>
+    <script src="WidgetFolders.js"></script>
+    <script src="WidgetHeadlines.js"></script>
+    <script src="WidgetMessages.js"></script>
+    <script src="WidgetAttacher.js"></script>
+    <script src="WidgetSearchAddr.js"></script>
+    <script src="WidgetCompose.js"></script>
     <script src="mail.js"></script>
 </head>
 <body>

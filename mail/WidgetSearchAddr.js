@@ -9,14 +9,14 @@
  */
 
 (function( $, Contacts ) {
-$.fn.searchAddr = function(options) {
+window.WidgetSearchAddr = function(options) {
     var userOpts = $.extend({
+        $elem: '', // jQuery object for the target DIV
         maxVisibleContacts: 10
     }, options);
 
-    var exp = { };
-
-    var $txtbox   = this; // a textarea element
+    var obj       = this;
+    var $txtbox   = userOpts.$elem; // a textarea element
     var token     = '';
     var onClickCB = null; // user callback
 
@@ -75,21 +75,21 @@ $.fn.searchAddr = function(options) {
         return $popup;
     }
 
-    exp.close = function() {
+    obj.close = function() {
         $('#searchAddr_popup').remove(); // if any
-        return exp;
+        return obj;
     };
 
-    exp.processKey = function(key) {
+    obj.processKey = function(key) {
         if(key === 0) {
             // dummy
         } else if(key === 27) { // ESC
-            exp.close();
+            obj.close();
         } else if(key === 13) { // enter
             var opt = $('#searchAddr_list > option:selected');
             if(opt.length) {
                 opt.trigger('mousedown');
-                exp.close();
+                obj.close();
             }
         } else if(key === 38) { // up arrow
             var $listbox = $('#searchAddr_list');
@@ -106,13 +106,13 @@ $.fn.searchAddr = function(options) {
         }
     };
 
-    exp.onClick = function(callback) {
+    obj.onClick = function(callback) {
         onClickCB = callback;
-        return exp;
+        return obj;
     };
 
     (function _Ctor() {
-        exp.close(); // there can be only one
+        obj.close(); // there can be only one
         token = $txtbox.val(); // string to be searched among contacts
         var lastComma = token.lastIndexOf(',');
         if(lastComma > 0) token = $.trim(token.substr(lastComma + 1));
@@ -147,7 +147,5 @@ $.fn.searchAddr = function(options) {
             }
         });
     });
-
-    return exp;
 };
 })( jQuery, Contacts );

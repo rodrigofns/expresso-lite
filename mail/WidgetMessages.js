@@ -9,16 +9,16 @@
  */
 
 (function( $, Contacts, DateFormat, ThreadMail ) {
-$.fn.messages = function(options) {
+window.WidgetMessages = function(options) {
     var userOpts = $.extend({
+        elem: '', // jQuery selector for the target DIV
         folderCache: [],
-        wndCompose: null, // $.compose() object
+        wndCompose: null, // WidgetCompose object
         genericMugshot: '../img/person-generic.gif'
     }, options);
 
-    var exp = { };
-
-    var $targetDiv   = this;
+    var obj          = this;
+    var $targetDiv   = $(userOpts.elem);
     var curFolder    = null; // folder object currently loaded
     var menu         = null; // context menu object
     var onViewCB     = null; // user callbacks
@@ -262,12 +262,12 @@ $.fn.messages = function(options) {
         });
     }
 
-    exp.empty = function() {
+    obj.empty = function() {
         $targetDiv.children('.messages_unit').remove();
-        return exp;
+        return obj;
     };
 
-    exp.render = function(thread, currentFolder) {
+    obj.render = function(thread, currentFolder) {
         curFolder = currentFolder; // keep
         $targetDiv.children('.messages_unit').remove(); // clear, if any
         var divs = [];
@@ -284,45 +284,45 @@ $.fn.messages = function(options) {
         $targetDiv.find('.messages_top1:eq('+firstUnread+')').trigger('click', function() {
             _LoadMugshots(thread, divs);
         });
-        return exp;
+        return obj;
     };
 
-    exp.redrawIcons = function(headline) {
+    obj.redrawIcons = function(headline) {
         $targetDiv.children('.messages_unit').each(function(idx, elem) {
             var $div = $(elem);
             if($div.data('headline').id === headline.id)
                 $div.find('.messages_icons').html(_BuildIcons(headline));
         });
-        return exp;
+        return obj;
     };
 
-    exp.count = function() {
+    obj.count = function() {
         return $targetDiv.find('div.messages_unit').length;
     };
 
-    exp.countOpen = function() {
+    obj.countOpen = function() {
         return $targetDiv.find('div.messages_body:visible').length;
     };
 
-    exp.closeAll = function() {
+    obj.closeAll = function() {
         $targetDiv.find('div.messages_content:visible')
             .prevAll('div.messages_top1').trigger('click');
-        return exp;
+        return obj;
     };
 
-    exp.onView = function(callback) {
+    obj.onView = function(callback) {
         onViewCB = callback;
-        return exp;
+        return obj;
     };
 
-    exp.onMarkRead = function(callback) {
+    obj.onMarkRead = function(callback) {
         onMarkReadCB = callback;
-        return exp;
+        return obj;
     };
 
-    exp.onMove = function(callback) {
+    obj.onMove = function(callback) {
         onMoveCB = callback;
-        return exp;
+        return obj;
     };
 
     $targetDiv.on('click', '.messages_top1,.messages_top2', function(ev, onDone) { // open message
@@ -416,7 +416,5 @@ $.fn.messages = function(options) {
             } });
         }
     });
-
-    return exp;
 };
 })( jQuery, Contacts, DateFormat, ThreadMail );

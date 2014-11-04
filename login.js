@@ -29,26 +29,26 @@ $(document).ready(function() {
 });
 
 function ValidateBrowser(minBrowsers) {
-    var    ua = navigator.userAgent;
+    var ua = navigator.userAgent;
     for(var m = 0; m < minBrowsers.length; ++m) {
         var bname = minBrowsers[m].name,
             bver = minBrowsers[m].version;
         var browserPrefixIndex = ua.indexOf(bname+'/');
         if( browserPrefixIndex !== -1) {
-            //we found the browser within the user agent, let's check its version
+            // We found the browser within the user agent, let's check its version.
             var ver;
             if (bname !== 'Safari') {
                 ver = ua.substr(browserPrefixIndex + (bname+'/').length);
                 if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
             } else {
-                //Safari is a bit of a special case, its major version is
-                //expressed after the Version\ prefix
+                // Safari is a bit of a special case, its major version is
+                //  expressed after the Version\ prefix.
                 var versionPrefixIndex = ua.indexOf('Version/');
                 if( versionPrefixIndex !== -1) {
                     ver = ua.substr(versionPrefixIndex + 'Version/'.length);
                     if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
                 } else {
-                    bver = '-1'; //may happen when using Google Chrome on iPhone
+                    bver = '-1'; // may happen when using Google Chrome on iPhone
                 }
             }
             return (bver <= parseInt(ver));

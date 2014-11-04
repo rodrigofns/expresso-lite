@@ -23,10 +23,10 @@
         Cache.MAILBATCH = $('#mailBatch').val();
 
         // Init widget objects.
-        Cache.wndCompose = $.compose({ folderCache:Cache.folders });
-        Cache.lstFolder = $('#foldersArea').folders({ folderCache:Cache.folders });
-        Cache.lstHeadline = $('#headlinesArea').headlines({ folderCache:Cache.folders });
-        Cache.lstMessage = $('#messagesArea').messages({ folderCache:Cache.folders,
+        Cache.wndCompose = new WidgetCompose({ folderCache:Cache.folders });
+        Cache.lstFolder = new WidgetFolders({ elem:'#foldersArea', folderCache:Cache.folders });
+        Cache.lstHeadline = new WidgetHeadlines({ elem:'#headlinesArea', folderCache:Cache.folders });
+        Cache.lstMessage = new WidgetMessages({ elem:'#messagesArea', folderCache:Cache.folders,
             contactsCache:Cache.contacts, wndCompose:Cache.wndCompose });
         Cache.menuHeadlines = $('#headerHeadlinesDropdown').dropdownMenu({ });
 

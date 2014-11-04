@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Widget to render the folder list. jQuery plugin.
+ * Widget to render the folder list.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -9,14 +9,14 @@
  */
 
 (function( $ ) {
-$.fn.folders = function(options) {
+window.WidgetFolders = function(options) {
     var userOpts = $.extend({
+        elem: '', // jQuery selector for the target DIV
         folderCache: []
     }, options);
 
-    var exp = { };
-
-    var $targetDiv   = this;
+    var obj          = this;
+    var $targetDiv   = $(userOpts.elem);
     var menu         = null; // context menu object
     var isFirstClick = true; // flag to avoid immediate refresh (unnecessary) on 1st click
     var curFolder    = null; // cache currently selected folder
@@ -83,12 +83,12 @@ $.fn.folders = function(options) {
                 folder.unreadMails = stats.unreadMails;
 
                 if(folder.id === curFolder.id) { // current folder
-                    exp.redraw(folder);
+                    obj.redraw(folder);
                     if(onFolderUpdatedCB !== null) onFolderUpdatedCB(folder);
                 } else { // not current folder
                     folder.messages.length = 0; // force cache rebuild
                     folder.threads.length = 0;
-                    exp.redraw(folder);
+                    obj.redraw(folder);
                 }
             }
             if(onDone !== undefined) onDone();
@@ -144,21 +144,21 @@ $.fn.folders = function(options) {
         }
     }
 
-    exp.loadRoot = function(onDone) {
+    obj.loadRoot = function(onDone) {
         _LoadSubfolders(null, onDone);
-        return exp;
+        return obj;
     };
 
-    exp.setCurrent = function(folder) {
+    obj.setCurrent = function(folder) {
         _FindFolderLi(folder).children('.folders_text').trigger('click');
-        return exp;
+        return obj;
     };
 
-    exp.getCurrent = function() {
+    obj.getCurrent = function() {
         return curFolder;
     };
 
-    exp.redraw = function(folder) {
+    obj.redraw = function(folder) {
         var $li = _FindFolderLi(folder);
         var $div = $li.children('div:first');
         var $childUl = $div.next('ul');
@@ -167,35 +167,35 @@ $.fn.folders = function(options) {
         if($div.hasClass('folders_current'))
             $newDiv.addClass('folders_current');
         $div.replaceWith($newDiv);
-        return exp;
+        return obj;
     };
 
-    exp.expand = function(folder) {
+    obj.expand = function(folder) {
         _FindFolderLi(folder).find('.folders_text > .folders_toggle:first').trigger('click');
-        return exp;
+        return obj;
     };
 
-    exp.updateAll = function(onDone) {
+    obj.updateAll = function(onDone) {
         _UpdateSubfolders($targetDiv.find('.folders_li:first'), onDone);
-        return exp;
+        return obj;
     };
 
-    exp.onClick = function(callback) {
+    obj.onClick = function(callback) {
         onClickCB = callback; // onClick(folder)
-        return exp;
+        return obj;
     };
 
-    exp.onTreeChanged = function(callback) {
+    obj.onTreeChanged = function(callback) {
         onTreeChangedCB = callback; // onTreeChanged()
-        return exp;
+        return obj;
     };
 
-    exp.onFolderUpdated = function(callback) {
+    obj.onFolderUpdated = function(callback) {
         onFolderUpdatedCB = callback; // onFolderUpdated(folder)
-        return exp;
+        return obj;
     };
 
-    $targetDiv.on('click', 'a.folders_toggle', function() {
+    $targetDiv.on('click', 'a.folders_toggle', function() { // expand/collapse a folder
         $(this).blur();
         var $li = $(this).closest('li');
         var folder = $li.data('folder');
@@ -213,7 +213,7 @@ $.fn.folders = function(options) {
         return false;
     });
 
-    $targetDiv.on('click', 'div.folders_text', function() {
+    $targetDiv.on('click', 'div.folders_text', function() { // click on folder name
         var $li = $(this).closest('li');
         curFolder = $li.data('folder'); // cache
         $targetDiv.find('.folders_current').removeClass('folders_current');
@@ -241,7 +241,7 @@ $.fn.folders = function(options) {
                         curFolder.unreadMails = stats.unreadMails;
                         curFolder.messages.length = 0; // clear cache, will force reload
                         curFolder.threads.length = 0;
-                        exp.redraw(curFolder);
+                        obj.redraw(curFolder);
                     }
                     if(onClickCB !== null)
                         onClickCB(curFolder); // invoke user callback
@@ -253,7 +253,5 @@ $.fn.folders = function(options) {
         }
         return false;
     });
-
-    return exp;
 };
 })( jQuery );

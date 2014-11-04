@@ -9,13 +9,13 @@
  */
 
 (function( $ ) {
-$.fn.attacher = function(options) {
+window.WidgetAttacher = function(options) {
     var userOpts = $.extend({
+        elem: '' // jQuery selector for the target DIV
     }, options);
 
-    var exp = { };
-
-    var $targetDiv = this;
+    var obj        = this;
+    var $targetDiv = $(userOpts.elem);
     var onContentChangeCB = null; // user callback
 
     function _BuildDivSlot() {
@@ -29,7 +29,7 @@ $.fn.attacher = function(options) {
             '</tr></table></div>');
     }
 
-    exp.getAll = function() {
+    obj.getAll = function() {
         var ret = [];
         $targetDiv.children('.attacher_unit').each(function(idx, div) {
             var attachmentObj = $(div).data('file'); // previously kept into DIV
@@ -38,7 +38,7 @@ $.fn.attacher = function(options) {
         return ret;
     };
 
-    exp.rebuildFromMsg = function(headline) {
+    obj.rebuildFromMsg = function(headline) {
         for(var i = 0; i < headline.attachments.length; ++i) {
             var file = headline.attachments[i];
             var $divSlot = _BuildDivSlot();
@@ -56,10 +56,10 @@ $.fn.attacher = function(options) {
         }
         if(headline.attachments.length && onContentChangeCB !== null)
             onContentChangeCB(); // invoke user callback
-        return exp;
+        return obj;
     };
 
-    exp.newAttachment = function() {
+    obj.newAttachment = function() {
         var $divSlot = null;
         var tempFiles = [];
 
@@ -104,17 +104,17 @@ $.fn.attacher = function(options) {
             alert(str);
         });
 
-        return exp;
+        return obj;
     };
 
-    exp.removeAll = function() {
+    obj.removeAll = function() {
         $targetDiv.children('.attacher_unit').remove();
-        return exp;
+        return obj;
     };
 
-    exp.onContentChange = function(callback) {
+    obj.onContentChange = function(callback) {
         onContentChangeCB = callback;
-        return exp;
+        return obj;
     };
 
     $targetDiv.on('click', '.attacher_remove', function() {
@@ -123,7 +123,5 @@ $.fn.attacher = function(options) {
         if(onContentChangeCB !== null)
             onContentChangeCB(); // invoke user callback
     });
-
-    return exp;
 };
 })( jQuery );
