@@ -64,9 +64,7 @@ function LoadServerStatus() {
         window.alert('Erro ao consultar a versão atual do Expresso.\n'+
             'É possível que o Expresso esteja fora do ar.');
     }).done(function(data) {
-        $('#versionInfo').html(data.Tinebase.version.codeName+'<br/>' +
-            data.Tinebase.version.buildType+', '+data.Tinebase.version.packageString+'<br/>' +
-            data.Tinebase.version.releaseTime).fadeIn(400);
+        $('#versionInfo').append(data.Tinebase.version.packageString).fadeIn(400);
     });
 }
 

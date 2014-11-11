@@ -11,6 +11,9 @@
 
 @session_start();
 require_once(dirname(__FILE__).'/conf.php');
+
+define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
+
 if(!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
 if(isset($_REQUEST['r'])) { // that's an AJAX request
     require('inc/Ajax.class.php');
@@ -68,6 +71,9 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
         <br/>
         <a href="<?php echo CLASSIC_URL;?>">Ir para a versão clássica do Expresso</a>
     </div>
-    <div id="versionInfo"></div>
+    <div id="versionInfo">
+        Informações da Versão<br />
+        <?php echo EXPRESSOLITE_PACKAGE_STRING;?><br />
+    </div>
 </body>
 </html>
