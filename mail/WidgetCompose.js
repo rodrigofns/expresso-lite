@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Widget to render the compose email fields. jQuery plugin.
+ * Widget to render the compose email fields.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat ) {
+(function( $, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat, ModelessDialog ) {
 window.WidgetCompose = function(options) {
     var userOpts = $.extend({
         folderCache: []
@@ -18,7 +18,7 @@ window.WidgetCompose = function(options) {
     var onCloseCB = null; // user callbacks
     var onSendCB  = null;
     var onDraftCB = null;
-    var popup     = null; // $().modelessDialog() object, created on show()
+    var popup     = null; // ModelessDialog object, created on show()
     var attacher  = null; // WidgetAttacher object, created on show()
     var autocomp  = null; // WidgetSearchAddr object, created on keydown
     var msg       = { fwd:null, re:null, draft:null }; // we have a forwarded/replied/draft message
@@ -201,7 +201,8 @@ window.WidgetCompose = function(options) {
     }
 
     function _SetupNewModelessDialog() {
-        popup = $('#composePanel').modelessDialog({
+        popup = new ModelessDialog({
+            elem: $('#composePanel'),
             caption: 'Escrever email',
             width: 550,
             height: $(window).outerHeight() - 120,
@@ -431,4 +432,4 @@ window.WidgetCompose = function(options) {
         }
     });
 };
-})( jQuery, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat );
+})( jQuery, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat, ModelessDialog );

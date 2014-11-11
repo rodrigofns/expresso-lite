@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Popup for search and autocomplete email addresses. jQuery plugin.
+ * Popup for search and autocomplete email addresses.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3

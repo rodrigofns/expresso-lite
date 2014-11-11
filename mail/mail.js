@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, Contacts, UrlStack ) {
+(function( $, Contacts, UrlStack, DropdownMenu ) {
     var Cache = { // global page cache with all objects
         MAILBATCH: 50, // overwritten with value from conf in document.ready
         folders: [], // all folder objects
@@ -28,7 +28,7 @@
         Cache.lstHeadline = new WidgetHeadlines({ elem:'#headlinesArea', folderCache:Cache.folders });
         Cache.lstMessage = new WidgetMessages({ elem:'#messagesArea', folderCache:Cache.folders,
             contactsCache:Cache.contacts, wndCompose:Cache.wndCompose });
-        Cache.menuHeadlines = $('#headerHeadlinesDropdown').dropdownMenu({ });
+        Cache.menuHeadlines = new DropdownMenu({ btn:$('#headerHeadlinesDropdown') });
 
         // Setup all page events.
         SetupEvents();
@@ -326,4 +326,4 @@
         if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
             LoadFirstHeadlines(draftFolder);
     }
-})( jQuery, Contacts, UrlStack );
+})( jQuery, Contacts, UrlStack, DropdownMenu );

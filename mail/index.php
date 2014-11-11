@@ -19,17 +19,18 @@ if(!Tine::isLogged()) header('location: ../');
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1"/>
-    <link rel="stylesheet" href="../inc/general.css"/>
-    <link rel="stylesheet" href="mail.css"/>
+    <link type="text/css" rel="stylesheet" href="../inc/general.css"/>
+    <link type="text/css" rel="stylesheet" href="mail.css"/>
     <title>Expresso Lite</title>
     <script src="../inc/UrlStack.js"></script>
     <script src="../inc/DateFormat.js"></script>
     <script src="../inc/sprintf.min.js"></script>
     <script src="../inc/jquery-2.1.1.min.js"></script>
     <script src="../inc/jquery-serialize.js"></script>
-    <script src="../inc/jquery-dropdownMenu.js"></script>
-    <script src="../inc/jquery-modelessDialog.js"></script>
-    <script src="../inc/jquery-uploadFile.js"></script>
+    <script src="../inc/LoadCss.js"></script>
+    <script src="../inc/DropdownMenu.js"></script>
+    <script src="../inc/ModelessDialog.js"></script>
+    <script src="../inc/UploadFile.js"></script>
     <script src="Contacts.js"></script>
     <script src="ThreadMail.js"></script>
     <script src="WidgetFolders.js"></script>

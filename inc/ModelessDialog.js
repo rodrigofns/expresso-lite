@@ -8,22 +8,12 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, UrlStack ) {
-$(document).ready(function() {
-    $(document.head).append('<style>' +
-    '#modelessDialog_box { position:fixed; background:white; box-shadow:1px 1px 12px #666; } ' +
-    '#modelessDialog_bar { overflow:hidden; padding:6px; border-bottom:1px solid #DDD; cursor:move; ' +
-        '-moz-user-select:none; -webkit-user-select:none; user-select:none; background:#005483; } ' +
-    '#modelessDialog_title { font-weight:bold; color:#F0F0F0; display:inline-block; margin-top:3px; } ' +
-    '#modelessDialog_minCage,#modelessDialog_closeCage { padding:0 1px; display:inline-block; float:right; } ' +
-    '#modelessDialog_resz { position:absolute; right:0; bottom:0; background:#F8F8F8; ' +
-        'cursor:se-resize; width:30px; height:30px; }' +
-    '.modelessDialog_unselectable { -moz-user-select:none; -webkit-user-select:none; user-select:none; } ' +
-    '</style>');
-});
+LoadCss('../inc/ModelessDialog.css');
 
-$.fn.modelessDialog = function(options) {
+(function( $, UrlStack ) {
+window.ModelessDialog = function(options) {
     var userOpts = $.extend({
+        elem: null, // jQuery object for the target DIV
         caption: 'Modeless popup',
         width: 400,
         height: 400,
@@ -35,38 +25,37 @@ $.fn.modelessDialog = function(options) {
         cxPhone: 767 // max smartphone width, in pixels
     }, options);
 
-    var exp = { };
-
+    var obj           = this;
     var onUserCloseCB = null; // user callbacks
     var onCloseCB     = null;
     var onResizeCB    = null;
-    var $targetDiv    = this;
+    var $targetDiv    = userOpts.elem;
     var $popupDiv     = null;
     var cyTitle       = 0; // height of titlebar; never changes
     var prevMinPos    = { x:0, y:0, cx:0, cy:0 }; // position/size before minimize
     var prevMaxPos    = { x:0, y:0, cx:0, cy:0 }; // before maximize
 
     (function _Ctor() {
-        $popupDiv = $('<div id="modelessDialog_box">' +
-            '<div id="modelessDialog_bar">' +
-                '<div id="modelessDialog_title">'+userOpts.caption+'</div>' +
-                '<div id="modelessDialog_closeCage"><input type="button" value="X" title="Fechar esta janela"/></div>' +
-                '<div id="modelessDialog_minCage"><input type="button" value="_" title="Minimizar esta janela"/></div>' +
+        $popupDiv = $('<div id="ModelessDialog_box">' +
+            '<div id="ModelessDialog_bar">' +
+                '<div id="ModelessDialog_title">'+userOpts.caption+'</div>' +
+                '<div id="ModelessDialog_closeCage"><input type="button" value="X" title="Fechar esta janela"/></div>' +
+                '<div id="ModelessDialog_minCage"><input type="button" value="_" title="Minimizar esta janela"/></div>' +
             '</div>' +
-            '<div id="modelessDialog_content"></div>' +
-            '<div id="modelessDialog_resz"></div>' +
+            '<div id="ModelessDialog_content"></div>' +
+            '<div id="ModelessDialog_resz"></div>' +
             '</div>');
         var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
         var szCss = (wnd.cx <= userOpts.cxPhone) ? // smartphone screen
             { width:wnd.cx+'px', height:wnd.cy+'px' } :
             { width:userOpts.width+'px', height:userOpts.height+'px' };
         $popupDiv.css(szCss).appendTo(document.body);
-        $targetDiv.detach().appendTo('#modelessDialog_content').show();
+        $targetDiv.detach().appendTo('#ModelessDialog_content').show();
 
         if(wnd.cx <= userOpts.cxPhone) { // smartphone screen
-            $('#modelessDialog_minCage,#modelessDialog_resz').hide();
-            UrlStack.push('#modelessDialog', function() {
-                $('#modelessDialog_closeCage input:first').trigger('click');
+            $('#ModelessDialog_minCage,#ModelessDialog_resz').hide();
+            UrlStack.push('#ModelessDialog', function() {
+                $('#ModelessDialog_closeCage input:first').trigger('click');
             });
         } else {
             $popupDiv.css({ 'min-width': userOpts.minWidth+'px',
@@ -74,39 +63,39 @@ $.fn.modelessDialog = function(options) {
                 left:($(window).outerWidth() / 2 - $popupDiv.outerWidth() / 2)+'px', // center screen
                 top:Math.max(0, $(window).outerHeight() / 2 - $popupDiv.outerHeight() / 2)+'px' });
             if(!userOpts.resizable)
-                $('#modelessDialog_resz').hide();
+                $('#ModelessDialog_resz').hide();
         }
-        cyTitle = $('#modelessDialog_bar').outerHeight();
+        cyTitle = $('#ModelessDialog_bar').outerHeight();
     })();
 
-    exp.getContentArea = function() {
+    obj.getContentArea = function() {
         return { cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() - cyTitle };
     };
 
-    exp.isOpen = function() {
+    obj.isOpen = function() {
         return $popupDiv !== null;
     };
 
-    exp.close = function() {
+    obj.close = function() {
         $targetDiv.detach().appendTo(document.body).hide();
         $popupDiv.remove();
         $popupDiv = null;
-        UrlStack.pop('#modelessDialog');
+        UrlStack.pop('#ModelessDialog');
         if(onCloseCB !== null)
             onCloseCB(); // invoke user callback
-        return exp;
+        return obj;
     };
 
-    exp.isMinimized = function() {
-        return !$('#modelessDialog_content').is(':visible');
+    obj.isMinimized = function() {
+        return !$('#ModelessDialog_content').is(':visible');
     };
 
-    exp.toggleMinimize = function() {
-        //~ var willMin = $('#modelessDialog_content').is(':visible');
-        var willMin = !exp.isMinimized();
-        $('#modelessDialog_content,#modelessDialog_resz').toggle();
-        $('#modelessDialog_closeCage').toggle(!willMin);
-        $('#modelessDialog_minCage input').val(willMin ? '¯' : '_');
+    obj.toggleMinimize = function() {
+        //~ var willMin = $('#ModelessDialog_content').is(':visible');
+        var willMin = !obj.isMinimized();
+        $('#ModelessDialog_content,#ModelessDialog_resz').toggle();
+        $('#ModelessDialog_closeCage').toggle(!willMin);
+        $('#ModelessDialog_minCage input').val(willMin ? '¯' : '_');
         if(willMin) {
             prevMinPos = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                 cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() }; // keep current pos
@@ -119,42 +108,42 @@ $.fn.modelessDialog = function(options) {
         }
     };
 
-    exp.setCaption = function(htmlText) {
-        $('#modelessDialog_title').html(htmlText);
-        return exp;
+    obj.setCaption = function(htmlText) {
+        $('#ModelessDialog_title').html(htmlText);
+        return obj;
     };
 
-    exp.removeCloseButton = function() {
-        $('#modelessDialog_closeCage').remove();
-        return exp;
+    obj.removeCloseButton = function() {
+        $('#ModelessDialog_closeCage').remove();
+        return obj;
     };
 
-    exp.onUserClose = function(callback) {
+    obj.onUserClose = function(callback) {
         onUserCloseCB = callback; // triggered only when the user clicks the close button
-        return exp;
+        return obj;
     };
 
-    exp.onClose = function(callback) {
+    obj.onClose = function(callback) {
         onCloseCB = callback; // onClose()
-        return exp;
+        return obj;
     };
 
-    exp.onResize = function(callback) {
+    obj.onResize = function(callback) {
         onResizeCB = callback; // onResize()
-        return exp;
+        return obj;
     };
 
-    $('#modelessDialog_bar').on('mousedown', function(ev) {
+    $('#ModelessDialog_bar').on('mousedown', function(ev) {
         ev.stopImmediatePropagation();
 
-        if($('#modelessDialog_content').is(':visible')) {
+        if($('#ModelessDialog_content').is(':visible')) {
             var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
             var pop = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                 cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() };
             var offset = { x:ev.clientX - pop.x, y:ev.clientY - pop.y };
-            $('div').addClass('modelessDialog_unselectable');
+            $('div').addClass('ModelessDialog_unselectable');
 
-            $(document).on('mousemove.modelessDialog', function(ev) {
+            $(document).on('mousemove.ModelessDialog', function(ev) {
                 ev.stopImmediatePropagation();
                 var newPos = { x:ev.clientX - offset.x, y:ev.clientY - offset.y };
                 var destCss = { };
@@ -163,20 +152,20 @@ $.fn.modelessDialog = function(options) {
                 $popupDiv.css(destCss);
             });
 
-            $(document).on('mouseup.modelessDialog', function(ev) {
-                $('div').removeClass('modelessDialog_unselectable');
-                $(document).off('.modelessDialog');
+            $(document).on('mouseup.ModelessDialog', function(ev) {
+                $('div').removeClass('ModelessDialog_unselectable');
+                $(document).off('.ModelessDialog');
             });
         } else {
-            exp.toggleMinimize();
+            obj.toggleMinimize();
         }
     });
 
-    $('#modelessDialog_bar').on('dblclick', function(ev) {
+    $('#ModelessDialog_bar').on('dblclick', function(ev) {
         ev.stopImmediatePropagation();
         var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
         if(wnd.cx > userOpts.cxPhone) { // on phones doubleclick does nothing
-            if($('#modelessDialog_content').is(':visible')) { // not minimized
+            if($('#ModelessDialog_content').is(':visible')) { // not minimized
                 var isMaximized = ($popupDiv.offset().left === userOpts.marginLeftMaximized) &&
                     ($popupDiv.offset().top === userOpts.marginMaximized) &&
                     ($popupDiv.outerWidth() === wnd.cx - userOpts.marginLeftMaximized - userOpts.marginMaximized) &&
@@ -197,20 +186,20 @@ $.fn.modelessDialog = function(options) {
                 if(onResizeCB !== null)
                     onResizeCB(); // invoke user callback
             } else { // if minimized, simply restore; never happens because mousedown comes first
-                exp.toggleMinimize();
+                obj.toggleMinimize();
             }
         }
     });
 
-    $('#modelessDialog_resz').on('mousedown', function(ev) {
+    $('#ModelessDialog_resz').on('mousedown', function(ev) {
         ev.stopImmediatePropagation();
         var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
         var pop = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
             cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() };
         var orig = { x:ev.clientX, y:ev.clientY };
-        $('div').addClass('modelessDialog_unselectable');
+        $('div').addClass('ModelessDialog_unselectable');
 
-        $(document).on('mousemove.modelessDialog', function(ev) {
+        $(document).on('mousemove.ModelessDialog', function(ev) {
             ev.stopImmediatePropagation();
             var newSz = { cx:pop.cx + ev.clientX - orig.x, cy:pop.cy + ev.clientY - orig.y };
             var destCss = { };
@@ -221,23 +210,21 @@ $.fn.modelessDialog = function(options) {
                 onResizeCB();
         });
 
-        $(document).on('mouseup.modelessDialog', function(ev) {
-            $('div').removeClass('modelessDialog_unselectable');
-            $(document).off('.modelessDialog');
+        $(document).on('mouseup.ModelessDialog', function(ev) {
+            $('div').removeClass('ModelessDialog_unselectable');
+            $(document).off('.ModelessDialog');
         });
     });
 
-    $('#modelessDialog_minCage input').on('click', function(ev) {
+    $('#ModelessDialog_minCage input').on('click', function(ev) {
         ev.stopImmediatePropagation();
-        exp.toggleMinimize();
+        obj.toggleMinimize();
     });
 
-    $('#modelessDialog_closeCage input').on('click', function(ev) {
+    $('#ModelessDialog_closeCage input').on('click', function(ev) {
         ev.stopImmediatePropagation();
         if(onUserCloseCB !== null)
             onUserCloseCB(); // invoke user callback, user must call close() himself
     });
-
-    return exp;
 };
 })( jQuery, UrlStack );

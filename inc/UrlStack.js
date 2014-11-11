@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-var UrlStack = (function() {
+window.UrlStack = (function() {
     var exp = { };
 
     var states = [];

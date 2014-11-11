@@ -9,33 +9,34 @@
  */
 
 (function( $ ) {
-$.extend({
-    uploadFile: function(options) {
-        var userOpts = $.extend({
-            url: '',
-            fileName: 'file',
-            chunkSize: 102400 // file sliced into 100 KB chunks
-        }, options);
+window.UploadFile = function(options) {
+    var userOpts = $.extend({
+        url: '',
+        fileName: 'file',
+        chunkSize: 102400 // file sliced into 100 KB chunks
+    }, options);
 
-        var exp = { };
+    var obj = this;
+    var onProgressCB = null; // (pct, xhr)
+    var onDoneCB = null; // (file, xhr)
+    var onFailCB = null; // (xhr, str, err)
 
-        var onProgressCB = null; // (pct, xhr)
-        var onDoneCB = null; // (file, xhr)
-        var onFailCB = null; // (xhr, str, err)
+    function _ToBlob(dataChunk) {
+        // http://stackoverflow.com/questions/7211902/corruption-with-filereader-into-formdata
+        var ui8a = new Uint8Array(dataChunk.length);
+        for(var i = 0; i < dataChunk.length; ++i)
+            ui8a[i] = dataChunk.charCodeAt(i);
+        return new Blob([ ui8a.buffer ]);
+    }
 
-        function _ToBlob(dataChunk) {
-            // http://stackoverflow.com/questions/7211902/corruption-with-filereader-into-formdata
-            var ui8a = new Uint8Array(dataChunk.length);
-            for(var i = 0; i < dataChunk.length; ++i)
-                ui8a[i] = dataChunk.charCodeAt(i);
-            return new Blob([ ui8a.buffer ]);
-        }
-
-        (function _Ctor() {
-            $('<form enctype="multipart/form-data" style="display:none;">' +
-                '<input type="file" name="'+userOpts.fileName+'"/>' +
-            '</form>')
-            .appendTo('body').children(':file').change(function() {
+    (function _Ctor() {
+        $(document.createElement('form'))
+            .attr('enctype', 'multipart/form-data')
+            .css('display', 'none')
+            .append( $(document.createElement('input'))
+                .attr('type', 'file')
+                .attr('name', userOpts.fileName)
+            ).appendTo('body').children(':file').change(function() {
                 // http://stackoverflow.com/questions/166221/how-can-i-upload-files-asynchronously-with-jquery
                 var file = this.files[0];
                 var binaryReader = new FileReader();
@@ -78,13 +79,10 @@ $.extend({
 
                 ReadNextChunk(); // 1st call
             }).click();
-        })();
+    })();
 
-        exp.onProgress = function(callback) { onProgressCB = callback; return exp; };
-        exp.onDone =     function(callback) { onDoneCB = callback; return exp; };
-        exp.onFail =     function(callback) { onFailCB = callback; return exp; };
-
-        return exp;
-    }
-});
+    obj.onProgress = function(callback) { onProgressCB = callback; return obj; };
+    obj.onDone =     function(callback) { onDoneCB = callback; return obj; };
+    obj.onFail =     function(callback) { onFailCB = callback; return obj; };
+};
 })( jQuery );

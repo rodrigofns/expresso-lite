@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-var ThreadMail = (function() {
+window.ThreadMail = (function() {
     var exp = { };
 
     function _UniqueSenders(threads, useAddressee) {

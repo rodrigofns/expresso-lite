@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-var Contacts = (function( $ ) {
+window.Contacts = (function( $ ) {
     var exp = { };
 
     function _Hex2bin(hex) {

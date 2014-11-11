@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Widget to render the email headlines. jQuery plugin.
+ * Widget to render the email headlines.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3

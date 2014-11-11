@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Handles uploads for email attachments. jQuery plugin.
+ * Handles uploads for email attachments.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $ ) {
+(function( $, UploadFile ) {
 window.WidgetAttacher = function(options) {
     var userOpts = $.extend({
         elem: '' // jQuery selector for the target DIV
@@ -63,7 +63,7 @@ window.WidgetAttacher = function(options) {
         var $divSlot = null;
         var tempFiles = [];
 
-        var up = $.uploadFile({
+        var up = new UploadFile({
             url: '../?r=uploadTempFile',
             chunkSize: 1024 * 200 // file sliced into 200 KB chunks
         });
@@ -124,4 +124,4 @@ window.WidgetAttacher = function(options) {
             onContentChangeCB(); // invoke user callback
     });
 };
-})( jQuery );
+})( jQuery, UploadFile );

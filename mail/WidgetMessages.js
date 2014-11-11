@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Widget to render the message bodies. jQuery plugin.
+ * Widget to render the message bodies.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, Contacts, DateFormat, ThreadMail ) {
+(function( $, Contacts, DateFormat, ThreadMail, DropdownMenu ) {
 window.WidgetMessages = function(options) {
     var userOpts = $.extend({
         elem: '', // jQuery selector for the target DIV
@@ -51,7 +51,7 @@ window.WidgetMessages = function(options) {
     }
 
     function _BuildDropdownMenu($divUnit) {
-        var menu = $divUnit.find('.messages_dropdown').dropdownMenu({ });
+        var menu = new DropdownMenu({ btn:$divUnit.find('.messages_dropdown') });
         menu.addOption('Marcar como não lida', function() { _MarkRead($divUnit, false); })
             .addOption('Responder', function() { _NewMail($divUnit, 're'); })
             .addOption('Encaminhar', function() { _NewMail($divUnit, 'fwd'); })
@@ -417,4 +417,4 @@ window.WidgetMessages = function(options) {
         }
     });
 };
-})( jQuery, Contacts, DateFormat, ThreadMail );
+})( jQuery, Contacts, DateFormat, ThreadMail, DropdownMenu );

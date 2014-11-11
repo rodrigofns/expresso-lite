@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Dynamic dropdown widget, which is shown on hovering. jQuery plugin; uses UrlStack.
+ * Dynamic dropdown widget, which is shown on hovering.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -8,45 +8,33 @@
  * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, UrlStack ) {
-$(document).ready(function() {
-    $(document.head).append('<style>' +
-        'div.dropdownMenu_surrounding { display:inline; padding:0; margin:0; text-align:left; }' +
-        'div.dropdownMenu_surrounding * { -moz-user-select:none; -webkit-user-select:none; }' +
-        'ul.dropdownMenu_box { margin:0; overflow-y:auto; background:white; box-shadow:3px 3px 18px #666; padding:3px; } ' +
-        '@media (max-width:767px) { ul.dropdownMenu_box { box-shadow:3px 3px 180px #666; } } ' +
-        'li.dropdownMenu_option { list-style:none; margin:0; padding:4px 8px; cursor:pointer; } ' +
-        'li.dropdownMenu_option:hover { background:#E8F1FD; } ' +
-        'li.dropdownMenu_header { border-top:1px solid #E8E8E8; padding-top:8px; color:#8A8A8A; font-style:italic; cursor:default; } ' +
-        'li.dropdownMenu_header:hover { background:white; } ' +
-        'a.dropdownMenu_link { color:#222; text-decoration:none; } ' +
-        '</style>');
-});
+LoadCss('../inc/DropdownMenu.css');
 
-$.fn.dropdownMenu = function(options) {
+(function( $, UrlStack ) {
+window.DropdownMenu = function(options) {
     var userOpts = $.extend({
+        btn: null, // jQuery object for the target button
         cxPhone: 767 // max smartphone width, in pixels
     }, options);
 
-    var exp = { };
-
-    var $userBtn = this; // user button; when mouse goes over it, dropdown is shown
+    var obj       = this;
+    var $userBtn  = userOpts.btn; // user button; when mouse goes over it, dropdown is shown
     var $surroDiv = null; // this DIV will take place of user button; user button will be placed inside of it
-    var $list = null; // the dropdown UL
-    var entries = []; // populated by addOption() and addHeader()
+    var $list     = null; // the dropdown UL
+    var entries   = []; // populated by addOption() and addHeader()
 
     function _RenderLastEntry() {
         var eLast = entries[entries.length-1]; // append the last element as an LI into the container UL
-        var $liEntry = $(document.createElement('li')).addClass('dropdownMenu_option');
+        var $liEntry = $(document.createElement('li')).addClass('DropdownMenu_option');
         if(eLast.onClick === null)
-            $liEntry.addClass('dropdownMenu_header'); // non-clickable
+            $liEntry.addClass('DropdownMenu_header'); // non-clickable
 
         if(eLast.onClick === null) {
             $liEntry.append( $(document.createElement('span')).text(eLast.text) );
         } else {
             $liEntry.append( $(document.createElement('a'))
                 .attr('href', '#')
-                .addClass('dropdownMenu_link')
+                .addClass('DropdownMenu_link')
                 .html(eLast.text) );
         }
 
@@ -62,26 +50,26 @@ $.fn.dropdownMenu = function(options) {
         return prefix+text;
     }
 
-    exp.purge = function() {
+    obj.purge = function() {
         entries.length = 0;
         $list.empty();
-        exp.hidePopup();
-        return exp;
+        obj.hidePopup();
+        return obj;
     };
 
-    exp.addOption = function(text, callback, indent) {
+    obj.addOption = function(text, callback, indent) {
         entries.push({ text:_ApplyIndentation(text, indent), onClick:callback });
         _RenderLastEntry();
-        return exp;
+        return obj;
     };
 
-    exp.addHeader = function(text, indent) {
+    obj.addHeader = function(text, indent) {
         entries.push({ text:_ApplyIndentation(text, indent), onClick:null });
         _RenderLastEntry();
-        return exp;
+        return obj;
     };
 
-    exp.hidePopup = function() {
+    obj.hidePopup = function() {
         if($list.is(':visible')) {
             $list.hide();
             $surroDiv.prepend($userBtn).css({
@@ -90,13 +78,13 @@ $.fn.dropdownMenu = function(options) {
                 'z-index': 'auto'
             });
             $userBtn.css('position', 'static');
-            UrlStack.pop('#dropdownMenu');
+            UrlStack.pop('#DropdownMenu');
         }
     };
 
     (function _Ctor() {
         $surroDiv = $(document.createElement('div')) // create surrounding DIV
-            .addClass('dropdownMenu_surrounding')
+            .addClass('DropdownMenu_surrounding')
             .css({
                 width: $userBtn.outerWidth()+'px', // same size of user button
                 height: $userBtn.outerHeight()+'px'
@@ -105,7 +93,7 @@ $.fn.dropdownMenu = function(options) {
         $surroDiv.append($userBtn); // and user button goes inside the new DIV
 
         $list = $(document.createElement('ul')) // create dropdown UL
-            .addClass('dropdownMenu_box')
+            .addClass('DropdownMenu_box')
             .css({
                 //~ 'max-height': '500px', // too many items, scrollbar kicks in
                 //~ 'overflow-y': 'auto',
@@ -113,9 +101,9 @@ $.fn.dropdownMenu = function(options) {
             }).hide().appendTo($surroDiv);
     })();
 
-    $userBtn.on('click.dropdownMenu', function(ev) {
+    $userBtn.on('click.DropdownMenu', function(ev) {
         ev.stopImmediatePropagation();
-        exp.hidePopup();
+        obj.hidePopup();
         var page = { cx:$(window).width(), cy:$(window).height() };
         if(page.cx <= userOpts.cxPhone) { // click works only on smartphones
             $list.css('height', ''); // revert to natural height, if changed
@@ -138,12 +126,12 @@ $.fn.dropdownMenu = function(options) {
                 });
                 $userBtn.detach().insertBefore($surroDiv);
                 $list.show();
-                UrlStack.push('#dropdownMenu', exp.hidePopup);
+                UrlStack.push('#DropdownMenu', obj.hidePopup);
             }
         }
     });
 
-    $surroDiv.on('mouseenter.dropdownMenu', function() { // mouse over user button
+    $surroDiv.on('mouseenter.DropdownMenu', function() { // mouse over user button
         var page = { cx:$(window).width(), cy:$(window).height() };
         if(page.cx > userOpts.cxPhone) { // mouse over does nothing on smartphones, since there's no mouse
             $list.css('height', ''); // revert to natural height, if changed
@@ -178,18 +166,16 @@ $.fn.dropdownMenu = function(options) {
         }
     });
 
-    $surroDiv.on('mouseleave.dropdownMenu', function() {
+    $surroDiv.on('mouseleave.DropdownMenu', function() {
         if($(window).width() > userOpts.cxPhone) // mouse over does nothing on smartphones, since there's no mouse
-            exp.hidePopup();
+            obj.hidePopup();
     });
 
-    $surroDiv.on('click.dropdownMenu', '.dropdownMenu_option:not(.dropdownMenu_header)', function(ev) {
+    $surroDiv.on('click.DropdownMenu', '.DropdownMenu_option:not(.DropdownMenu_header)', function(ev) {
         $(this).blur();
-        exp.hidePopup();
+        obj.hidePopup();
         $(this).closest('li').data('entry').onClick(); // invoke user callback
         return false;
     });
-
-    return exp;
 };
 })( jQuery, UrlStack );

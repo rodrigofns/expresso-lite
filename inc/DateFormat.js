@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-var DateFormat = (function() {
+window.DateFormat = (function() {
     var exp = { };
 
     function _Pad2(num) {
