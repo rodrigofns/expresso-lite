@@ -14,6 +14,7 @@ LoadCss('../inc/DropdownMenu.css');
 window.DropdownMenu = function(options) {
     var userOpts = $.extend({
         btn: null, // jQuery object for the target button
+        zIndex: 1, // CSS property of surrounding DIV
         cxPhone: 767 // max smartphone width, in pixels
     }, options);
 
@@ -72,7 +73,7 @@ window.DropdownMenu = function(options) {
     obj.hidePopup = function() {
         if($list.is(':visible')) {
             $list.hide();
-            $surroDiv.prepend($userBtn).css({
+            $surroDiv.prepend($list).prepend($userBtn).css({
                 position: 'static',
                 width: $userBtn.outerWidth()+'px',
                 'z-index': 'auto'
@@ -106,26 +107,25 @@ window.DropdownMenu = function(options) {
         obj.hidePopup();
         var page = { cx:$(window).width(), cy:$(window).height() };
         if(page.cx <= userOpts.cxPhone) { // click works only on smartphones
-            $list.css('height', ''); // revert to natural height, if changed
+            $list.css({ width:'', height:'' }); // revert to natural, if changed
             if(entries.length && page.cx <= userOpts.cxPhone) { // click works only on smartphones
                 var list = { cx:$list.outerWidth(), cy:$list.outerHeight() };
                 list.cx += 16; // even more room on smartphones
 
                 if(list.cy > page.cy - 16) { // dropdown goes beyond page height; shrink, scrollbar will appear
-                    $list.height(page.cy - 16); // 14px gap for prettiness
+                    list.cy = page.cy - 16; // gap for prettiness
                     list.cx += 16; // scrollbar room
                 }
 
-                $surroDiv.css({
+                $list.css({
                     position: 'fixed',
                     width: list.cx+'px',
                     height: list.cy+'px',
                     left: (page.cx / 2 - list.cx / 2)+'px',
                     top: '5px',
-                    'z-index': 1
-                });
-                $userBtn.detach().insertBefore($surroDiv);
-                $list.show();
+                    'z-index': userOpts.zIndex
+                }).appendTo('body').show();
+
                 UrlStack.push('#DropdownMenu', obj.hidePopup);
             }
         }
@@ -158,7 +158,7 @@ window.DropdownMenu = function(options) {
                     left: surrou.cx+'px',
                     top: userBtn.top+'px',
                     'padding-top': userBtn.cy+'px',
-                    'z-index': 1
+                    'z-index': userOpts.zIndex
                 });
                 $userBtn.detach().insertBefore($surroDiv);
                 $list.show();
@@ -171,7 +171,7 @@ window.DropdownMenu = function(options) {
             obj.hidePopup();
     });
 
-    $surroDiv.on('click.DropdownMenu', '.DropdownMenu_option:not(.DropdownMenu_header)', function(ev) {
+    $list.on('click.DropdownMenu', '.DropdownMenu_option:not(.DropdownMenu_header)', function(ev) {
         $(this).blur();
         obj.hidePopup();
         $(this).closest('li').data('entry').onClick(); // invoke user callback

@@ -101,7 +101,7 @@
                     RestoreLoginState();
                 }).done(function(data) {
                     $('#frmLogin .throbber').remove();
-                    $('#credent').hide();
+                    $('#credent,#links,#versionInfo').hide();
                     $('#thebg').fadeOut({ duration:400, queue:false });
                     $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
                     $('#blue').animate({ top:'7.5%' }, { duration:500, queue:false, complete:function() {

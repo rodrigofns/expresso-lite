@@ -43,6 +43,9 @@
 .loadingMessage { text-align:center; margin:10px; color:#888; font-style:italic; }
 .folders_ul { margin:0 8px 0 0; padding:0; }
 .folders_li { list-style:none; cursor:pointer; margin:3px 0; }
+@media (max-width:767px) { /* phones */
+    .folders_li { padding:6px 0; }
+}
 .folders_text { }
 .folders_text:hover { background:#F5F5F5; }
 .folders_current { background:#D9E8FB; }
@@ -188,6 +191,12 @@ pre.message-viewer { white-space:pre-wrap; }
 .icoSigned    { background-position:0 -80px; opacity:.65; }
 .icoHigh0     { background-position:0 -96px; }
 .icoHigh1     { background-position:0 -112px; }
-.icoCheck0,.icoCheck1 { background:no-repeat center; width:32px; height:32px; display:inline-block; }
+.icoCheck0,.icoCheck1 { background:no-repeat center; display:inline-block; }
+@media (max-width:767px) { /* phones */
+    .icoCheck0,.icoCheck1 { background-size:80%; width:34px; height:32px; }
+}
+@media (min-width:768px) { /* everyone else */
+    .icoCheck0,.icoCheck1 { width:32px; height:32px; }
+}
 .icoCheck0 { background-image:url(../img/check0.png); }
 .icoCheck1 { background-image:url(../img/check1.png); }

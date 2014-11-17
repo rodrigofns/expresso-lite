@@ -113,6 +113,7 @@
         var folder = Cache.lstFolder.getCurrent();
         var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
         document.title = folder.localName+' '+counter+'- '+$('.userAddr:first').text()+' - Expresso Lite';
+        $('#headerFolderCounter').text(' ('+folder.unreadMails+'/'+folder.totalMails+')');
     }
 
     function UpdateFolders() {

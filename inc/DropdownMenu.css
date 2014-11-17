@@ -11,10 +11,14 @@
 div.DropdownMenu_surrounding { display:inline; padding:0; margin:0; text-align:left; }
 div.DropdownMenu_surrounding * { -moz-user-select:none; -webkit-user-select:none; }
 ul.DropdownMenu_box { margin:0; overflow-y:auto; background:white; box-shadow:3px 3px 18px #666; padding:3px; }
-@media (max-width:767px) {
-    ul.DropdownMenu_box { box-shadow:3px 3px 180px #666; }
+li.DropdownMenu_option { list-style:none; margin:0; cursor:pointer; }
+@media (max-width:767px) { /* phones */
+    ul.DropdownMenu_box { box-shadow:3px 3px 54px #666; }
+    li.DropdownMenu_option { padding:10px 8px; }
 }
-li.DropdownMenu_option { list-style:none; margin:0; padding:4px 8px; cursor:pointer; }
+@media (min-width:768px) { /* everyone else */
+    li.DropdownMenu_option { padding:4px 8px; }
+}
 li.DropdownMenu_option:hover { background:#E8F1FD; }
 li.DropdownMenu_header { border-top:1px solid #E8E8E8; padding-top:8px; color:#8A8A8A; font-style:italic; cursor:default; }
 li.DropdownMenu_header:hover { background:white; }
