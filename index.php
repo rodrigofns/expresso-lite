@@ -1,4 +1,5 @@
 <?php
+use ExpressoLite\Backend;
 /*!
  * Expresso Lite
  * Main index login page.
@@ -9,17 +10,19 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-@session_start();
-require_once(dirname(__FILE__).'/conf.php');
+require_once (dirname(__FILE__).'/inc/bootstrap.php');
 define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
-if (!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
-if (isset($_REQUEST['r'])) { // that's an AJAX request
-    require('inc/Ajax.class.php');
-    Ajax::ProcessRequest();
+
+if(isset($_REQUEST['r'])) { // that's an AJAX request
+    $processor = new ExpressoLite\Backend\AjaxProcessor();
+    $processor->processHttpRequest($_REQUEST);
     exit; // nothing is outputted here
 }
-require('inc/Tine.class.php');
-if (Tine::IsLogged()) header('location: ./mail');
+
+if (Backend\TineSessionRepository::getTineSession()->isLoggedIn()) {
+    header('location: ./mail');
+}
+
 $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] : '';
 ?>
 <!DOCTYPE html>

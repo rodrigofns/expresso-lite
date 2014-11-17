@@ -43,14 +43,18 @@ require(['jquery', 'inc/App'], function($, App) {
                 var ver;
                 if (bname !== 'Safari') {
                     ver = ua.substr(browserPrefixIndex + (bname+'/').length);
-                    if (ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+                    if (ver.indexOf(' ') !== -1) {
+                        ver = ver.substr(0, ver.indexOf(' '));
+                    }
                 } else {
                     // Safari is a bit of a special case, its major version is
-                    //  expressed after the Version\ prefix.
+                    // expressed after the Version\ prefix.
                     var versionPrefixIndex = ua.indexOf('Version/');
                     if (versionPrefixIndex !== -1) {
                         ver = ua.substr(versionPrefixIndex + 'Version/'.length);
-                        if (ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+                        if (ver.indexOf(' ') !== -1) {
+                            ver = ver.substr(0, ver.indexOf(' '));
+                        }
                     } else {
                         bver = '-1'; // may happen when using Google Chrome on iPhone
                     }
@@ -63,7 +67,7 @@ require(['jquery', 'inc/App'], function($, App) {
 
     function LoadServerStatus() {
         $('#versionInfo').hide();
-        App.Post('getAllRegistryData', { validateLogin:0 })
+        App.Post('getAllRegistryData')
         .fail(function(resp) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+
                 'É possível que o Expresso esteja fora do ar.');
@@ -85,7 +89,7 @@ require(['jquery', 'inc/App'], function($, App) {
             $('#user').focus();
         }
 
-        App.Post('login', { user:$('#user').val(), pwd:$('#pwd').val() })
+        $.post('.', { r:'login', user:$('#user').val(), pwd:$('#pwd').val() })
         .fail(function(resp) {
             window.alert('Não foi possível efetuar login.\n' +
                 'O usuário ou a senha estão incorretos.');
@@ -96,21 +100,20 @@ require(['jquery', 'inc/App'], function($, App) {
                 window.alert('Sua senha expirou, é necessário trocá-la.');
                 var $frmLogin = $('#frmLogin').replaceWith($('#frmChangePwd')).appendTo('#templates');
                 $('#cpNewPwd').focus();
+            } else if (!data.success) {
+                window.alert('Não foi possível efetuar login.\n' +
+                    'O usuário ou a senha estão incorretos.');
+                RestoreLoginState();
             } else {
-                $('#frmLogin .throbber').children('span').text('Autenticando...');
-
-                App.Post('getAllRegistryData', { validateLogin:1 })
-                .fail(function(resp) {
-                    window.alert('Erro na consulta aos dados do usuário.\n'+resp.responseText);
-                    RestoreLoginState();
-                }).done(function(data) {
-                    $('#frmLogin .throbber').remove();
-                    $('#credent,#links,#versionInfo').hide();
-                    $('#thebg').fadeOut({ duration:400, queue:false });
-                    $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
-                    $('#blue').animate({ top:'7.5%' }, { duration:500, queue:false, complete:function() {
-                        location.href = './mail';
-                    } });
+                $('#credent,#links,#versionInfo').hide();
+                $('#thebg').fadeOut({ duration:400, queue:false });
+                $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
+                $('#blue').animate({ top: '7.5%'}, {
+                    duration: 500,
+                    queue: false,
+                   complete: function() {
+                       location.href = './mail';
+                   }
                 });
             }
         });

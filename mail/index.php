@@ -9,10 +9,13 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-@session_start();
-require_once(dirname(__FILE__).'/../conf.php');
-require_once(dirname(__FILE__).'/../inc/Ajax.class.php');
-if (!Tine::isLogged()) header('location: ../');
+require_once (dirname(__FILE__) .'/../inc/bootstrap.php');
+
+$tineSession = ExpressoLite\Backend\TineSessionRepository::getTineSession();
+
+if(!$tineSession->isLoggedIn()) {
+    header('location: ../');
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -27,8 +30,8 @@ if (!Tine::isLogged()) header('location: ../');
 <body>
     <section id="info"><!-- exposed server constants -->
         <input type="hidden" id="mailBatch" value="<?=MAIL_BATCH?>"/>
-        <input type="hidden" id="mailAddress" value="<?=$_SESSION['user_email']?>"/>
-        <input type="hidden" id="mailSignature" value="<?=$_SESSION['user_signature']?>"/>
+        <input type="hidden" id="mailAddress" value="<?=$tineSession->getAttribute('Expressomail.email') ?>"/>
+        <input type="hidden" id="mailSignature" value="<?=$tineSession->getAttribute('Expressomail.signature') ?>"/>
     </section>
     <section id="icons"><!-- icon templates -->
         <img class="throbber" src="../img/chromiumthrobber.svg"/>

@@ -15,3 +15,14 @@ define('ANDROID_URL', '');
 define('IOS_URL',     ''); // app download links
 
 define('MAIL_BATCH', 50); // how many email entries loaded by default
+
+/* It is possible to make ExpressoLite activate PHP XDebug in the target
+ * Tine backend server. To do this, configure a constant named
+ * ACTIVATE_TINE_XDEBUG with the value true, like:
+ *
+ * define('ACTIVATE_TINE_XDEBUG', true);
+ *
+ * WARNING: DO NOT DO THIS IN A PRODUCTION ENVIRONMENT. It is meant only for
+ * debug purposes!
+ *
+ */
