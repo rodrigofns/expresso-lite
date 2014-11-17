@@ -155,6 +155,7 @@
     .messages_icons {  }
     .messages_when  { float:right; padding:4px; }
 }
+pre.message-viewer { white-space:pre-wrap; }
 
 
 /* --- Non-modal email composing form --- */
