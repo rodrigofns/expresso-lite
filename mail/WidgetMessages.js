@@ -27,9 +27,9 @@ window.WidgetMessages = function(options) {
 
     function _FormatAttachments(attachs) {
         var ret = '';
-        if(attachs !== undefined && attachs.length) {
+        if (attachs !== undefined && attachs.length) {
             ret = '<b>'+(attachs.length === 1 ? 'Anexo' : attachs.length+' anexos')+'</b>: ';
-            for(var i = 0; i < attachs.length; ++i) {
+            for (var i = 0; i < attachs.length; ++i) {
                 ret += '<span style="white-space:nowrap;"><a href="#">'+attachs[i].filename+'</a> ' +
                     '('+ThreadMail.FormatBytes(attachs[i].size)+')</span>, ';
             }
@@ -39,9 +39,9 @@ window.WidgetMessages = function(options) {
     }
 
     function _FormatManyAddresses(addrs) {
-        if(!addrs.length) return '<i>(ninguém)</i>';
+        if (!addrs.length) return '<i>(ninguém)</i>';
         var ret = '';
-        for(var i = 0; i < addrs.length; ++i) {
+        for (var i = 0; i < addrs.length; ++i) {
             var $span = $('#templates .messages_addrPerson').clone();
             var ad = addrs[i].toLowerCase();
             ret += $span.find('.messages_addrName').text( ad.substr(0, ad.indexOf('@')) ).serialize() +
@@ -60,7 +60,7 @@ window.WidgetMessages = function(options) {
 
         var MenuRenderFolderLevel = function(folders, level) {
             $.each(folders, function(idx, folder) {
-                if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
+                if (folder.globalName !== curFolder.globalName) { // avoid move to current folder
                     menu.addOption(folder.localName, function() {
                         _MoveMessage($divUnit, folder); // pass folder object
                     }, level); // indentation
@@ -82,7 +82,7 @@ window.WidgetMessages = function(options) {
 
     function _BuildDivMail(headline) {
         var mugshot = Contacts.getMugshotSrc(headline.from.email);
-        if(mugshot === '')
+        if (mugshot === '')
             mugshot = userOpts.genericMugshot;
 
         var unreadClass = headline.unread ? 'messages_unread' : 'messages_read';
@@ -110,30 +110,30 @@ window.WidgetMessages = function(options) {
     }
 
     function _NewMail($div, action) {
-        if(!$div.hasClass('messages_unit'))
+        if (!$div.hasClass('messages_unit'))
             $div = $div.closest('.messages_unit');
-        if(!$div.children('.messages_content').is(':visible')) {
+        if (!$div.children('.messages_content').is(':visible')) {
             window.alert('Abra a mensagem antes de '+(action==='fwd'?'encaminhá':'respondê')+'-la.');
         } else {
             var opts = { curFolder:curFolder };
 
-            if(action === 'fwd') opts.forward = $div.data('headline');
-            else if(action === 're') opts.reply = $div.data('headline');
+            if (action === 'fwd') opts.forward = $div.data('headline');
+            else if (action === 're') opts.reply = $div.data('headline');
 
             userOpts.wndCompose.show(opts);
         }
     }
 
     function _MarkRead($elem, asRead) {
-        if(!$elem.hasClass('messages_unit'))
+        if (!$elem.hasClass('messages_unit'))
             $elem = $elem.closest('.messages_unit');
         var headline = $elem.data('headline');
-        if( (asRead && !headline.unread) || (!asRead && headline.unread) ) {
+        if ( (asRead && !headline.unread) || (!asRead && headline.unread) ) {
             window.alert('Mensagem já marcada como '+(asRead?'':'não')+' lida.');
         } else {
             $elem.find('.messages_from:first').append(
                 '<span class="messages_throbber">&nbsp; '+$('#icons .throbber').serialize()+'</span>' );
-            if(!asRead && $elem.find('.messages_content').is(':visible'))
+            if (!asRead && $elem.find('.messages_content').is(':visible'))
                     $elem.children('.messages_top1').trigger('click'); // collapse if expanded
 
             $.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:headline.id })
@@ -146,16 +146,16 @@ window.WidgetMessages = function(options) {
                 asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
                 $elem.children('.messages_top1,.messages_top2')
                     .toggleClass('messages_read', asRead).toggleClass('.messages_unread', !asRead);
-                if(onMarkReadCB !== null)
+                if (onMarkReadCB !== null)
                     onMarkReadCB(curFolder, headline); // invoke user callback
             });
         }
     }
 
     function _MoveMessage($elem, destFolder) {
-        if(!$elem.hasClass('messages_unit'))
+        if (!$elem.hasClass('messages_unit'))
             $elem = $elem.closest('.messages_unit');
-        if($elem.find('.throbber').length) // already working?
+        if ($elem.find('.throbber').length) // already working?
             return;
         var headline = $elem.data('headline');
 
@@ -176,14 +176,14 @@ window.WidgetMessages = function(options) {
                     var origThread = ThreadMail.FindThread(curFolder.threads, headline);
                     --curFolder.totalMails; // update cache
                     ++destFolder.totalMails;
-                    if(headline.unread) {
+                    if (headline.unread) {
                         --curFolder.unreadMails;
                         ++destFolder.unreadMails;
                     }
                     ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
                     destFolder.messages.length = 0; // force cache rebuild
                     destFolder.threads.length = 0;
-                    if(onMoveCB !== null)
+                    if (onMoveCB !== null)
                         onMoveCB(destFolder, origThread);
                 });
             });
@@ -195,15 +195,15 @@ window.WidgetMessages = function(options) {
     }
 
     function _DeleteMessage($elem) {
-        if(!$elem.hasClass('messages_unit'))
+        if (!$elem.hasClass('messages_unit'))
             $elem = $elem.closest('.messages_unit');
-        if($elem.find('.throbber').length) // already working?
+        if ($elem.find('.throbber').length) // already working?
             return;
         var headline = $elem.data('headline');
 
-        if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
+        if (curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
             _MoveMessage($elem, ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
-        } else if(window.confirm('Deseja apagar esta mensagem?')) { // we're in trash folder, add deleted flag
+        } else if (window.confirm('Deseja apagar esta mensagem?')) { // we're in trash folder, add deleted flag
             function ProceedDeleting() {
                 $elem.find('.messages_fromName').hide();
                 $elem.find('.messages_fromMail').html(' &nbsp; <i>Excluindo...</i>');
@@ -220,10 +220,10 @@ window.WidgetMessages = function(options) {
                         $elem.remove();
                         var origThread = ThreadMail.FindThread(curFolder.threads, headline);
                         --curFolder.totalMails; // update cache
-                        if(headline.unread)
+                        if (headline.unread)
                             --curFolder.unreadMails;
                         ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
-                        if(onMoveCB !== null)
+                        if (onMoveCB !== null)
                             onMoveCB(null, origThread);
                     });
                 });
@@ -237,19 +237,19 @@ window.WidgetMessages = function(options) {
 
     function _LoadMugshots(thread, unitDivs, onDone) {
         var mugshotAddrs = []; // email addresses to have mugshot fetched
-        for(var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
+        for (var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
             var fromAddr = thread[i].from.email.toLowerCase();
-            if(fromAddr.indexOf('@serpro.gov.br') !== -1 && mugshotAddrs.indexOf(fromAddr) === -1) // only @serpro addresses
+            if (fromAddr.indexOf('@serpro.gov.br') !== -1 && mugshotAddrs.indexOf(fromAddr) === -1) // only @serpro addresses
                 mugshotAddrs.push(fromAddr);
         }
 
         Contacts.loadMugshots(mugshotAddrs, function() {
-            for(var i = 0; i < unitDivs.length; ++i) {
-                if(!unitDivs[i].closest('body').length) // not in DOM anymore
+            for (var i = 0; i < unitDivs.length; ++i) {
+                if (!unitDivs[i].closest('body').length) // not in DOM anymore
                     continue;
-                if(unitDivs[i].find('.messages_mugshot > img').attr('src') === userOpts.genericMugshot) {
+                if (unitDivs[i].find('.messages_mugshot > img').attr('src') === userOpts.genericMugshot) {
                     var imgsrc = Contacts.getMugshotSrc(unitDivs[i].data('headline').from.email);
-                    if(imgsrc !== '') {
+                    if (imgsrc !== '') {
                         unitDivs[i].find('.messages_mugshot > img')
                             .attr('src', imgsrc)
                             .hide()
@@ -257,7 +257,7 @@ window.WidgetMessages = function(options) {
                     }
                 }
             }
-            if(onDone !== undefined)
+            if (onDone !== undefined)
                 onDone();
         });
     }
@@ -273,9 +273,9 @@ window.WidgetMessages = function(options) {
         var divs = [];
         var firstUnread = -1;
         thread.reverse(); // headlines now sorted oldest first
-        for(var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
+        for (var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
             divs.push(_BuildDivMail(thread[i]));
-            if(firstUnread === -1 && thread[i].unread)
+            if (firstUnread === -1 && thread[i].unread)
                 firstUnread = i;
         }
         thread.reverse(); // headlines now sorted newest first again
@@ -290,7 +290,7 @@ window.WidgetMessages = function(options) {
     obj.redrawIcons = function(headline) {
         $targetDiv.children('.messages_unit').each(function(idx, elem) {
             var $div = $(elem);
-            if($div.data('headline').id === headline.id)
+            if ($div.data('headline').id === headline.id)
                 $div.find('.messages_icons').html(_BuildIcons(headline));
         });
         return obj;
@@ -328,12 +328,12 @@ window.WidgetMessages = function(options) {
     $targetDiv.on('click', '.messages_top1,.messages_top2', function(ev, onDone) { // open message
         var $divUnit = $(this).closest('.messages_unit');
         var headline = $divUnit.data('headline');
-        if(!$divUnit.find('.messages_top2').is(':visible')) { // will expand
+        if (!$divUnit.find('.messages_top2').is(':visible')) { // will expand
 
             function PutContentsAndSlideDown() {
                 $divUnit.find('.messages_attachs').html(_FormatAttachments(headline.attachments));
                 $divUnit.find('.messages_body').html(headline.body.message);
-                if(headline.body.quoted !== null) {
+                if (headline.body.quoted !== null) {
                     $divUnit.find('.messages_showQuote').show();
                     $divUnit.find('.messages_quote').html(headline.body.quoted);
                 }
@@ -344,15 +344,15 @@ window.WidgetMessages = function(options) {
                     $divUnit.children('.messages_top1,.messages_top2')
                         .removeClass('messages_unread').addClass('messages_read');
 
-                    if(headline.unread) _MarkRead($divUnit, true);
-                    if(onViewCB !== null)
+                    if (headline.unread) _MarkRead($divUnit, true);
+                    if (onViewCB !== null)
                         onViewCB(curFolder, headline); // invoke user callback
-                    if(onDone !== undefined)
+                    if (onDone !== undefined)
                         onDone();
                 });
             }
 
-            if(headline.body === null) { // not cached yet
+            if (headline.body === null) { // not cached yet
                 $divUnit.append('<div class="loadingMessage">' +
                     'Carregando mensagem... '+$('#icons .throbber').serialize()+'</div>');
                 $.post('../', { r:'getMessage', id:headline.id })
@@ -374,7 +374,7 @@ window.WidgetMessages = function(options) {
                 '.messages_top2,.messages_attachs,.messages_content' :
                 '.messages_top2,.messages_content';
             $divUnit.find(toGo).slideUp(200).promise('fx').done(function() {
-                if(onDone !== undefined)
+                if (onDone !== undefined)
                     onDone();
             });
         }
@@ -403,14 +403,14 @@ window.WidgetMessages = function(options) {
     $targetDiv.on('mouseenter', '.messages_mugshot > img', function(ev) {
         var $img = $(this);
         var src = $img.attr('src');
-        if(src.substr(0, 5) === 'data:') { // apply effect only to real pictures
+        if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
             $img.css('box-shadow', '3px 3px 3px #888')
                 .animate({ width:'90px' }, { duration:70, queue:false });
         }
     }).on('mouseleave', '.messages_mugshot > img', function(ev) {
         var $img = $(this);
         var src = $img.attr('src');
-        if(src.substr(0, 5) === 'data:') { // apply effect only to real pictures
+        if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
             $img.animate({ width:'20px' }, { duration:70, queue:false, complete:function() {
                 $img.css('box-shadow', '');
             } });

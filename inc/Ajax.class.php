@@ -26,28 +26,28 @@ class Ajax
     {
         // Yes, we could have one method to each request, but on an editor
         // with code folding, this is actually faster to work with.
-        if($_REQUEST['r'] === 'session')
+        if ($_REQUEST['r'] === 'session')
         {
             self::_EchoJson($_SESSION); // for debug purposes
         }
-        else if($_REQUEST['r'] === 'isLogged')
+        else if ($_REQUEST['r'] === 'isLogged')
         {
             self::_EchoJson(Tine::IsLogged());
         }
-        else if($_REQUEST['r'] === 'login')
+        else if ($_REQUEST['r'] === 'login')
         {
-            if(!isset($_REQUEST['user']) || !isset($_REQUEST['pwd']))
+            if (!isset($_REQUEST['user']) || !isset($_REQUEST['pwd']))
                 self::_HttpError(400, 'É necessário informar login e senha.');
 
             try {
                 $logged = self::$tine->login($_REQUEST['user'], $_REQUEST['pwd']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(400, $e->getMessage());
             }
 
             self::_EchoJson($logged);
         }
-        else if($_REQUEST['r'] === 'changeExpiredPassword')
+        else if ($_REQUEST['r'] === 'changeExpiredPassword')
         {
             try {
                 $changed = self::$tine->changeExpiredPassword(
@@ -55,28 +55,28 @@ class Ajax
                     $_REQUEST['oldPassword'],
                     $_REQUEST['newPassword']
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(400, $e->getMessage());
             }
             self::_EchoJson($changed);
         }
-        else if($_REQUEST['r'] === 'setLocale')
+        else if ($_REQUEST['r'] === 'setLocale')
         {
             try {
                 $res = self::$tine->setLocale('pt_BR');
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($res);
         }
-        else if($_REQUEST['r'] === 'getAllRegistryData')
+        else if ($_REQUEST['r'] === 'getAllRegistryData')
         {
             try {
                 $ud = self::$tine->getAllRegistryData($_REQUEST['validateLogin'] == 1);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
-            if($_REQUEST['validateLogin'] == 1) {
+            if ($_REQUEST['validateLogin'] == 1) {
                 $_SESSION['user_email']       = $ud->email;
                 $_SESSION['user_login']       = $ud->user; // cpf
                 $_SESSION['user_name']        = $ud->from;
@@ -86,11 +86,11 @@ class Ajax
             }
             self::_EchoJson($ud);
         }
-        else if($_REQUEST['r'] === 'logoff')
+        else if ($_REQUEST['r'] === 'logoff')
         {
             try {
                 $res = self::$tine->logoff();
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             unset($_SESSION['user_org']);
@@ -100,153 +100,153 @@ class Ajax
             unset($_SESSION['user_signature']);
             self::_EchoJson($res);
         }
-        else if($_REQUEST['r'] === 'getPersonalContacts')
+        else if ($_REQUEST['r'] === 'getPersonalContacts')
         {
             try {
                 $contacts = self::$tine->getPersonalContacts($_SESSION['user_addrCatalog']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($contacts);
         }
-        else if($_REQUEST['r'] === 'searchFolders')
+        else if ($_REQUEST['r'] === 'searchFolders')
         {
             try {
                 $fldr = self::$tine->searchFolders(
                     isset($_REQUEST['parentFolder']) ? $_REQUEST['parentFolder'] : '',
                     isset($_REQUEST['recursive']) ? $_REQUEST['recursive'] == 1 : false);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($fldr);
         }
-        else if($_REQUEST['r'] === 'updateMessageCache')
+        else if ($_REQUEST['r'] === 'updateMessageCache')
         {
             try {
                 $folderStatus = self::$tine->updateMessageCache($_REQUEST['folderId']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($folderStatus);
         }
-        else if($_REQUEST['r'] === 'getFolderStatus')
+        else if ($_REQUEST['r'] === 'getFolderStatus')
         {
             try {
                 $folders = self::$tine->getFolderStatus(explode(',', $_REQUEST['ids'])); // comma-separated into array
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($folders);
         }
-        else if($_REQUEST['r'] === 'getFolderHeadlines')
+        else if ($_REQUEST['r'] === 'getFolderHeadlines')
         {
             try {
                 $headlines = self::$tine->getFolderHeadlines($_REQUEST['folderId'],
                     (int)$_REQUEST['start'], (int)$_REQUEST['limit']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($headlines);
         }
-        else if($_REQUEST['r'] === 'getMessage')
+        else if ($_REQUEST['r'] === 'getMessage')
         {
             try {
                 $msg = self::$tine->getMessage($_REQUEST['id']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($msg);
         }
-        else if($_REQUEST['r'] === 'searchMessages')
+        else if ($_REQUEST['r'] === 'searchMessages')
         {
             try {
                 $headlines = self::$tine->searchMessages($_REQUEST['what'],
                     explode(',', $_REQUEST['folderIds']), // comma-separated into array
                     (int)$_REQUEST['start'], (int)$_REQUEST['limit']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($headlines);
         }
-        else if($_REQUEST['r'] === 'markAsHighlighted')
+        else if ($_REQUEST['r'] === 'markAsHighlighted')
         {
             try {
                 $status = self::$tine->markMessageHighlighted(
                     $_REQUEST['asHighlighted'] === '1',
                     explode(',', $_REQUEST['ids']) ); // comma-separated into array
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'markAsRead')
+        else if ($_REQUEST['r'] === 'markAsRead')
         {
             try {
                 $status = self::$tine->markMessageRead(
                     $_REQUEST['asRead'] === '1',
                     explode(',', $_REQUEST['ids']) ); // comma-separated into array
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'deleteMessages')
+        else if ($_REQUEST['r'] === 'deleteMessages')
         {
             try {
                 $status = self::$tine->deleteMessages(
                     explode(',', $_REQUEST['messages']), // comma-separated into array
                     isset($_REQUEST['forever']) && $_REQUEST['forever'] === '1');
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'moveMessages')
+        else if ($_REQUEST['r'] === 'moveMessages')
         {
             try {
                 $status = self::$tine->moveMessages(
                     explode(',', $_REQUEST['messages']), // comma-separated into array
                     $_REQUEST['folder']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'downloadAttachment')
+        else if ($_REQUEST['r'] === 'downloadAttachment')
         {
             try {
                 self::$tine->downloadAttachment($_REQUEST['fileName'], $_REQUEST['messageId'],
                     $_REQUEST['partId']); // this method will directly output the binary stream to client
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
         }
-        else if($_REQUEST['r'] === 'searchContactsByToken')
+        else if ($_REQUEST['r'] === 'searchContactsByToken')
         {
             try {
                 $contacts = self::$tine->searchContactsByToken($_REQUEST['token']);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($contacts);
         }
-        else if($_REQUEST['r'] === 'searchContactsByEmail')
+        else if ($_REQUEST['r'] === 'searchContactsByEmail')
         {
             try {
                 $contacts = self::$tine->searchContactsByEmail( explode(',', $_REQUEST['emails']) ); // comma-separated into array
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($contacts);
         }
-        else if($_REQUEST['r'] === 'saveContacts')
+        else if ($_REQUEST['r'] === 'saveContacts')
         {
             try {
                 $personalId = ltrim(substr($_SESSION['user_login'], 0, 9), '0'); // cpf without last two digits
                 $containers = self::$tine->getNewContactsContainer($personalId);
                 $good = false;
-                foreach($containers as $container) {
-                    if($container->name === 'Contatos Coletados' && $container->type === 'personal') {
+                foreach ($containers as $container) {
+                    if ($container->name === 'Contatos Coletados' && $container->type === 'personal') {
                         self::$tine->saveContact($container->id,
                             explode(',', $_REQUEST['emails']), // comma-separated into array
                             explode(',', $_REQUEST['surnames']),
@@ -256,20 +256,20 @@ class Ajax
                         break;
                     }
                 }
-                if(!$good) self::_HttpError(500, 'Erro ao salvar novo contato: '.
+                if (!$good) self::_HttpError(500, 'Erro ao salvar novo contato: '.
                     'container de contatos coletados não encontrado.');
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
         }
-        else if($_REQUEST['r'] === 'uploadTempFile')
+        else if ($_REQUEST['r'] === 'uploadTempFile')
         {
-            if(isset($_SERVER['HTTP_X_FILE_NAME']) && isset($_SERVER['HTTP_X_FILE_TYPE'])) {
+            if (isset($_SERVER['HTTP_X_FILE_NAME']) && isset($_SERVER['HTTP_X_FILE_TYPE'])) {
                 try {
                     // http://stackoverflow.com/questions/9553168/undefined-variable-http-raw-post-data
                     $status = self::$tine->uploadTempFile(file_get_contents('php://input'),
                         $_SERVER['HTTP_X_FILE_NAME'], $_SERVER['HTTP_X_FILE_TYPE']);
-                } catch(Exception $e) {
+                } catch (Exception $e) {
                     self::_HttpError(500, $e->getMessage());
                 }
                 self::_EchoJson($status);
@@ -277,16 +277,16 @@ class Ajax
                 self::_HttpError(400, 'Nenhum arquivo a ser carregado.');
             }
         }
-        else if($_REQUEST['r'] === 'joinTempFiles')
+        else if ($_REQUEST['r'] === 'joinTempFiles')
         {
             try {
                 $status = self::$tine->joinTempFiles(json_decode($_REQUEST['tempFiles']));
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'saveMessage')
+        else if ($_REQUEST['r'] === 'saveMessage')
         {
             try {
                 $status = self::$tine->saveMessage(
@@ -301,12 +301,12 @@ class Ajax
                     ($_REQUEST['origDraftId'] != '') ? $_REQUEST['origDraftId'] : null, // if sending an existing draft
                     ($_REQUEST['attachs'] != '') ? json_decode($_REQUEST['attachs']) : array() // array of tempFile objects
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);
         }
-        else if($_REQUEST['r'] === 'saveMessageDraft')
+        else if ($_REQUEST['r'] === 'saveMessageDraft')
         {
             try {
                 $status = self::$tine->saveMessageDraft(
@@ -322,7 +322,7 @@ class Ajax
                     ($_REQUEST['origDraftId'] != '') ? $_REQUEST['origDraftId'] : null, // if editing an existing draft
                     ($_REQUEST['attachs'] != '') ? json_decode($_REQUEST['attachs']) : array() // array of tempFile objects
                 );
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 self::_HttpError(500, $e->getMessage());
             }
             self::_EchoJson($status);

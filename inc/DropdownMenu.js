@@ -27,10 +27,10 @@ window.DropdownMenu = function(options) {
     function _RenderLastEntry() {
         var eLast = entries[entries.length-1]; // append the last element as an LI into the container UL
         var $liEntry = $(document.createElement('li')).addClass('DropdownMenu_option');
-        if(eLast.onClick === null)
+        if (eLast.onClick === null)
             $liEntry.addClass('DropdownMenu_header'); // non-clickable
 
-        if(eLast.onClick === null) {
+        if (eLast.onClick === null) {
             $liEntry.append( $(document.createElement('span')).text(eLast.text) );
         } else {
             $liEntry.append( $(document.createElement('a'))
@@ -45,8 +45,8 @@ window.DropdownMenu = function(options) {
 
     function _ApplyIndentation(text, nIndent) {
         var prefix = '';
-        if(nIndent !== undefined && nIndent !== null) // text indentation
-            for(var i = 0; i < nIndent; ++i)
+        if (nIndent !== undefined && nIndent !== null) // text indentation
+            for (var i = 0; i < nIndent; ++i)
                 prefix += '&nbsp; ';
         return prefix+text;
     }
@@ -71,7 +71,7 @@ window.DropdownMenu = function(options) {
     };
 
     obj.hidePopup = function() {
-        if($list.is(':visible')) {
+        if ($list.is(':visible')) {
             $list.hide();
             $surroDiv.prepend($list).prepend($userBtn).css({
                 position: 'static',
@@ -106,13 +106,13 @@ window.DropdownMenu = function(options) {
         ev.stopImmediatePropagation();
         obj.hidePopup();
         var page = { cx:$(window).width(), cy:$(window).height() };
-        if(page.cx <= userOpts.cxPhone) { // click works only on smartphones
+        if (page.cx <= userOpts.cxPhone) { // click works only on smartphones
             $list.css({ width:'', height:'' }); // revert to natural, if changed
-            if(entries.length && page.cx <= userOpts.cxPhone) { // click works only on smartphones
+            if (entries.length && page.cx <= userOpts.cxPhone) { // click works only on smartphones
                 var list = { cx:$list.outerWidth(), cy:$list.outerHeight() };
                 list.cx += 16; // even more room on smartphones
 
-                if(list.cy > page.cy - 16) { // dropdown goes beyond page height; shrink, scrollbar will appear
+                if (list.cy > page.cy - 16) { // dropdown goes beyond page height; shrink, scrollbar will appear
                     list.cy = page.cy - 16; // gap for prettiness
                     list.cx += 16; // scrollbar room
                 }
@@ -133,16 +133,16 @@ window.DropdownMenu = function(options) {
 
     $surroDiv.on('mouseenter.DropdownMenu', function() { // mouse over user button
         var page = { cx:$(window).width(), cy:$(window).height() };
-        if(page.cx > userOpts.cxPhone) { // mouse over does nothing on smartphones, since there's no mouse
+        if (page.cx > userOpts.cxPhone) { // mouse over does nothing on smartphones, since there's no mouse
             $list.css('height', ''); // revert to natural height, if changed
-            if(entries.length) {
+            if (entries.length) {
                 var userBtn = $userBtn.offset(); // left, top
                 var list = { cx:$list.outerWidth(), cy:$list.outerHeight() };
                 var page = { cx:$(window).width(), cy:$(window).height() };
                 var surrou = { };
                 userBtn.cy = $userBtn.outerHeight();
 
-                if(userBtn.top  + userBtn.cy + list.cy > page.cy) { // dropdown goes beyond page height; shrink, scrollbar will appear
+                if (userBtn.top  + userBtn.cy + list.cy > page.cy) { // dropdown goes beyond page height; shrink, scrollbar will appear
                     $list.height(page.cy - userBtn.top - userBtn.cy - 14); // 14px gap for prettiness
                     list.cx += 14; // scrollbar room
                 }
@@ -167,7 +167,7 @@ window.DropdownMenu = function(options) {
     });
 
     $surroDiv.on('mouseleave.DropdownMenu', function() {
-        if($(window).width() > userOpts.cxPhone) // mouse over does nothing on smartphones, since there's no mouse
+        if ($(window).width() > userOpts.cxPhone) // mouse over does nothing on smartphones, since there's no mouse
             obj.hidePopup();
     });
 

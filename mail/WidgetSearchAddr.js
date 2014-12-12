@@ -22,7 +22,7 @@ window.WidgetSearchAddr = function(options) {
 
     function _InsertNamesIntoList(contacts) {
         var $list = $('#searchAddr_list');
-        for(var c = 0; c < contacts.length; ++c) {
+        for (var c = 0; c < contacts.length; ++c) {
             var addr = contacts[c].emails.length > 1 ?
                 (contacts[c].emails.length)+' emails' : contacts[c].emails[0];
             var $opt = $('<option>'+contacts[c].name+' ('+addr+')'+'</option>');
@@ -32,28 +32,28 @@ window.WidgetSearchAddr = function(options) {
     }
 
     function _InsertMoreNamesIntoList(newContacts) {
-        if(!newContacts.length) return;
+        if (!newContacts.length) return;
         var $list = $('#searchAddr_list');
         var people = [];
         $list.children('option').each(function(idx, opt) {
             people.push($(opt).data('contact')); // array with currently displayed contacts
         });
-        for(var c = 0; c < newContacts.length; ++c) {
+        for (var c = 0; c < newContacts.length; ++c) {
             var alreadyExists = false;
-            for(var p = 0; p < people.length; ++p) {
-                if(people[p].emails.length !== 1) continue; // don't count groups
-                if(people[p].emails[0] === newContacts[c].email) {
+            for (var p = 0; p < people.length; ++p) {
+                if (people[p].emails.length !== 1) continue; // don't count groups
+                if (people[p].emails[0] === newContacts[c].email) {
                     alreadyExists = true;
                     break;
                 }
             }
-            if(!alreadyExists)
+            if (!alreadyExists)
                 people.push({ name:newContacts[c].name, emails:[newContacts[c].email] }); // append new one
         }
         people.sort(function(a, b) { return a.name.localeCompare(b.name); });
         $list.empty();
         _InsertNamesIntoList(people);
-        if(people.length > 2)
+        if (people.length > 2)
             $list.attr('size', Math.min(people.length, userOpts.maxVisibleContacts));
     }
 
@@ -81,23 +81,23 @@ window.WidgetSearchAddr = function(options) {
     };
 
     obj.processKey = function(key) {
-        if(key === 0) {
+        if (key === 0) {
             // dummy
-        } else if(key === 27) { // ESC
+        } else if (key === 27) { // ESC
             obj.close();
-        } else if(key === 13) { // enter
+        } else if (key === 13) { // enter
             var opt = $('#searchAddr_list > option:selected');
-            if(opt.length) {
+            if (opt.length) {
                 opt.trigger('mousedown');
                 obj.close();
             }
-        } else if(key === 38) { // up arrow
+        } else if (key === 38) { // up arrow
             var $listbox = $('#searchAddr_list');
             var $selopt = $listbox.children('option:selected');
             !$selopt.length ?
                 $listbox.children('option:last').prop('selected', true) :
                 $selopt.prev().prop('selected', true);
-        } else if(key === 40) { // down arrow
+        } else if (key === 40) { // down arrow
             var $listbox = $('#searchAddr_list');
             var $selopt = $listbox.children('option:selected');
             !$selopt.length ?
@@ -115,8 +115,8 @@ window.WidgetSearchAddr = function(options) {
         obj.close(); // there can be only one
         token = $txtbox.val(); // string to be searched among contacts
         var lastComma = token.lastIndexOf(',');
-        if(lastComma > 0) token = $.trim(token.substr(lastComma + 1));
-        if(token.length >= 2) {
+        if (lastComma > 0) token = $.trim(token.substr(lastComma + 1));
+        if (token.length >= 2) {
             var contacts = Contacts.searchByToken(token);
             _BuildPopup(contacts.length);
             _InsertNamesIntoList(contacts);
@@ -124,7 +124,7 @@ window.WidgetSearchAddr = function(options) {
     })();
 
     $('#searchAddr_list').on('mousedown', 'option', function(ev) {
-        if(onClickCB !== null)
+        if (onClickCB !== null)
             onClickCB(token, $(this).data('contact')); // invoke user callback
     });
 
@@ -139,7 +139,7 @@ window.WidgetSearchAddr = function(options) {
         .fail(function(resp) {
             window.alert('Erro na pesquisa de contatos no catálogo do Expresso.\n' + resp.responseText);
         }).done(function(contacts) {
-            if(contacts.length > 45) {
+            if (contacts.length > 45) {
                 _InsertMoreNamesIntoList([]);
                 window.alert('Muitos contatos com "'+token+'" foram encontrados.\nUse um termo mais específico.');
             } else {

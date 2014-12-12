@@ -52,7 +52,7 @@ window.ModelessDialog = function(options) {
         $popupDiv.css(szCss).appendTo(document.body);
         $targetDiv.detach().appendTo('#ModelessDialog_content').show();
 
-        if(wnd.cx <= userOpts.cxPhone) { // smartphone screen
+        if (wnd.cx <= userOpts.cxPhone) { // smartphone screen
             $('#ModelessDialog_minCage,#ModelessDialog_resz').hide();
             UrlStack.push('#ModelessDialog', function() {
                 $('#ModelessDialog_closeCage input:first').trigger('click');
@@ -62,7 +62,7 @@ window.ModelessDialog = function(options) {
                 'min-height': userOpts.minHeight+'px',
                 left:($(window).outerWidth() / 2 - $popupDiv.outerWidth() / 2)+'px', // center screen
                 top:Math.max(0, $(window).outerHeight() / 2 - $popupDiv.outerHeight() / 2)+'px' });
-            if(!userOpts.resizable)
+            if (!userOpts.resizable)
                 $('#ModelessDialog_resz').hide();
         }
         cyTitle = $('#ModelessDialog_bar').outerHeight();
@@ -81,7 +81,7 @@ window.ModelessDialog = function(options) {
         $popupDiv.remove();
         $popupDiv = null;
         UrlStack.pop('#ModelessDialog');
-        if(onCloseCB !== null)
+        if (onCloseCB !== null)
             onCloseCB(); // invoke user callback
         return obj;
     };
@@ -96,7 +96,7 @@ window.ModelessDialog = function(options) {
         $('#ModelessDialog_content,#ModelessDialog_resz').toggle();
         $('#ModelessDialog_closeCage').toggle(!willMin);
         $('#ModelessDialog_minCage input').val(willMin ? '¯' : '_');
-        if(willMin) {
+        if (willMin) {
             prevMinPos = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                 cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() }; // keep current pos
             $popupDiv.css({ width:userOpts.minWidth+'px',
@@ -136,7 +136,7 @@ window.ModelessDialog = function(options) {
     $('#ModelessDialog_bar').on('mousedown', function(ev) {
         ev.stopImmediatePropagation();
 
-        if($('#ModelessDialog_content').is(':visible')) {
+        if ($('#ModelessDialog_content').is(':visible')) {
             var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
             var pop = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                 cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() };
@@ -147,8 +147,8 @@ window.ModelessDialog = function(options) {
                 ev.stopImmediatePropagation();
                 var newPos = { x:ev.clientX - offset.x, y:ev.clientY - offset.y };
                 var destCss = { };
-                if(newPos.x >= 0 && newPos.x + pop.cx <= wnd.cx) destCss.left = newPos.x+'px';
-                if(newPos.y >= 0 && newPos.y + pop.cy <= wnd.cy) destCss.top = newPos.y+'px';
+                if (newPos.x >= 0 && newPos.x + pop.cx <= wnd.cx) destCss.left = newPos.x+'px';
+                if (newPos.y >= 0 && newPos.y + pop.cy <= wnd.cy) destCss.top = newPos.y+'px';
                 $popupDiv.css(destCss);
             });
 
@@ -164,13 +164,13 @@ window.ModelessDialog = function(options) {
     $('#ModelessDialog_bar').on('dblclick', function(ev) {
         ev.stopImmediatePropagation();
         var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
-        if(wnd.cx > userOpts.cxPhone) { // on phones doubleclick does nothing
-            if($('#ModelessDialog_content').is(':visible')) { // not minimized
+        if (wnd.cx > userOpts.cxPhone) { // on phones doubleclick does nothing
+            if ($('#ModelessDialog_content').is(':visible')) { // not minimized
                 var isMaximized = ($popupDiv.offset().left === userOpts.marginLeftMaximized) &&
                     ($popupDiv.offset().top === userOpts.marginMaximized) &&
                     ($popupDiv.outerWidth() === wnd.cx - userOpts.marginLeftMaximized - userOpts.marginMaximized) &&
                     ($popupDiv.outerHeight() === wnd.cy - userOpts.marginMaximized * 2);
-                if(!isMaximized) {
+                if (!isMaximized) {
                     prevMaxPos = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                         cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() }; // keep current pos
                     $popupDiv.css({
@@ -183,7 +183,7 @@ window.ModelessDialog = function(options) {
                     $popupDiv.css({ left:prevMaxPos.x+'px', top:prevMaxPos.y+'px',
                         width:prevMaxPos.cx+'px', height:prevMaxPos.cy+'px' }); // restore previous pos
                 }
-                if(onResizeCB !== null)
+                if (onResizeCB !== null)
                     onResizeCB(); // invoke user callback
             } else { // if minimized, simply restore; never happens because mousedown comes first
                 obj.toggleMinimize();
@@ -203,10 +203,10 @@ window.ModelessDialog = function(options) {
             ev.stopImmediatePropagation();
             var newSz = { cx:pop.cx + ev.clientX - orig.x, cy:pop.cy + ev.clientY - orig.y };
             var destCss = { };
-            if(pop.x + newSz.cx < wnd.cx) destCss.width = newSz.cx+'px';
-            if(pop.y + newSz.cy < wnd.cy) destCss.height = newSz.cy+'px';
+            if (pop.x + newSz.cx < wnd.cx) destCss.width = newSz.cx+'px';
+            if (pop.y + newSz.cy < wnd.cy) destCss.height = newSz.cy+'px';
             $popupDiv.css(destCss);
-            if(onResizeCB !== null)
+            if (onResizeCB !== null)
                 onResizeCB();
         });
 
@@ -223,7 +223,7 @@ window.ModelessDialog = function(options) {
 
     $('#ModelessDialog_closeCage input').on('click', function(ev) {
         ev.stopImmediatePropagation();
-        if(onUserCloseCB !== null)
+        if (onUserCloseCB !== null)
             onUserCloseCB(); // invoke user callback, user must call close() himself
     });
 };

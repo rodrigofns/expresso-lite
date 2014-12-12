@@ -29,7 +29,7 @@ window.WidgetFolders = function(options) {
         var $retLi = null; // given a folder object, find the LI to which it belongs
         $targetDiv.find('li').each(function(idx, li) {
             var $li = $(li);
-            if($li.data('folder').globalName === folder.globalName) {
+            if ($li.data('folder').globalName === folder.globalName) {
                 $retLi = $li;
                 return false; // break
             }
@@ -39,7 +39,7 @@ window.WidgetFolders = function(options) {
 
     function _BuildDiv(folder, isExpanded) {
         var lnkToggle = '';
-        if(folder.hasSubfolders) {
+        if (folder.hasSubfolders) {
             lnkToggle = isExpanded ?
             '<a href="#" class="folders_toggle" title="Recolher pasta"><div class="arrowDown"></div></a>' :
                 '<a href="#" class="folders_toggle" title="Expandir pasta"><div class="arrowRite"></div></a>';
@@ -53,11 +53,11 @@ window.WidgetFolders = function(options) {
 
     function _BuildUl(folders, isRootLevel) {
         var $ul = $('<ul class="folders_ul" style="padding-left:'+(isRootLevel?'0':'11')+'px;"></ul>');
-        for(var i = 0; i < folders.length; ++i) {
+        for (var i = 0; i < folders.length; ++i) {
             var $li = $('<li class="folders_li"></li>');
             $li.data('folder', folders[i]); // keep folder object within LI
             $li.append(_BuildDiv(folders[i], false));
-            if(folders[i].subfolders.length)
+            if (folders[i].subfolders.length)
                 _BuildUl(folders[i].subfolders, false).appendTo($li);
             $li.appendTo($ul);
         }
@@ -65,7 +65,7 @@ window.WidgetFolders = function(options) {
     }
 
     function _UpdateOneFolder($li, onDone) {
-        if(!$li.hasClass('folders_li'))
+        if (!$li.hasClass('folders_li'))
             $li = $li.closest('.folders_li');
         var folder = $li.data('folder');
         var $counter = $li.find('.folders_counter:first').replaceWith($('#icons .throbber').serialize());
@@ -78,32 +78,32 @@ window.WidgetFolders = function(options) {
         }).done(function(stats) {
             var hasChanged = (folder.totalMails !== stats.totalMails) ||
                 (folder.unreadMails !== stats.unreadMails);
-            if(hasChanged) { // folder status changed
+            if (hasChanged) { // folder status changed
                 folder.totalMails = stats.totalMails;
                 folder.unreadMails = stats.unreadMails;
 
-                if(folder.id === curFolder.id) { // current folder
+                if (folder.id === curFolder.id) { // current folder
                     obj.redraw(folder);
-                    if(onFolderUpdatedCB !== null) onFolderUpdatedCB(folder);
+                    if (onFolderUpdatedCB !== null) onFolderUpdatedCB(folder);
                 } else { // not current folder
                     folder.messages.length = 0; // force cache rebuild
                     folder.threads.length = 0;
                     obj.redraw(folder);
                 }
             }
-            if(onDone !== undefined) onDone();
+            if (onDone !== undefined) onDone();
         });
     }
 
     function _UpdateSubfolders($li, onDone) {
-        if(!$li.hasClass('folders_li'))
+        if (!$li.hasClass('folders_li'))
             $li = $li.closest('.folders_li');
 
         _UpdateOneFolder($li, function() {
             var all = $li.find('.folders_li:visible').toArray(); // all updateable
             (function GoNext() {
-                if(all.length) _UpdateOneFolder($(all.shift()), GoNext);
-                else if(onDone !== undefined && onDone !== null) onDone();
+                if (all.length) _UpdateOneFolder($(all.shift()), GoNext);
+                else if (onDone !== undefined && onDone !== null) onDone();
             })();
         });
     }
@@ -111,7 +111,7 @@ window.WidgetFolders = function(options) {
     function _LoadSubfolders(parentFolder, onDone) {
         var $divLoading = $('<div class="loadingMessage">' +
             'Carregando pastas... '+$('#icons .throbber').serialize()+'</div>');
-        if(parentFolder === null) { // root folder
+        if (parentFolder === null) { // root folder
             $divLoading.appendTo($targetDiv);
 
             $.post('../', { r:'searchFolders' })
@@ -123,7 +123,7 @@ window.WidgetFolders = function(options) {
                 userOpts.folderCache.length = 0;
                 userOpts.folderCache.push.apply(userOpts.folderCache, folders); // cache
                 _BuildUl(folders, true).appendTo($targetDiv);
-                if(onDone !== undefined && onDone !== null) onDone();
+                if (onDone !== undefined && onDone !== null) onDone();
             });
         } else { // non-root folder
             var $li = _FindFolderLi(parentFolder);
@@ -138,8 +138,8 @@ window.WidgetFolders = function(options) {
                 parentFolder.subfolders.length = 0;
                 parentFolder.subfolders.push.apply(parentFolder.subfolders, subfolders); // cache
                 _BuildUl(subfolders, false).appendTo($li);
-                if(onDone !== undefined && onDone !== null) onDone();
-                if(onTreeChangedCB !== null) onTreeChangedCB();
+                if (onDone !== undefined && onDone !== null) onDone();
+                if (onTreeChangedCB !== null) onTreeChangedCB();
             });
         }
     }
@@ -164,7 +164,7 @@ window.WidgetFolders = function(options) {
         var $childUl = $div.next('ul');
         var isExpanded = $childUl.length && $childUl.is(':visible');
         var $newDiv = _BuildDiv(folder, isExpanded);
-        if($div.hasClass('folders_current'))
+        if ($div.hasClass('folders_current'))
             $newDiv.addClass('folders_current');
         $div.replaceWith($newDiv);
         return obj;
@@ -200,7 +200,7 @@ window.WidgetFolders = function(options) {
         var $li = $(this).closest('li');
         var folder = $li.data('folder');
 
-        if(folder.hasSubfolders && !folder.subfolders.length) { // subfolders not cached yet
+        if (folder.hasSubfolders && !folder.subfolders.length) { // subfolders not cached yet
             _LoadSubfolders(folder);
             $(this).find('div').removeClass('arrowRite').addClass('arrowDown');
         } else {
@@ -219,10 +219,10 @@ window.WidgetFolders = function(options) {
         $targetDiv.find('.folders_current').removeClass('folders_current');
         $(this).addClass('folders_current');
 
-        if(!curFolder.messages.length) { // if messages not cached yet
-            if(isFirstClick) {
+        if (!curFolder.messages.length) { // if messages not cached yet
+            if (isFirstClick) {
                 isFirstClick = false;
-                if(onClickCB !== null)
+                if (onClickCB !== null)
                     onClickCB(curFolder); // invoke user callback
             } else {
                 var $counter = $li.find('.folders_counter:first')
@@ -236,19 +236,19 @@ window.WidgetFolders = function(options) {
                 }).done(function(stats) {
                     var hasChanged = (curFolder.totalMails !== stats.totalMails) ||
                         (curFolder.unreadMails !== stats.unreadMails);
-                    if(hasChanged) {
+                    if (hasChanged) {
                         curFolder.totalMails = stats.totalMails;
                         curFolder.unreadMails = stats.unreadMails;
                         curFolder.messages.length = 0; // clear cache, will force reload
                         curFolder.threads.length = 0;
                         obj.redraw(curFolder);
                     }
-                    if(onClickCB !== null)
+                    if (onClickCB !== null)
                         onClickCB(curFolder); // invoke user callback
                 });
             }
         } else { // messages already cached, won't look for more right now
-            if(onClickCB !== null)
+            if (onClickCB !== null)
                 onClickCB(curFolder); // invoke user callback
         }
         return false;

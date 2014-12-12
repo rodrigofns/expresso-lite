@@ -37,8 +37,8 @@ window.WidgetHeadlines = function(options) {
         $targetDiv.children('div').each(function(idx, div) {
             var $div = $(div);
             var thread = $div.data('thread'); // each thread is an array of headlines
-            for(var i = 0; i < thread.length; ++i) {
-                if(thread[i].id === headline.id) {
+            for (var i = 0; i < thread.length; ++i) {
+                if (thread[i].id === headline.id) {
                     $retDiv = $div;
                     return false; // break
                 }
@@ -49,29 +49,29 @@ window.WidgetHeadlines = function(options) {
 
     function _RemoveDuplicates(arr) {
         var ret = [];
-        for(var a = 0; a < arr.length; ++a) { // faster than simply using indexOf
+        for (var a = 0; a < arr.length; ++a) { // faster than simply using indexOf
             var exists = false;
-            for(var r = 0; r < ret.length; ++r) {
-                if(arr[a] === ret[r]) {
+            for (var r = 0; r < ret.length; ++r) {
+                if (arr[a] === ret[r]) {
                     exists = true;
                     break;
                 }
             }
-            if(!exists) ret.push(arr[a]);
+            if (!exists) ret.push(arr[a]);
         }
         return ret;
     }
 
     function _BuildSendersText(thread, isSentFolder) {
         var names = { read:[], unread:[] };
-        for(var i = 0; i < thread.length; ++i) { // a thread is an array of headlines
+        for (var i = 0; i < thread.length; ++i) { // a thread is an array of headlines
             var msg = thread[i];
             var who = msg.unread ? names.unread : names.read;
-            if(!isSentFolder) {
+            if (!isSentFolder) {
                 who.push( msg.from.name.indexOf('@') !== -1 ? // an actual email address
                     Contacts.HumanizeLogin(msg.from.name, false) : msg.from.name );
             } else { // on Sent folder, show "to" field instead of "from"
-                for(var t = 0; t < msg.to.length; ++t)
+                for (var t = 0; t < msg.to.length; ++t)
                     who.push(Contacts.HumanizeLogin(msg.to[t], msg.to.length > 1));
             }
         }
@@ -80,16 +80,16 @@ window.WidgetHeadlines = function(options) {
         names.read = _RemoveDuplicates(names.read);
         names.unread = _RemoveDuplicates(names.unread);
 
-        if(names.read.length + names.unread.length > 1) {
-            for(var i = 0; i < names.read.length; ++i)
+        if (names.read.length + names.unread.length > 1) {
+            for (var i = 0; i < names.read.length; ++i)
                 names.read[i] = names.read[i].split(' ')[0]; // many people, remove surnames
-            for(var i = 0; i < names.unread.length; ++i)
+            for (var i = 0; i < names.unread.length; ++i)
                 names.unread[i] = names.unread[i].split(' ')[0]; // unread also in bold
         }
-        for(var i = 0; i < names.unread.length; ++i)
+        for (var i = 0; i < names.unread.length; ++i)
             names.unread[i] = '<b>'+names.unread[i]+'</b>'; // unread in bold
 
-        if(!names.read.length && !names.unread.length) {
+        if (!names.read.length && !names.unread.length) {
             return '(ninguém)';
         } else {
             return (names.read.length ? names.read.join(', ') : '') +
@@ -108,16 +108,16 @@ window.WidgetHeadlines = function(options) {
         var hasUnread     = false;
         var hasSigned     = false;
         var wantConfirm   = false;
-        for(var i = 0; i < thread.length; ++i) { // a thread is an array of headlines
+        for (var i = 0; i < thread.length; ++i) { // a thread is an array of headlines
             var msg = thread[i];
-            if(msg.flagged)       hasHighlight = true; // at least 1 email in the thread has highlight status
-            if(msg.hasAttachment) hasAttachment = true;
-            if(msg.important)     hasImportant = true;
-            if(msg.unread)        hasUnread = true;
-            if(msg.signed)        hasSigned = true;
-            if(msg.replied)       hasReplied = true;
-            if(msg.forwarded)     hasForwarded = true
-            if(msg.unread && msg.wantConfirm) wantConfirm = true; // confirmation only if unread
+            if (msg.flagged)       hasHighlight = true; // at least 1 email in the thread has highlight status
+            if (msg.hasAttachment) hasAttachment = true;
+            if (msg.important)     hasImportant = true;
+            if (msg.unread)        hasUnread = true;
+            if (msg.signed)        hasSigned = true;
+            if (msg.replied)       hasReplied = true;
+            if (msg.forwarded)     hasForwarded = true
+            if (msg.unread && msg.wantConfirm) wantConfirm = true; // confirmation only if unread
         }
 
         var unreadClass = hasUnread ? 'headlines_entryUnread' : 'headlines_entryRead';
@@ -145,25 +145,25 @@ window.WidgetHeadlines = function(options) {
 
     function _BuildAllThreadsDivs() {
         var divs = [];
-        for(var i = 0; i < curFolder.threads.length; ++i)
+        for (var i = 0; i < curFolder.threads.length; ++i)
             divs.push(_BuildDiv(curFolder.threads[i], curFolder.globalName === 'INBOX/Sent'));
         return divs;
     }
 
     function _RedrawDiv($div) {
         var $newDiv = _BuildDiv($div.data('thread'), curFolder.globalName === 'INBOX/Sent');
-        if(!$div.children('.headlines_check').is(':visible'))
+        if (!$div.children('.headlines_check').is(':visible'))
             $newDiv.find('.headlines_check').hide();
-        if($div.hasClass('headlines_entryCurrent'))
+        if ($div.hasClass('headlines_entryCurrent'))
             $newDiv.addClass('headlines_entryCurrent');
         var isChecked = $div.hasClass('headlines_entryChecked');
         $div.replaceWith($newDiv);
-        if(isChecked)
+        if (isChecked)
             $newDiv.find('.headlines_check > div').trigger('click');
     }
 
     function _FetchDraftMessage($div, headline, onDone) {
-        if(headline.body === null) { // message content not fetched yet
+        if (headline.body === null) { // message content not fetched yet
             var htmlCheck = $div.find('.headlines_check > [class^=icoCheck]').serialize(); // keep
             $div.find('.headlines_check > [class^=icoCheck]').replaceWith(
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
@@ -177,10 +177,10 @@ window.WidgetHeadlines = function(options) {
             }).done(function(msg) {
                 headline.attachments = msg.attachments; // cache
                 headline.body = msg.body;
-                if(onDone !== undefined) onDone();
+                if (onDone !== undefined) onDone();
             });
         } else {
-            if(onDone !== undefined) onDone();
+            if (onDone !== undefined) onDone();
         }
     }
 
@@ -191,8 +191,8 @@ window.WidgetHeadlines = function(options) {
         $checkedDivs.each(function(idx, elem) {
             var $div = $(elem);
             var thread = $div.data('thread'); // a thread is an array of messages
-            for(var i = 0; i < thread.length; ++i) {
-                if((asRead && thread[i].unread) || (!asRead && !thread[i].unread)) {
+            for (var i = 0; i < thread.length; ++i) {
+                if ((asRead && thread[i].unread) || (!asRead && !thread[i].unread)) {
                     thread[i].unread = !thread[i].unread; // update cache
                     asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
                     relevantHeadlines.push(thread[i]);
@@ -200,7 +200,7 @@ window.WidgetHeadlines = function(options) {
             }
         });
 
-        if(!relevantHeadlines.length) {
+        if (!relevantHeadlines.length) {
             window.alert('Nenhuma mensagem a ser marcada como '+(asRead?'':'não')+' lida.');
         } else {
             var htmlCheck = $checkedDivs.find('.icoCheck1:first').serialize(); // keep
@@ -211,7 +211,7 @@ window.WidgetHeadlines = function(options) {
             $.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:relevantIds.join(',') })
             .always(function() {
                 $checkedDivs.find('.throbber').replaceWith(htmlCheck); // restore checkbox
-                if(onMarkReadCB !== null)
+                if (onMarkReadCB !== null)
                     onMarkReadCB(curFolder);
             }).fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
@@ -227,7 +227,7 @@ window.WidgetHeadlines = function(options) {
 
     obj.moveMessages = function(destFolder) {
         var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
-        if($checkedDivs.find('.throbber').length) // already working?
+        if ($checkedDivs.find('.throbber').length) // already working?
             return;
         var headlines = []; // will hold all individual headlines
         $checkedDivs.each(function(idx, elem) { // each selected row
@@ -238,8 +238,8 @@ window.WidgetHeadlines = function(options) {
 
             curFolder.totalMails -= thread.length; // update cache
             destFolder.totalMails += thread.length;
-            for(var i = 0; i < thread.length; ++i) {
-                if(thread[i].unread) {
+            for (var i = 0; i < thread.length; ++i) {
+                if (thread[i].unread) {
                     --curFolder.unreadMails;
                     ++destFolder.unreadMails;
                 }
@@ -257,7 +257,7 @@ window.WidgetHeadlines = function(options) {
         }).done(function() {
             $checkedDivs.slideUp(200).promise('fx').done(function() {
                 $checkedDivs.remove();
-                if(onMoveCB !== null)
+                if (onMoveCB !== null)
                     onMoveCB(destFolder);
             });
         });
@@ -272,15 +272,15 @@ window.WidgetHeadlines = function(options) {
         $checkedDivs.each(function(idx, elem) {
             var $div = $(elem);
             var thread = $div.data('thread');
-            for(var i = 0; i < thread.length; ++i) {
+            for (var i = 0; i < thread.length; ++i) {
                 headlines.push(thread[i]);
-                if(!thread[i].flagged)
+                if (!thread[i].flagged)
                     willStar = true; // at least 1 unstarred? star all
             }
         });
         var msgIds = $.map(headlines, function(elem) { return elem.id; });
         $checkedDivs.find('div[class^=icoHigh]').replaceWith(_CreateDivLoading(null));
-        for(var i = 0; i < headlines.length; ++i)
+        for (var i = 0; i < headlines.length; ++i)
             headlines[i].flagged = willStar; // update cache
 
         $.post('../', { r:'markAsHighlighted', ids:msgIds.join(','), asHighlighted:(willStar?'1':'0') })
@@ -295,11 +295,11 @@ window.WidgetHeadlines = function(options) {
     };
 
     obj.deleteMessages = function() {
-        if(curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
+        if (curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
             obj.moveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
-        } else if(window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
+        } else if (window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
             var $checkedDivs = $targetDiv.find('.headlines_entryChecked');
-            if($checkedDivs.find('.throbber').length) // already working?
+            if ($checkedDivs.find('.throbber').length) // already working?
                 return;
             var headlines = [];
             $checkedDivs.each(function(idx, elem) {
@@ -309,8 +309,8 @@ window.WidgetHeadlines = function(options) {
                     '&nbsp; <i>Excluindo...</i>');
 
                 curFolder.totalMails -= thread.length; // update cache
-                for(var i = 0; i < thread.length; ++i)
-                    if(thread[i].unread)
+                for (var i = 0; i < thread.length; ++i)
+                    if (thread[i].unread)
                         --curFolder.unreadMails;
             });
             var msgIds = $.map(headlines, function(elem) { return elem.id; });
@@ -323,7 +323,7 @@ window.WidgetHeadlines = function(options) {
             }).done(function(status) {
                 $checkedDivs.slideUp(200).promise('fx').done(function() {
                     $checkedDivs.remove();
-                    if(onMoveCB !== null)
+                    if (onMoveCB !== null)
                         onMoveCB(null);
                 });
             });
@@ -335,11 +335,11 @@ window.WidgetHeadlines = function(options) {
         curFolder = folder; // cache
         $targetDiv.empty();
 
-        if(!curFolder.totalMails) { // no messages on this folder
-            if(onDone !== undefined && onDone !== null)
+        if (!curFolder.totalMails) { // no messages on this folder
+            if (onDone !== undefined && onDone !== null)
                 onDone();
         } else {
-            if(!curFolder.messages.length) { // not cached yet
+            if (!curFolder.messages.length) { // not cached yet
                 _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
                 $.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
                 .always(function() { $targetDiv.children('.loadingMessage').remove(); })
@@ -352,12 +352,12 @@ window.WidgetHeadlines = function(options) {
                     curFolder.threads.push.apply(curFolder.threads,
                         ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
                     $targetDiv.append(_BuildAllThreadsDivs());
-                    if(onDone !== undefined && onDone !== null)
+                    if (onDone !== undefined && onDone !== null)
                         onDone();
                 });
             } else {
                 $targetDiv.append(_BuildAllThreadsDivs());
-                if(onDone !== undefined && onDone !== null)
+                if (onDone !== undefined && onDone !== null)
                     onDone();
             }
         }
@@ -378,7 +378,7 @@ window.WidgetHeadlines = function(options) {
             curFolder.threads.push.apply(curFolder.threads,
                 ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts')); // rebuild
             $targetDiv.empty().append(_BuildAllThreadsDivs());
-            if(onDone !== undefined && onDone !== null)
+            if (onDone !== undefined && onDone !== null)
                 onDone();
         });
 
@@ -391,7 +391,7 @@ window.WidgetHeadlines = function(options) {
 
         var headl0 = null;
         var $current = $targetDiv.find('.headlines_entryCurrent');
-        if($current.length)
+        if ($current.length)
             headl0 = $current.data('thread')[0]; // 1st headline of thread being read
 
         $.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
@@ -403,10 +403,10 @@ window.WidgetHeadlines = function(options) {
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
             curFolder.threads = ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts'); // in thread: oldest first
             $targetDiv.empty().append(_BuildAllThreadsDivs());
-            if(headl0 !== null)
+            if (headl0 !== null)
                 _FindHeadlineDiv(headl0).addClass('headlines_entryCurrent');
 
-            if(onDone !== undefined && onDone !== null)
+            if (onDone !== undefined && onDone !== null)
                 onDone(); // invoke user callback
         });
 
@@ -416,7 +416,7 @@ window.WidgetHeadlines = function(options) {
     obj.getCurrent = function() {
         var curThread = null;
         var $cur = $targetDiv.find('.headlines_entryCurrent');
-        if($cur.length)
+        if ($cur.length)
             curThread = $cur.data('thread');
         return curThread;
     };
@@ -439,14 +439,14 @@ window.WidgetHeadlines = function(options) {
         var $checkeds = $targetDiv.find('.headlines_entryChecked');
         $checkeds.removeClass('headlines_entryChecked');
         $checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
-        if(onCheckCB !== null)
+        if (onCheckCB !== null)
             onCheckCB(); // invoke user callback
         return obj;
     };
 
     obj.redraw = function(headline) {
         var $div = _FindHeadlineDiv(headline); // the DIV which contains the headline
-        if($div !== null)
+        if ($div !== null)
             _RedrawDiv($div);
         return obj;
     };
@@ -454,21 +454,21 @@ window.WidgetHeadlines = function(options) {
     obj.redrawByThread = function(thread, onDone) {
         $targetDiv.children('div').each(function(idx, div) {
             var $div = $(div);
-            if($div.data('thread') === thread) { // compare references
-                if(!thread.length) { // headline entry will be deleted
+            if ($div.data('thread') === thread) { // compare references
+                if (!thread.length) { // headline entry will be deleted
                     $div.slideUp(200, function() {
                         $div.remove();
-                        if(onDone !== undefined && onDone !== null)
+                        if (onDone !== undefined && onDone !== null)
                             onDone();
                     });
                 } else { // headline entry will be just updated
                     var $newDiv = _BuildDiv($div.data('thread'), curFolder.globalName === 'INBOX/Sent');
-                    if(!$div.children('.headlines_check').is(':visible'))
+                    if (!$div.children('.headlines_check').is(':visible'))
                         $newDiv.find('.headlines_check').hide();
-                    if($div.hasClass('headlines_entryCurrent'))
+                    if ($div.hasClass('headlines_entryCurrent'))
                         $newDiv.addClass('headlines_entryCurrent');
                     $div.replaceWith($newDiv);
-                    if(onDone !== undefined && onDone !== null)
+                    if (onDone !== undefined && onDone !== null)
                         onDone();
                 }
                 return false; // break
@@ -482,7 +482,7 @@ window.WidgetHeadlines = function(options) {
         $targetDiv.children('div').each(function(idx, div) {
             var $div = $(div);
             var cyDiv = $div.outerHeight();
-            if($div.data('thread')[0].id === thread[0].id) {
+            if ($div.data('thread')[0].id === thread[0].id) {
                 cy += cyDiv / 2;
                 return false; // break
             }
@@ -512,19 +512,19 @@ window.WidgetHeadlines = function(options) {
     };
 
     $targetDiv.on('click', '.headlines_entry', function(ev) { // click on headline
-        if(!ev.shiftKey) {
+        if (!ev.shiftKey) {
             var $div = $(this);
             var thread = $div.data('thread');
-            if(curFolder.globalName === 'INBOX/Drafts') {
+            if (curFolder.globalName === 'INBOX/Drafts') {
                 var headline = thread[0]; // drafts are not supposed to be threaded, so message is always 1st
                 _FetchDraftMessage($div, headline, function() { // get content and remove div from list
-                    if(onClickCB !== null)
+                    if (onClickCB !== null)
                         onClickCB([ headline ]); // create a new thread, because the original is destroyed
                 });
             } else {
                 $targetDiv.find('.headlines_entryCurrent').removeClass('headlines_entryCurrent');
                 $div.addClass('headlines_entryCurrent');
-                if(onClickCB !== null)
+                if (onClickCB !== null)
                     onClickCB(thread);
             }
         }
@@ -539,16 +539,16 @@ window.WidgetHeadlines = function(options) {
         $chk.toggleClass('icoCheck0', !willCheck).toggleClass('icoCheck1', willCheck);
         lastCheckWith = 'leftClick';
 
-        if(ev.shiftKey && $prevClick !== null) { // will check a range
+        if (ev.shiftKey && $prevClick !== null) { // will check a range
             var isIn = false;
             $targetDiv.find('div.headlines_entry').each(function(idx, div) {
                 var $div = $(div);
-                if(isIn) { // we're in the middle of the selection range
+                if (isIn) { // we're in the middle of the selection range
                     $div.addClass('headlines_entryChecked').find('.icoCheck0')
                         .removeClass('icoCheck0').addClass('icoCheck1');
                 }
-                if($div.is($divClicked) || $div.is($prevClick)) { // boundary DIV?
-                    if(!isIn) { // we've just entered the selection range
+                if ($div.is($divClicked) || $div.is($prevClick)) { // boundary DIV?
+                    if (!isIn) { // we've just entered the selection range
                         isIn = true;
                         $div.addClass('headlines_entryChecked').find('.icoCheck0')
                             .removeClass('icoCheck0').addClass('icoCheck1');
@@ -564,7 +564,7 @@ window.WidgetHeadlines = function(options) {
         }
 
         $prevClick = $divClicked; // keep
-        if(onCheckCB !== null)
+        if (onCheckCB !== null)
             onCheckCB(); // invoke user callback
     });
 };

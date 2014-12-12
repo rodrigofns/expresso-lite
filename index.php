@@ -14,14 +14,14 @@ require_once(dirname(__FILE__).'/conf.php');
 
 define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
 
-if(!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
-if(isset($_REQUEST['r'])) { // that's an AJAX request
+if (!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
+if (isset($_REQUEST['r'])) { // that's an AJAX request
     require('inc/Ajax.class.php');
     Ajax::ProcessRequest();
     exit; // nothing is outputted here
 }
 require('inc/Tine.class.php');
-if(Tine::IsLogged())
+if (Tine::IsLogged())
     header('location: ./mail');
 $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] : '';
 ?>
@@ -61,11 +61,11 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
         </form>
     </section>
     <div id="links">
-        <?php if(ANDROID_URL != '') { ?>
+        <?php if (ANDROID_URL != '') { ?>
         <a href="<?php echo ANDROID_URL?>" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
         <!-- Google Play é uma marca registrada da Google Inc. -->
         <?php } ?>
-        <?php if(IOS_URL != '') { ?>
+        <?php if (IOS_URL != '') { ?>
         <a href="<?php echo IOS_URL?>" title="Baixe na Apple Store™"><img src="img/store-apple.png"/></a>
         <!-- Apple Store é uma marca registrada da Apple Inc. -->
         <?php } ?>

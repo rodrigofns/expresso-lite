@@ -25,7 +25,7 @@ window.WidgetCompose = function(options) {
     var isSending = false; // a "send" async request is running
 
     function _DeleteOldDraftIfAny(draftMsgObj, onDone) {
-        if(draftMsgObj !== null) { // are we editing an old draft?
+        if (draftMsgObj !== null) { // are we editing an old draft?
             popup.setCaption('Atualizando rascunho... '+$('#icons .throbber').serialize());
             $.post('../', { r:'deleteMessages', messages:draftMsgObj.id, forever:1 })
             .fail(function(resp) {
@@ -34,10 +34,10 @@ window.WidgetCompose = function(options) {
             }).done(function(status) {
                 var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', userOpts.folderCache);
                 --draftFolder.totalMails;
-                if(onDone !== undefined) onDone();
+                if (onDone !== undefined) onDone();
             });
         } else {
-            if(onDone !== undefined) onDone(); // do nothing and just invoke callback
+            if (onDone !== undefined) onDone(); // do nothing and just invoke callback
         }
     }
 
@@ -52,15 +52,15 @@ window.WidgetCompose = function(options) {
 
     function _PrepareBodyToQuote(action, headline) {
         var out = '';
-        if(action === 'draft') {
+        if (action === 'draft') {
             return headline.body.message;
-        } else if(action === 'reply') { // prepare mail content to be replied
+        } else if (action === 'reply') { // prepare mail content to be replied
             out = '<br/>Em '+DateFormat.Medium(headline.received)+', ' +
                 headline.from.name+' escreveu:' +
                 '<blockquote>'+headline.body.message+'<br/>' +
                 (headline.body.quoted !== null ? headline.body.quoted : '') +
                 '</blockquote>';
-        } else if(action === 'forward') { // prepare mail content to be forwarded
+        } else if (action === 'forward') { // prepare mail content to be forwarded
             out = '<br/>-----Mensagem original-----<br/>' +
                 '<b>Assunto:</b> '+headline.subject+'<br/>' +
                 '<b>Remetente:</b> "'+headline.from.name+'" &lt;'+headline.from.email+'&gt;<br/>' +
@@ -77,13 +77,13 @@ window.WidgetCompose = function(options) {
         var origAction = 'new';
         var origMsg = null;
 
-        if(msg.fwd !== null) {
+        if (msg.fwd !== null) {
             origAction = 'forward';
             origMsg = msg.fwd;
-        } else if(msg.re !== null) {
+        } else if (msg.re !== null) {
             origAction = 'reply';
             origMsg = msg.re;
-        } else if(msg.draft !== null) {
+        } else if (msg.draft !== null) {
             origAction = 'draft';
             origMsg = msg.draft;
         }
@@ -96,8 +96,8 @@ window.WidgetCompose = function(options) {
 
     function _ValidateAddresses(strAddrs) {
         var mails = strAddrs.split(/[\s,;]+/); // single string with all addresses into array
-        for(var i = 0; i < mails.length; ++i)
-            if(!/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(mails[i]))
+        for (var i = 0; i < mails.length; ++i)
+            if (!/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(mails[i]))
                 return { status:false, address:mails[i] }; // invalid address is returned
         return { status:true };
     }
@@ -114,9 +114,9 @@ window.WidgetCompose = function(options) {
                 elem !== headline.from.email &&
                 _ValidateAddresses(elem).status;
             });
-        if(clonedTo.length && clonedCc.length) return clonedTo.join(', ') + ', ' + clonedCc.join(', ') + ', ';
-        else if(clonedTo.length) return clonedTo.join(', ') + ', ';
-        else if(clonedCc.length) return clonedCc.join(', ') + ', ';
+        if (clonedTo.length && clonedCc.length) return clonedTo.join(', ') + ', ' + clonedCc.join(', ') + ', ';
+        else if (clonedTo.length) return clonedTo.join(', ') + ', ';
+        else if (clonedCc.length) return clonedCc.join(', ') + ', ';
         else return '';
     }
 
@@ -134,52 +134,52 @@ window.WidgetCompose = function(options) {
             attachs: ''
         };
 
-        if($('#composePanel_important').is(':checked'))
+        if ($('#composePanel_important').is(':checked'))
             message.isImportant = '1';
 
-        if(msg.re !== null) // is this message a reply to other one?
+        if (msg.re !== null) // is this message a reply to other one?
             message.replyToId = msg.re.id;
-        else if(msg.fwd !== null) // is this message a forwarding of other one?
+        else if (msg.fwd !== null) // is this message a forwarding of other one?
             message.forwardFromId = msg.fwd.id;
 
-        if(msg.draft !== null) // are we editing an existing draft?
+        if (msg.draft !== null) // are we editing an existing draft?
             message.origDraftId = msg.draft.id;
 
         var attachments = attacher.getAll();
-        if(attachments.length)
+        if (attachments.length)
             message.attachs = JSON.stringify(attachments); // attachments already uploaded to temp area
 
         return message;
     }
 
     function _ValidateSend(message, allowBlankDest) {
-        if(message.subject == '') {
+        if (message.subject == '') {
             window.alert('O email está sem assunto.');
             $('#composePanel_subject').focus();
             return false;
-        } else if(allowBlankDest === undefined && message.to == '' && message.cc == '' && message.bcc == '') {
+        } else if (allowBlankDest === undefined && message.to == '' && message.cc == '' && message.bcc == '') {
             window.alert('Não há destinatários para o email.');
             //~ $('#composePanel_to').focus();
             return false;
         }
 
-        if(message.to != '') {
+        if (message.to != '') {
             var valid = _ValidateAddresses(message.to);
-            if(!valid.status) {
+            if (!valid.status) {
                 window.alert('O campo "para" possui um endereço inválido:\n'+valid.address);
                 return false;
             }
         }
-        if(message.cc != '') {
+        if (message.cc != '') {
             var valid = _ValidateAddresses(message.cc);
-            if(!valid.status) {
+            if (!valid.status) {
                 window.alert('O campo "Cc" possui um endereço inválido:\n'+valid.address);
                 return false;
             }
         }
-        if(message.bcc != '') {
+        if (message.bcc != '') {
             var valid = _ValidateAddresses(message.bcc);
-            if(!valid.status) {
+            if (!valid.status) {
                 window.alert('O campo "Bcc" possui um endereço inválido:\n'+valid.address);
                 return false;
             }
@@ -196,7 +196,7 @@ window.WidgetCompose = function(options) {
         attacher.removeAll();
         attacher = null;
         $('#composePanel_attacher').hide();
-        if(onCloseCB !== null)
+        if (onCloseCB !== null)
             onCloseCB(); // invoke user callback
     }
 
@@ -210,8 +210,8 @@ window.WidgetCompose = function(options) {
             minHeight: 450
         });
         popup.onUserClose(function() { // when user clicked X button
-            if(_UserWroteSomethingNew()) {
-                if(window.confirm('Deseja descartar este email?'))
+            if (_UserWroteSomethingNew()) {
+                if (window.confirm('Deseja descartar este email?'))
                     popup.close();
             } else {
                 popup.close();
@@ -234,13 +234,13 @@ window.WidgetCompose = function(options) {
             draft: null // this email is a draft editing
         }, showOptions);
 
-        if(isSending) { // "send" asynchronous request is running right now
+        if (isSending) { // "send" asynchronous request is running right now
             window.alert('Um email está sendo enviado, aguarde.');
-        } else if(popup !== null && popup.isOpen()) { // popup is already open with another message
-            if(popup.isMinimized())
+        } else if (popup !== null && popup.isOpen()) { // popup is already open with another message
+            if (popup.isMinimized())
                 popup.toggleMinimize();
-            if(_UserWroteSomethingNew()) {
-                if(window.confirm('Há um email sendo escrito que ainda não foi enviado.\n' +
+            if (_UserWroteSomethingNew()) {
+                if (window.confirm('Há um email sendo escrito que ainda não foi enviado.\n' +
                     'Deseja descartá-lo?')) {
                     popup.close();
                     CreateNewDialog();
@@ -256,24 +256,24 @@ window.WidgetCompose = function(options) {
         function CreateNewDialog() {
             _SetupNewModelessDialog();
 
-            if(showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
+            if (showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
                 $('#composePanel_to,#composePanel_cc,#composePanel_bcc').val('');
                 $('#composePanel_body').html(_PrepareBodyToQuote('new', null));
                 $('#composePanel_subject').val('').focus();
-            } else if(showOpts.forward !== null) {
+            } else if (showOpts.forward !== null) {
                 msg.fwd = showOpts.forward; // keep forwarded headline
                 $('#composePanel_subject').val('Fwd: '+msg.fwd.subject);
                 $('#composePanel_to,#composePanel_cc,#composePanel_bcc').val('');
                 $('#composePanel_body').html(_PrepareBodyToQuote('forward', msg.fwd)).focus();
                 attacher.rebuildFromMsg(msg.fwd); // when forwarding, keep attachments
-            } else if(showOpts.reply !== null) {
+            } else if (showOpts.reply !== null) {
                 msg.re = showOpts.reply; // keep replied headline
                 $('#composePanel_subject').val('Re: '+msg.re.subject);
                 $('#composePanel_to').val(msg.re.from.email + ', ');
                 $('#composePanel_cc').val(_JoinReplyAddresses(msg.re).toLowerCase());
                 $('#composePanel_toggs a').trigger('click'); // empty ones will be hidden soon, ahead
                 $('#composePanel_body').html(_PrepareBodyToQuote('reply', msg.re)).focus();
-            } else if(showOpts.draft !== null) {
+            } else if (showOpts.draft !== null) {
                 msg.draft = showOpts.draft; // keep draft headline
                 $('#composePanel_subject').val(msg.draft.subject);
                 $('#composePanel_to').val(msg.draft.to.join(', ').toLowerCase().toLowerCase());
@@ -308,13 +308,13 @@ window.WidgetCompose = function(options) {
 
     $('#composePanel_toggs a').on('click', function(ev) { // click To, Cc or Bcc link
         var $lnk = $(this);
-        switch($lnk.text()) {
+        switch ($lnk.text()) {
             case 'Para...': $('#composePanel_to').show().focus(); break;
             case 'Cc...'  : $('#composePanel_cc').show().focus(); break;
             case 'Bcc...' : $('#composePanel_bcc').show().focus();
         }
         $lnk.hide();
-        if(!$('#composePanel_toggs a:visible').length)
+        if (!$('#composePanel_toggs a:visible').length)
             $('#composePanel_toggs').hide();
         _ResizeWriteField();
         return false;
@@ -322,7 +322,7 @@ window.WidgetCompose = function(options) {
 
     $('#composePanel_to,#composePanel_cc,#composePanel_bcc').on('blur', function(ev) { // field loses focus
         var $txt = $(this); // textarea
-        if($.trim($txt.val()) === '') { // when the field is empty and loses focus, hide it
+        if ($.trim($txt.val()) === '') { // when the field is empty and loses focus, hide it
             $('#composePanel_toggs').show(); // "show" links container
             $('#'+$txt.attr('id')+'Btn').show();
             $txt.hide();
@@ -330,7 +330,7 @@ window.WidgetCompose = function(options) {
         }
 
         window.setTimeout(function() { // allow click event to be triggered
-            if(autocomp !== null) {
+            if (autocomp !== null) {
                 autocomp.close();
                 autocomp = null;
             }
@@ -339,7 +339,7 @@ window.WidgetCompose = function(options) {
 
     $('#composePanel_send').on('click', function() { // send email
         var message = _BuildMessageObject();
-        if(_ValidateSend(message)) {
+        if (_ValidateSend(message)) {
             isSending = true;
             popup.removeCloseButton()
                 .setCaption('Enviando email... '+$('#icons .throbber').serialize())
@@ -359,11 +359,11 @@ window.WidgetCompose = function(options) {
                 popup.close();
             }).done(function(status) {
                 _DeleteOldDraftIfAny(draftMsg, function() {
-                    if(reMsg !== null) reMsg.replied = true; // update cache
-                    if(fwdMsg !== null) fwdMsg.forwarded = true;
+                    if (reMsg !== null) reMsg.replied = true; // update cache
+                    if (fwdMsg !== null) fwdMsg.forwarded = true;
                     isSending = false;
                     popup.close();
-                    if(onSendCB !== null)
+                    if (onSendCB !== null)
                         onSendCB(reMsg, fwdMsg, draftMsg); // invoke user callback
                 });
             });
@@ -372,7 +372,7 @@ window.WidgetCompose = function(options) {
 
     $('#composePanel_draft').on('click', function() { // save as draft
         var message = _BuildMessageObject();
-        if(_ValidateSend(message, 'allowBlankDest')) {
+        if (_ValidateSend(message, 'allowBlankDest')) {
             isSending = true;
             popup.removeCloseButton()
                 .setCaption('Salvando rascunho... '+$('#icons .throbber').serialize())
@@ -391,7 +391,7 @@ window.WidgetCompose = function(options) {
                 _DeleteOldDraftIfAny(msg.draft, function() {
                     isSending = false;
                     popup.close();
-                    if(onDraftCB !== null)
+                    if (onDraftCB !== null)
                         onDraftCB(); // invoke user callback
                 });
             });
@@ -403,11 +403,11 @@ window.WidgetCompose = function(options) {
     });
 
     $('#composePanel_to,#composePanel_cc,#composePanel_bcc').on('keydown', function KeyHandle(ev) {
-        if([0, 27, 13, 38, 40].indexOf(ev.which) !== -1) { // esc, enter, up, dn
+        if ([0, 27, 13, 38, 40].indexOf(ev.which) !== -1) { // esc, enter, up, dn
             ev.stopImmediatePropagation();
             autocomp.processKey(ev.which);
         } else {
-            if(KeyHandle.timer !== undefined && KeyHandle.timer !== null) {
+            if (KeyHandle.timer !== undefined && KeyHandle.timer !== null) {
                 window.clearTimeout(KeyHandle.timer);
                 KeyHandle.timer = null;
             }
@@ -426,7 +426,7 @@ window.WidgetCompose = function(options) {
     });
 
     $('#composePanel_to,#composePanel_cc,#composePanel_bcc').on('keypress', function(ev) {
-        if(ev.keyCode === 13) { // enter; new line disabled
+        if (ev.keyCode === 13) { // enter; new line disabled
             ev.stopImmediatePropagation();
             return false;
         }

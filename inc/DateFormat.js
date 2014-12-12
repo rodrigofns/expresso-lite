@@ -31,15 +31,15 @@ window.DateFormat = (function() {
     };
 
     exp.Humanize = function(dateObj) {
-        if(_IsToday(dateObj, 0)) {
+        if (_IsToday(dateObj, 0)) {
             return 'hoje, ' +
                 _Pad2(dateObj.getHours()) + ':' +
                 _Pad2(dateObj.getMinutes());
-        } else if(_IsToday(dateObj, -1)) {
+        } else if (_IsToday(dateObj, -1)) {
             return 'ontem, ' +
                 _Pad2(dateObj.getHours()) + ':' +
                 _Pad2(dateObj.getMinutes());
-        } else if(_IsToday(dateObj, -2) || _IsToday(dateObj, -3) ||
+        } else if (_IsToday(dateObj, -2) || _IsToday(dateObj, -3) ||
             _IsToday(dateObj, -4) || _IsToday(dateObj, -5) ||
             _IsToday(dateObj, -6) )
         {

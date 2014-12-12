@@ -24,7 +24,7 @@ window.UploadFile = function(options) {
     function _ToBlob(dataChunk) {
         // http://stackoverflow.com/questions/7211902/corruption-with-filereader-into-formdata
         var ui8a = new Uint8Array(dataChunk.length);
-        for(var i = 0; i < dataChunk.length; ++i)
+        for (var i = 0; i < dataChunk.length; ++i)
             ui8a[i] = dataChunk.charCodeAt(i);
         return new Blob([ ui8a.buffer ]);
     }
@@ -60,18 +60,18 @@ window.UploadFile = function(options) {
                         headers: { 'X-File-Name':file.name, 'X-File-Type':file.type },
                         complete: function(jqxhr, msg) {
                             curSlice += userOpts.chunkSize;
-                            if(curSlice > file.size) curSlice = file.size;
-                            if(onProgressCB !== null) onProgressCB(curSlice / file.size, jqxhr);
+                            if (curSlice > file.size) curSlice = file.size;
+                            if (onProgressCB !== null) onProgressCB(curSlice / file.size, jqxhr);
 
-                            if(curSlice < file.size) { // still more chunks to upload
+                            if (curSlice < file.size) { // still more chunks to upload
                                 ReadNextChunk();
                             } else { // finished last chunk
-                                if(onDoneCB !== null)
+                                if (onDoneCB !== null)
                                     onDoneCB(file, jqxhr);
                             }
                         },
                         error: function(jqxhr, txtStatus, errThrown) {
-                            if(onFailCB !== null)
+                            if (onFailCB !== null)
                                 onFailCB(jqxhr, txtStatus, errThrown);
                         }
                     });

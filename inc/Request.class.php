@@ -46,15 +46,15 @@ class Request
         ));
         $errMsg = '';
         $req = curl_exec($curl);
-        if($req === false)
+        if ($req === false)
             $errMsg = sprintf('cURL failed. #%d: %s', curl_errno($curl), curl_error($curl));
         curl_close($curl);
-        if($errMsg != '')
+        if ($errMsg != '')
             throw new Exception($errMsg);
 
-        if($this->binaryOutput) {
+        if ($this->binaryOutput) {
             return true;
-        } else if($this->_isImage($req)) {
+        } else if ($this->_isImage($req)) {
             return bin2hex(base64_encode( substr($req, strpos($req, "\r\n\r\n") + 4) ));
         } else {
             return $this->_crackResponse($req);
@@ -64,8 +64,8 @@ class Request
     private function _currentCookies()
     {
         $vals = array();
-        foreach($_COOKIE as $name => $val)
-            if(strcmp($name, 'PHPSESSID') !== 0)
+        foreach ($_COOKIE as $name => $val)
+            if (strcmp($name, 'PHPSESSID') !== 0)
                 $vals[] = ($name.'='.$val);
         return implode('; ', $vals);
     }
@@ -79,8 +79,8 @@ class Request
             'Content-Type: image/png',
             'Content-Type: image/tiff'
         );
-        foreach($lines as $line)
-            if(in_array($line, $ctts))
+        foreach ($lines as $line)
+            if (in_array($line, $ctts))
                 return true;
         return false;
     }
@@ -88,8 +88,8 @@ class Request
     private function _crackResponse($res)
     {
         $lines = explode("\r\n", $res);
-        foreach($lines as $line) {
-            if($this->cookies && strncasecmp($line, 'Set-Cookie: ', strlen('Set-Cookie: ')) === 0) {
+        foreach ($lines as $line) {
+            if ($this->cookies && strncasecmp($line, 'Set-Cookie: ', strlen('Set-Cookie: ')) === 0) {
                 $coo = (object)array(
                     'name'     => '',
                     'value'    => '',
@@ -100,10 +100,10 @@ class Request
                     'httpOnly' => false
                 );
                 $cookieParts = explode(';', substr($line, strlen('Set-Cookie: ')));
-                foreach($cookieParts as $cookiePart) {
+                foreach ($cookieParts as $cookiePart) {
                     $cookiePart = trim($cookiePart);
                     $pair = explode('=', $cookiePart);
-                    switch($pair[0]) {
+                    switch ($pair[0]) {
                     case 'path':     $coo->path = $pair[1]; break;
                     case 'HttpOnly': $coo->httpOnly = true; break;
                     case 'secure':   $coo->secure = true;   break;

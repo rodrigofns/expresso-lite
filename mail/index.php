@@ -12,7 +12,7 @@
 @session_start();
 require_once(dirname(__FILE__).'/../conf.php');
 require_once(dirname(__FILE__).'/../inc/Ajax.class.php');
-if(!Tine::isLogged()) header('location: ../');
+if (!Tine::isLogged()) header('location: ../');
 ?>
 <!DOCTYPE html>
 <html>

@@ -13,15 +13,15 @@ window.Contacts = (function( $ ) {
 
     function _Hex2bin(hex) {
         var bytes = [];
-        for(var i = 0; i < hex.length - 1; i += 2)
+        for (var i = 0; i < hex.length - 1; i += 2)
             bytes.push(parseInt(hex.substr(i, 2), 16));
         return String.fromCharCode.apply(String, bytes);
     }
 
     function _GetContactByMail(mailAddr, people) {
-        for(var p = 0; p < people.length; ++p)
-            for(var m = 0; m < people[p].emails.length; ++m)
-                if(mailAddr === people[p].emails[m])
+        for (var p = 0; p < people.length; ++p)
+            for (var m = 0; m < people[p].emails.length; ++m)
+                if (mailAddr === people[p].emails[m])
                     return people[p];
         return null;
     }
@@ -31,10 +31,10 @@ window.Contacts = (function( $ ) {
     }
 
     exp.loadPersonal = function(onDone) {
-        if(_ReadContactsList() === null) {
+        if (_ReadContactsList() === null) {
             $.post('../', { r:'getPersonalContacts' }).done(function(contacts) {
                 sessionStorage.setItem('contacts', JSON.stringify(contacts));
-                if(onDone !== undefined && onDone !== null)
+                if (onDone !== undefined && onDone !== null)
                     onDone(); // invoke user callback
             });
         }
@@ -42,21 +42,21 @@ window.Contacts = (function( $ ) {
     };
 
     exp.loadMugshots = function(addrs, onDone) {
-        for(var a = addrs.length - 1; a >= 0; --a) {
+        for (var a = addrs.length - 1; a >= 0; --a) {
             var mugshot = sessionStorage.getItem('pic$'+addrs[a]);
-            if(mugshot !== null)
+            if (mugshot !== null)
                 addrs.splice(a, 1); // mugshot already cached, won't be queried
         }
 
-        if(addrs.length) {
+        if (addrs.length) {
             $.post('../', { r:'searchContactsByEmail', emails:addrs.join(',') })
             .fail(function(resp) {
                 window.alert('Erro ao trazer a foto de um contato.\n' + resp.responseText);
             }).done(function(contacts) {
                 var people = _ReadContactsList();
-                for(var i = 0; i < contacts.length; ++i) {
+                for (var i = 0; i < contacts.length; ++i) {
                     var con = _GetContactByMail(contacts[i].email, people);
-                    if(con === null) { // whole contact not cached yet, add new
+                    if (con === null) { // whole contact not cached yet, add new
                         people.push({
                             name: contacts[i].name,
                             emails: [ contacts[i].email ]
@@ -64,11 +64,11 @@ window.Contacts = (function( $ ) {
                     }
                     sessionStorage.setItem('pic$'+contacts[i].email, contacts[i].mugshot);
                 }
-                if(onDone !== undefined && onDone !== null)
+                if (onDone !== undefined && onDone !== null)
                     onDone(); // invoke user callback
             });
         } else {
-            if(onDone !== undefined && onDone !== null)
+            if (onDone !== undefined && onDone !== null)
                 onDone(); // invoke user callback
         }
         return exp;
@@ -76,10 +76,10 @@ window.Contacts = (function( $ ) {
 
     exp.getMugshotSrc = function(email) {
         var mugshot = sessionStorage.getItem('pic$'+email);
-        if(mugshot === null || mugshot === '') {
-            if(email.indexOf('serpro.gov.br') !== -1)
+        if (mugshot === null || mugshot === '') {
+            if (email.indexOf('serpro.gov.br') !== -1)
                 return '';
-            switch(email.substr(email.indexOf('@') + 1)) {
+            switch (email.substr(email.indexOf('@') + 1)) {
                 case 'gmail.com': return '../img/person-gmail.png';
                 case 'yahoo.com':
                 case 'yahoo.com.br': return '../img/person-yahoo.png';
@@ -96,16 +96,16 @@ window.Contacts = (function( $ ) {
     exp.searchByToken = function(token) {
         token = token.toLowerCase();
         var ret = [];
-        if(token.length >= 2) { // search only with 2+ chars
+        if (token.length >= 2) { // search only with 2+ chars
             var people = _ReadContactsList();
-            NEXTPEOPLE: for(var p = 0; p < people.length; ++p) {
-                for(var m = 0; m < people[p].emails.length; ++m) { // search within email addresses
-                    if(people[p].emails[m].indexOf(token) !== -1) {
+            NEXTPEOPLE: for (var p = 0; p < people.length; ++p) {
+                for (var m = 0; m < people[p].emails.length; ++m) { // search within email addresses
+                    if (people[p].emails[m].indexOf(token) !== -1) {
                         ret.push(people[p]);
                         continue NEXTPEOPLE;
                     }
                 }
-                if(people[p].name.toLowerCase().indexOf(token) !== -1) // search within name
+                if (people[p].name.toLowerCase().indexOf(token) !== -1) // search within name
                     ret.push(people[p]);
             }
         }
@@ -124,11 +124,11 @@ window.Contacts = (function( $ ) {
         function UppercaseFirst(name) { return name.charAt(0).toUpperCase() + name.substr(1); }
 
         var parts = emailAddr.substr(0, emailAddr.indexOf('@')).split(/[\.-]+/);
-        if(onlyFirstName) {
+        if (onlyFirstName) {
             return UppercaseFirst(parts[0]); // jose.silva@brasil.gov -> "Jose"
         } else {
             var ret = '';
-            for(var i = 0; i < parts.length; ++i)
+            for (var i = 0; i < parts.length; ++i)
                 ret += UppercaseFirst(parts[i]) + ' ';
             return ret.substr(0, ret.length - 1); // jose.silva@brasil.gov -> "Jose Silva"
         }

@@ -39,7 +39,7 @@ window.WidgetAttacher = function(options) {
     };
 
     obj.rebuildFromMsg = function(headline) {
-        for(var i = 0; i < headline.attachments.length; ++i) {
+        for (var i = 0; i < headline.attachments.length; ++i) {
             var file = headline.attachments[i];
             var $divSlot = _BuildDivSlot();
             $divSlot.find('.attacher_pro').remove();
@@ -54,7 +54,7 @@ window.WidgetAttacher = function(options) {
                 partId: file.partId
             });
         }
-        if(headline.attachments.length && onContentChangeCB !== null)
+        if (headline.attachments.length && onContentChangeCB !== null)
             onContentChangeCB(); // invoke user callback
         return obj;
     };
@@ -68,9 +68,9 @@ window.WidgetAttacher = function(options) {
             chunkSize: 1024 * 200 // file sliced into 200 KB chunks
         });
         up.onProgress(function(pct, xhr) {
-            if($divSlot === null) {
+            if ($divSlot === null) {
                 ($divSlot = _BuildDivSlot()).appendTo($targetDiv);
-                if(onContentChangeCB !== null)
+                if (onContentChangeCB !== null)
                     onContentChangeCB(); // invoke user callback
             }
             tempFiles.push(xhr.responseJSON.tempFile); // object returned by Tinebase.uploadTempFile
@@ -78,12 +78,12 @@ window.WidgetAttacher = function(options) {
                 .text(sprintf('Carregando... %.0f%%', pct * 100));
             $divSlot.find('.attacher_pro')[0].value = pct;
         }).onDone(function(file, xhr) {
-            if($divSlot === null) {
+            if ($divSlot === null) {
                 ($divSlot = _BuildDivSlot()).appendTo($targetDiv);
-                if(onContentChangeCB !== null)
+                if (onContentChangeCB !== null)
                     onContentChangeCB(); // invoke user callback
             }
-            if(xhr.responseJSON.status === 'success') {
+            if (xhr.responseJSON.status === 'success') {
                 $.post('../', { r:'joinTempFiles', tempFiles:JSON.stringify(tempFiles) }).done(function(tmpf) {
                     $divSlot.data('file', { // keep attachment object into DIV
                         name: file.name,
@@ -120,7 +120,7 @@ window.WidgetAttacher = function(options) {
     $targetDiv.on('click', '.attacher_remove', function() {
         var $slot = $(this).closest('.attacher_unit');
         $slot.remove();
-        if(onContentChangeCB !== null)
+        if (onContentChangeCB !== null)
             onContentChangeCB(); // invoke user callback
     });
 };

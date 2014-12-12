@@ -11,7 +11,7 @@
 (function( $ ) {
     $(document).ready(function() {
         // Browser validation.
-        if(!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
+        if (!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
             $('#frmLogin').html('Os browsers mínimos suportados são Firefox 24, Chrome 25 e Safari 7.<br/>' +
                 'Utilize o webmail padrão do Expresso em:<br/>' +
                 '<a href="http://expressov3.serpro.gov.br">http://expressov3.serpro.gov.br</a>');
@@ -19,7 +19,7 @@
         }
 
         // Initial stuff.
-        if(location.href.indexOf('#') !== -1)
+        if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
         LoadServerStatus();
         $.post('.', { r:'setLocale' }); // default to PT/BR
@@ -30,23 +30,23 @@
 
     function ValidateBrowser(minBrowsers) {
         var ua = navigator.userAgent;
-        for(var m = 0; m < minBrowsers.length; ++m) {
+        for (var m = 0; m < minBrowsers.length; ++m) {
             var bname = minBrowsers[m].name,
                 bver = minBrowsers[m].version;
             var browserPrefixIndex = ua.indexOf(bname+'/');
-            if( browserPrefixIndex !== -1) {
+            if (browserPrefixIndex !== -1) {
                 // We found the browser within the user agent, let's check its version.
                 var ver;
                 if (bname !== 'Safari') {
                     ver = ua.substr(browserPrefixIndex + (bname+'/').length);
-                    if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+                    if (ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
                 } else {
                     // Safari is a bit of a special case, its major version is
                     //  expressed after the Version\ prefix.
                     var versionPrefixIndex = ua.indexOf('Version/');
-                    if( versionPrefixIndex !== -1) {
+                    if (versionPrefixIndex !== -1) {
                         ver = ua.substr(versionPrefixIndex + 'Version/'.length);
-                        if(ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
+                        if (ver.indexOf(' ') !== -1) ver = ver.substr(0, ver.indexOf(' '));
                     } else {
                         bver = '-1'; // may happen when using Google Chrome on iPhone
                     }
@@ -69,7 +69,7 @@
     }
 
     function DoLogin() {
-        if(!ValidateLogin()) return false;
+        if (!ValidateLogin()) return false;
         $('#btnLogin').hide();
         $('#frmLogin input').prop('disabled', true);
         $('#frmLogin .throbber').show().children('span').text('Efetuando login...');
@@ -87,7 +87,7 @@
                 'O usuário ou a senha estão incorretos.');
             RestoreLoginState();
         }).done(function(data) {
-            if(data.expired) {
+            if (data.expired) {
                 RestoreLoginState();
                 window.alert('Sua senha expirou, é necessário trocá-la.');
                 var $frmLogin = $('#frmLogin').replaceWith($('#frmChangePwd')).appendTo('#templates');
@@ -114,7 +114,7 @@
     }
 
     function DoChangePassword() {
-        if($('#cpNewPwd').val() !== $('#cpNewPwd2').val()) {
+        if ($('#cpNewPwd').val() !== $('#cpNewPwd2').val()) {
             window.alert('As novas senha não coincidem, por favor digite-as novamente.');
             $('#cpNewPwd,#cpNewPwd2').val('');
             $('#cpNewPwd').focus();
@@ -156,11 +156,11 @@
     }
 
     function ValidateLogin() {
-        if($('#user').val() == '') {
+        if ($('#user').val() == '') {
             window.alert('Por favor, digite seu nome de usuário.');
             $('#user').focus();
             return false;
-        } else if($('#pwd').val() == '') {
+        } else if ($('#pwd').val() == '') {
             window.alert('Por favor, digite sua senha.');
             $('#pwd').focus();
             return false;

@@ -50,7 +50,7 @@
     });
 
     $(document).ajaxComplete(function AjaxComplete() {
-        if(AjaxComplete.timer !== undefined && AjaxComplete.timer !== null)
+        if (AjaxComplete.timer !== undefined && AjaxComplete.timer !== null)
             window.clearTimeout(AjaxComplete.timer);
         AjaxComplete.timer = window.setTimeout(function() {
             AjaxComplete.timer = null;
@@ -88,7 +88,7 @@
         Cache.wndCompose.onSend(MailSent);
         Cache.wndCompose.onDraft(DraftSaved);
 
-        $(document).on('keydown', function(ev) { if(ev.keyCode === 27) EscKey(); });
+        $(document).on('keydown', function(ev) { if (ev.keyCode === 27) EscKey(); });
     }
 
     function DoLogoff(ev) {
@@ -100,7 +100,7 @@
     }
 
     function EscKey() {
-        if($('#centerColumn').hasClass('headlinesForReading')) { // email being read
+        if ($('#centerColumn').hasClass('headlinesForReading')) { // email being read
             Cache.lstMessage.count() > 1 && Cache.lstMessage.countOpen() > 0 ?
                 Cache.lstMessage.closeAll() :
                 $('#closeMessages').trigger('click'); // close reading panel
@@ -127,7 +127,7 @@
 
     function FoldersMenuClick() {
         var $divMenu = $('#leftColumn');
-        if(!$divMenu.hasClass('foldersShown')) { // will show
+        if (!$divMenu.hasClass('foldersShown')) { // will show
             $divMenu.addClass('foldersShown'); // has effect only on smartphones
             UrlStack.push('#foldersMenu', CloseFoldersMenu);
         } else { // will hide
@@ -183,7 +183,7 @@
 
     function OpenMailView() {
         var isMessagesOpened = $('#rightColumn').hasClass('messagesShown');
-        if(!isMessagesOpened) {
+        if (!isMessagesOpened) {
             CloseFoldersMenu();
             $('#leftColumn').addClass('foldersForReading'); // folder tree is hidden both in desktop and phone
             $('#headerMenu').addClass('headerElemHidden'); // in phones, hide folders menu
@@ -200,7 +200,7 @@
 
     function HeadlineClicked(thread) {
         var curFolder = Cache.lstFolder.getCurrent();
-        if(curFolder.globalName === 'INBOX/Drafts') {
+        if (curFolder.globalName === 'INBOX/Drafts') {
             Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
         } else {
             OpenMailView();
@@ -229,7 +229,7 @@
         var curFolder = Cache.lstFolder.getCurrent();
         var MenuRenderFolderLevel = function(folders, level) {
             $.each(folders, function(idx, folder) {
-                if(folder.globalName !== curFolder.globalName) { // avoid move to current folder
+                if (folder.globalName !== curFolder.globalName) { // avoid move to current folder
                     Cache.menuHeadlines.addOption(folder.localName, function() {
                         Cache.lstHeadline.moveMessages(folder); // pass folder object
                     }, level); // indentation
@@ -242,7 +242,7 @@
 
     function ThreadMoved(destFolder) {
         CloseMailView();
-        if(destFolder !== null)
+        if (destFolder !== null)
             Cache.lstFolder.redraw(destFolder);
         Cache.lstFolder.redraw(Cache.lstFolder.getCurrent());
         UpdateHeadlineFooter();
@@ -251,9 +251,9 @@
 
     function MailMoved(destFolder, origThread) {
         Cache.lstHeadline.redrawByThread(origThread, function() {
-            if(!Cache.lstMessage.count())
+            if (!Cache.lstMessage.count())
                 CloseMailView();
-            if(destFolder !== null)
+            if (destFolder !== null)
                 Cache.lstFolder.redraw(destFolder);
             Cache.lstFolder.redraw(Cache.lstFolder.getCurrent());
             UpdateHeadlineFooter();
@@ -275,7 +275,7 @@
         $('#subjectText').text('');
         Cache.lstMessage.empty();
 
-        if(openedThread !== null) {
+        if (openedThread !== null) {
             var cyPos = Cache.lstHeadline.calcScrollTopOf(openedThread), // scroll headlines to have selected at center
                 cyHalf = $('#centerColumn').outerHeight() / 2;
             $('#centerColumn').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
@@ -289,27 +289,27 @@
         ++sentFolder.totalMails;
         Cache.lstFolder.redraw(sentFolder);
 
-        if(reMsg !== null) {
+        if (reMsg !== null) {
             Cache.lstHeadline.redraw(reMsg); // if currently shown, will redraw
             Cache.lstMessage.redrawIcons(reMsg);
-        } else if(fwdMsg !== null) {
+        } else if (fwdMsg !== null) {
             Cache.lstHeadline.redraw(fwdMsg);
             Cache.lstMessage.redrawIcons(fwdMsg);
         }
 
-        if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Sent') {
+        if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Sent') {
             Cache.lstHeadline.loadNew(1);
         } else {
             sentFolder.messages.length = 0; // force cache rebuild
             sentFolder.threads.length = 0;
         }
 
-        if(draftMsg !== null) { // a draft was sent
+        if (draftMsg !== null) { // a draft was sent
             var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
             Cache.lstFolder.redraw(draftFolder);
             draftFolder.messages.length = 0; // force cache rebuild
             draftFolder.threads.length = 0;
-            if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
+            if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
                 LoadFirstHeadlines(draftFolder);
         }
 
@@ -324,7 +324,7 @@
         Cache.lstFolder.redraw(draftFolder);
         draftFolder.messages.length = 0; // force cache rebuild
         draftFolder.threads.length = 0;
-        if(Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
+        if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
             LoadFirstHeadlines(draftFolder);
     }
 })( jQuery, Contacts, UrlStack, DropdownMenu );

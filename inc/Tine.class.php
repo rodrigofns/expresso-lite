@@ -21,7 +21,7 @@ class Tine
 
     private function _jsonRpc($method, $params=array(), $ignoreErrors=false)
     {
-        if(!isset($_SESSION['ourtine_url']))
+        if (!isset($_SESSION['ourtine_url']))
             throw new Exception('No JSON-RPC requests before log in, dude.');
         $tid = sha1(mt_rand().microtime());
         $jsonRpc = new JsonRpc();
@@ -40,7 +40,7 @@ class Tine
             'X-Tine20-TransactionId: '.$tid
         ));
         $jreq = $jsonRpc->send();
-        if(!$ignoreErrors && isset($jreq->error))
+        if (!$ignoreErrors && isset($jreq->error))
             throw new Exception($jreq->error->code.', '.$jreq->error->message);
         return $jreq;
     }
@@ -57,7 +57,7 @@ class Tine
 
     public function login($user, $pwd)
     {
-        if($this->isLogged())
+        if ($this->isLogged())
             throw new Exception('Already logged in.');
         try {
             $jreq = $this->_jsonRpc('Tinebase.login', (object)array(
@@ -65,15 +65,15 @@ class Tine
                 'password'     => $pwd,
                 'securitycode' => ''
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             unset($_SESSION['ourtine_url']);
             throw new Exception('Tinebase.login: '.$e->getMessage());
         }
 
         $res = $jreq->result;
-        if($res->success === false && strpos($res->errorMessage, 'Your password has expired. You must change it.') === 0) {
+        if ($res->success === false && strpos($res->errorMessage, 'Your password has expired. You must change it.') === 0) {
             $res->expired = true;
-        } else if(isset($res->success) && $res->success === false)
+        } else if (isset($res->success) && $res->success === false)
             throw new Exception('Tinebase.login: '.$res->errorMessage);
         $_SESSION['ourtine_jsonkey'] = $res->jsonKey;
         // For some weird reason, calling getAllRegistryData() here will return an incomplete
@@ -83,10 +83,10 @@ class Tine
 
     public function logoff()
     {
-        if(!$this->isLogged()) return false;
+        if (!$this->isLogged()) return false;
         try {
             $jreq = $this->_jsonRpc('Tinebase.logout');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase.logout: '.$e->getMessage());
         }
         unset($_SESSION['ourtine_url']);
@@ -103,7 +103,7 @@ class Tine
                 'saveaspreference' => true,
                 'setcookie'        => true
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase.setLocale: '.$e->getMessage());
         }
         return $jreq->result;
@@ -113,11 +113,11 @@ class Tine
     {
         try {
             $jreq = $this->_jsonRpc('Tinebase.getAllRegistryData');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase.getAllRegistryData: '.$e->getMessage());
         }
-        if($validateLogin) {
-            if(!isset($jreq->result->{self::MAILMODULE}))
+        if ($validateLogin) {
+            if (!isset($jreq->result->{self::MAILMODULE}))
                 throw new Exception('Tinebase.getAllRegistryData: Mail info not returned.');
             $_SESSION['ourtine_id'] = $jreq->result->{self::MAILMODULE}->accounts->results[0]->id;
             //~ $_SESSION['ourtine_jsonkey'] = $jreq->result->Tinebase->jsonKey; // now set by login()
@@ -145,10 +145,10 @@ class Tine
                 'oldPassword' => $oldPassword,
                 'newPassword' => $newPassword
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase.changeExpiredPassword: '.$e->getMessage());
         }
-        if($jreq->result->success === false)
+        if ($jreq->result->success === false)
             throw new Exception($jreq->result->errorMessage);
         return $jreq->result;
     }
@@ -179,17 +179,17 @@ class Tine
                     'sort' => 'email'
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Addressbook.searchEmailAddresss: '.$e->getMessage());
         }
         $contacts = array();
-        foreach($jreq->result->results as $cont) {
+        foreach ($jreq->result->results as $cont) {
             $contactsEmail = null;
-            if(isset($cont->emails)) { // this contact is actually a group with many emails
+            if (isset($cont->emails)) { // this contact is actually a group with many emails
                 $contactsEmail = array();
                 $addrs = explode(',', $cont->emails);
-                foreach($addrs as $addr) {
-                    if(strpos($addr, '<') !== false) {
+                foreach ($addrs as $addr) {
+                    if (strpos($addr, '<') !== false) {
                         $contactsEmail[] = substr($addr,
                             strpos($addr, '<') + 1,
                             strrpos($addr, '>') - strpos($addr, '<') - 1 );
@@ -223,15 +223,15 @@ class Tine
                     )
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.searchFolders: '.$e->getMessage());
         }
         $fldrs = array();
-        foreach($jreq->result->results as $result) {
+        foreach ($jreq->result->results as $result) {
             $enTrans = array('INBOX', 'Drafts', 'Sent', 'Templates', 'Trash');
             $ptTrans = array('Inbox', 'Rascunhos', 'Enviados', 'Modelos', 'Lixeira');
-            for($i = 0; $i < count($enTrans); ++$i)
-                if($result->localname == $enTrans[$i])
+            for ($i = 0; $i < count($enTrans); ++$i)
+                if ($result->localname == $enTrans[$i])
                     $result->localname = $ptTrans[$i];
             $fldrs[] = (object)array(
                 'id'            => $result->id,
@@ -259,7 +259,7 @@ class Tine
                 'folderId' => $folderId,
                 'time'     => 10 // minutes?
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.updateMessageCache: '.$e->getMessage());
         }
         return (object)array(
@@ -283,11 +283,11 @@ class Tine
                     )
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.getFolderStatus: '.$e->getMessage());
         }
-        $folders = array();return $jreq;
-        foreach($jreq->result as $f) {
+        $folders = array();
+        foreach ($jreq->result as $f) {
             $folders[] = (object)array(
                 'id'            => $f->id,
                 'totalMails'    => isset($f->cache_totalcount) ? $f->cache_totalcount : 0,
@@ -307,12 +307,12 @@ class Tine
     {
         try {
             $jreq = $this->_jsonRpc(self::MAILMODULE.'.getMessage', (object)array('id' => $id));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.getMessage: '.$e->getMessage());
         }
         $mailsTo = (isset($jreq->result->headers->to) && $jreq->result->headers->to !== null) ?
             explode(',', $jreq->result->headers->to) : array();
-        for($i = 0, $countMailsTo = count($mailsTo); $i < $countMailsTo; ++$i)
+        for ($i = 0, $countMailsTo = count($mailsTo); $i < $countMailsTo; ++$i)
             $mailsTo[$i] = htmlspecialchars(trim($mailsTo[$i]));
         return (object)array(
             //~ 'id'          => $jreq->result->id,
@@ -347,11 +347,11 @@ class Tine
             '/((On)|(Am)) \d{1,2}(\/|\.|-)\d{1,2}(\/|\.|-)\d{4} \d\d:\d\d(:\d\d)?, (.{1,256})((wrote)|(schrieb)):?/'
         );
         $idx = array();
-        foreach($patterns as $pattern) {
-            if(preg_match($pattern, $message, $matches, PREG_OFFSET_CAPTURE))
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $message, $matches, PREG_OFFSET_CAPTURE))
                 $idx[] = $matches[0][1]; // append index of 1st occurrence of regex match
         }
-        if(!empty($idx)) {
+        if (!empty($idx)) {
             $idx = min($idx); // isolate index of earliest occurrence
             $topMsg = self::_FixInlineAttachmentImages( self::_TrimLinebreaks(substr($message, 0, $idx)) );
             $quotedMsg = self::_FixInlineAttachmentImages( self::_TrimLinebreaks(substr($message, $idx)) );
@@ -366,7 +366,7 @@ class Tine
     private static function _TrimLinebreaks($text)
     {
         $text = trim($text);
-        if($text != '') {
+        if ($text != '') {
             $text = preg_replace('/^(<(BR|br)\s?\/?>)+/', '', $text); // ltrim
             $text = preg_replace('/(<(BR|br)\s?\/?>)+$/', '', $text); // rtrim
         }
@@ -393,12 +393,12 @@ class Tine
     public function searchMessages($what, array $folderIds, $start, $limit)
     {
         $folderCompoundIds = array();
-        foreach($folderIds as $folderId)
+        foreach ($folderIds as $folderId)
             $folderCompoundIds[] = '/'.$_SESSION['ourtine_id'].'/'.$folderId;
         $headlines = $this->_searchHeadlines($what, $folderCompoundIds, $start, $limit);
         $unreadCount = 0;
-        foreach($headlines as $headline)
-            if($headline->unread) ++$unreadCount;
+        foreach ($headlines as $headline)
+            if ($headline->unread) ++$unreadCount;
         return (object)array( // return an artificial folder
             'id'            => null,
             'globalName'    => 'search',
@@ -458,11 +458,11 @@ class Tine
                     'limit' => $limit
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.searchMessages: '.$e->getMessage());
         }
         $headlines = array();
-        foreach($jreq->result->results as $mail) {
+        foreach ($jreq->result->results as $mail) {
             $headlines[] = (object)array(
                 'id'            => $mail->id,
                 'subject'       => $mail->subject !== null ? $mail->subject : '',
@@ -512,7 +512,7 @@ class Tine
     {
         $what = $doAdd ? '.addFlags' : '.clearFlags';
         try {
-            if(count($msgIds) === 1) {
+            if (count($msgIds) === 1) {
                 // Only 1 message to be processed.
                 $jreq = $this->_jsonRpc(self::MAILMODULE.$what, (object)array(
                     'filterData' => $msgIds[0],
@@ -536,7 +536,7 @@ class Tine
                     'flags' => $flag
                 ));
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(sprintf('%s.%s: %s',
                 self::MAILMODULE,
                 $doAdd ? 'addFlags' : 'clearFlags',
@@ -563,7 +563,7 @@ class Tine
                 ),
                 'targetFolderId' => $folderId
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.moveMessage: '.$e->getMessage());
         }
         return $jreq->result;
@@ -606,11 +606,11 @@ class Tine
                     'start' => 0
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Addressbook.searchContacts: '.$e->getMessage());
         }
         $contacts = array();
-        foreach($jreq->result->results as $contact) {
+        foreach ($jreq->result->results as $contact) {
             $contacts[] = (object)array(
                 'cpf'       => $contact->id, // yes, returned object is inconsistent, see searchContactsByEmail()
                 'email'     => $contact->email,
@@ -626,7 +626,7 @@ class Tine
     public function searchContactsByEmail(array $emails)
     {
         $filters = array();
-        foreach($emails as $email) {
+        foreach ($emails as $email) {
             $filters[] = (object)array(
                 'field'    => 'email_query',
                 'operator' => 'contains',
@@ -654,11 +654,11 @@ class Tine
                     'limit' => 50 //count($emails)
                 )
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Addressbook.searchContacts: '.$e->getMessage());
         }
         $contacts = array();
-        foreach($jreq->result->results as $contact) {
+        foreach ($jreq->result->results as $contact) {
             $contacts[] = (object)array(
                 'id'        => $contact->id,
                 'isDeleted' => $contact->is_deleted !== '0',
@@ -679,19 +679,19 @@ class Tine
     private static function _RemoveDuplicatedContacts(array $contacts)
     {
         $ret = array();
-        foreach($contacts as $contact) {
+        foreach ($contacts as $contact) {
             $willAdd = true;
-            for($i = 0, $tot = count($ret); $i < $tot; ++$i) {
-                if($contact->email === $ret[$i]->email) { // duplicated contact
-                    if($ret[$i]->mugshot == '' || $ret[$i]->mugshot === null) { // our current contact has no mugshot
-                        if($contact->mugshot != '' && $contact->mugshot !== null)
+            for ($i = 0, $tot = count($ret); $i < $tot; ++$i) {
+                if ($contact->email === $ret[$i]->email) { // duplicated contact
+                    if ($ret[$i]->mugshot == '' || $ret[$i]->mugshot === null) { // our current contact has no mugshot
+                        if ($contact->mugshot != '' && $contact->mugshot !== null)
                             $ret[$i] = $contact; // replace
                     }
                     $willAdd = false;
                     break;
                 }
             }
-            if($willAdd) $ret[] = $contact;
+            if ($willAdd) $ret[] = $contact;
         }
         return $ret;
     }
@@ -724,11 +724,11 @@ class Tine
                 'owner'          => $personalId,
                 'requiredGrants' => ''
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase_Container.getContainer: '.$e->getMessage());
         }
         $containers = array();
-        foreach($jreq->result as $cont) {
+        foreach ($jreq->result as $cont) {
             $containers[] = (object)array(
                 'id'        => $cont->id,
                 'name'      => $cont->name,
@@ -743,7 +743,7 @@ class Tine
     public function saveContact($idContainer, array $mails, array $surnames, array $names, array $orgs)
     {
         try {
-            for($i = 0, $tot = count($mails); $i < $tot; ++$i) { // one request to each new contact
+            for ($i = 0, $tot = count($mails); $i < $tot; ++$i) { // one request to each new contact
                 $this->_jsonRpc('Addressbook.saveContact', array(
                     (object)array(
                         'container_id' => $idContainer,
@@ -755,7 +755,7 @@ class Tine
                     false
                 ), true); // always returns an error, ignore it
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Addressbook.saveContact: '.$e->getMessage());
         }
         return count($mails);
@@ -783,7 +783,7 @@ class Tine
 
         $dotPos = strrpos($fileName, '.');
         $ext = ($dotPos === false) ? '' : substr($fileName, $dotPos);
-        if(array_key_exists($ext, $mimeTypes)) {
+        if (array_key_exists($ext, $mimeTypes)) {
             header('Content-Type: '.$mimeTypes[$ext]); // will be opened in browser
         } else {
             header("Content-Disposition: attachment; filename=\"$fileName\""); // will be downloaded
@@ -830,7 +830,7 @@ class Tine
         try {
             $jreq = $this->_jsonRpc('Tinebase.joinTempFiles',
                 (object)array('tempFilesData' => $tempFilesData));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception('Tinebase.joinTempFiles: '.$e->getMessage());
         }
         return $jreq->result;
@@ -844,7 +844,7 @@ class Tine
                 'recordData' => $this->_buildMessageForSaving($subject, $body, $to, $cc, $bcc,
                     $isImportant, $replyToId, $forwardFromId, $origDraftId, $attachs)
             ));
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.saveMessage: '.$e->getMessage());
         }
         return $jreq->result;
@@ -861,7 +861,7 @@ class Tine
             ));
             $draftMsg = $this->getFolderHeadlines($draftFolderId, 0, 1); // newest draft
             return $this->markMessageRead(true, array($draftMsg[0]->id)); // because Tine saves new draft as unread
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             throw new Exception(self::MAILMODULE.'.saveMessageInFolder: '.$e->getMessage());
         }
         return (object)array('DraftSaved' => 'ok', 'origDraftId' => $origDraftId);
@@ -885,15 +885,15 @@ class Tine
             'from_name'       => $_SESSION['user_name'],
             'customfields'    => (object)array()
         );
-        if($isImportant) $recordData->importance = true;
-        if($replyToId !== null) { // this email is a reply
+        if ($isImportant) $recordData->importance = true;
+        if ($replyToId !== null) { // this email is a reply
             $recordData->original_id = $replyToId;
             $recordData->flags = "\\Answered";
-        } else if($forwardFromId !== null) { // this email is being forwarded
+        } else if ($forwardFromId !== null) { // this email is being forwarded
             $recordData->original_id = $forwardFromId;
             $recordData->flags = 'Passed';
         }
-        if($origDraftId !== null) {
+        if ($origDraftId !== null) {
             $recordData->original_id = $origDraftId; // editing an existing draft
         }
         return $recordData;
