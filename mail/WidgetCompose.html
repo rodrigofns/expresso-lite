@@ -1,0 +1,32 @@
+<!--
+ * Expresso Lite
+ * WidgetMessages template.
+ *
+ * @package   Lite
+ * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
+ * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+-->
+
+<section id="Compose_template">
+    <section id="Compose_panel"><!-- will be shown into a non-modal window -->
+        <div><input type="text" id="Compose_subject" placeholder="Assunto..."/></div>
+        <div id="Compose_toggs">
+            <a id="Compose_toBtn" href="#" title="Adicionar destinatários do email">Para...</a> &nbsp;
+            <a id="Compose_ccBtn" href="#" title="Adicionar destinatários a receber cópia do email">Cc...</a> &nbsp;
+            <a id="Compose_bccBtn" href="#" title="Adicionar destinatários a receber cópia oculta do email">Bcc...</a>
+        </div>
+        <textarea id="Compose_to" placeholder="Para..."></textarea>
+        <textarea id="Compose_cc" placeholder="Cc..."></textarea>
+        <textarea id="Compose_bcc" placeholder="Bcc..."></textarea>
+        <div contentEditable="true" id="Compose_body"></div>
+        <div id="Compose_attacher"></div>
+        <div>
+            <input type="button" id="Compose_send" value="&nbsp; enviar &nbsp;" title="Enviar este email"/> &nbsp;
+            <input type="button" id="Compose_draft" value="salvar rascunho" title="Salvar na pasta Rascunhos"/> &nbsp;
+            <input type="button" id="Compose_attachNew" title="Anexar arquivo" value="anexar..."/> &nbsp; &nbsp;
+            <label title="Marcar esta mensagem como importante"><input type="checkbox" id="Compose_important"/><div
+                class="icoImportant" title="Marcar esta mensagem como importante"></div></label>
+        </div>
+    </section>
+</section>

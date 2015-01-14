@@ -8,323 +8,290 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, Contacts, UrlStack, DropdownMenu ) {
-    var Cache = { // global page cache with all objects
-        MAILBATCH: 50, // overwritten with value from conf in document.ready
-        folders: [], // all folder objects
-        lstFolder: null, // folder rendering widget
-        lstHeadline: null, // headline rendering widget
-        lstMessage: null, // message bodies rendering widget
-        menuHeadlines: null, // dropdown menu for headlines actions
-        wndCompose: null // compose modeless popup
-    };
+(function( $, UrlStack, Contacts ) {
+window.Cache = {
+    MAILBATCH: 50, // overwritten with value from conf in document.ready
+    folders: [], // all folder objects
+    layout: null, // renders the main page layout
+    treeFolders: null, // folder rendering widget
+    listHeadlines: null, // headlines list rendering widget
+    listMessages: null, // messages list rendering widget
+    wndCompose: null // compose modeless popup
+};
 
-    $(document).ready(function() {
-        Cache.MAILBATCH = $('#mailBatch').val();
-
-        // Init widget objects.
-        Cache.wndCompose = new WidgetCompose({ folderCache:Cache.folders });
-        Cache.lstFolder = new WidgetFolders({ elem:'#foldersArea', folderCache:Cache.folders });
-        Cache.lstHeadline = new WidgetHeadlines({ elem:'#headlinesArea', folderCache:Cache.folders });
-        Cache.lstMessage = new WidgetMessages({ elem:'#messagesArea', folderCache:Cache.folders,
-            contactsCache:Cache.contacts, wndCompose:Cache.wndCompose });
-        Cache.menuHeadlines = new DropdownMenu({ btn:$('#headerHeadlinesDropdown') });
-
-        // Setup all page events.
-        SetupEvents();
-
-        // Do some init stuff.
-        UrlStack.keepClean();
-        $(window).trigger('resize');
-        $('#leftColumn').addClass('foldersShown'); // show folders popup in phones
-        $('#headerCloseMessage').addClass('headerElemHidden'); // initally hidden; phones
-        $('#headerHeadlinesMenu,#updateFolders,#headlinesFooter').hide();
-
-        Cache.lstFolder.loadRoot(function() {
-            CloseFoldersMenu();
-            $('#updateFolders').show();
-            Cache.lstFolder.expand(Cache.folders[0]); // expand 1st folder (probably inbox)
-            Cache.lstFolder.setCurrent(Cache.folders[0], 'noClickEvent'); // ...and select it
-            Contacts.loadPersonal();
-        });
+$(document).ready(function() {
+    // Initialize page objects.
+    Cache.MAILBATCH = $('#mailBatch').val();
+    Cache.layout = new Layout({
+        userMail: $('#mailAddress').val(),
+        $menu: $('#leftColumn'),
+        $content: $('#bigBody'),
     });
+    Cache.wndCompose = new WidgetCompose({ folderCache:Cache.folders });
+    Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });
+    Cache.listHeadlines = new WidgetHeadlines({ $elem:$('#headlinesArea'), folderCache:Cache.folders });
+    Cache.listMessages = new WidgetMessages({ $elem:$('#messagesArea'), folderCache:Cache.folders, wndCompose:Cache.wndCompose });
 
-    $(document).ajaxComplete(function AjaxComplete() {
-        if (AjaxComplete.timer !== undefined && AjaxComplete.timer !== null)
-            window.clearTimeout(AjaxComplete.timer);
-        AjaxComplete.timer = window.setTimeout(function() {
-            AjaxComplete.timer = null;
-            $('#updateFolders').trigger('click');
-        }, 10 * 60 * 1000); // 10 minutes after the last request, an update will be performed (keep-alive)
-    });
+    // Some initial work.
+    UrlStack.keepClean();
+    $('#middleBody').addClass('middleBody_noMessages');
+    $('#rightBody').addClass('rightBody_noMessages');
+    $('#headlinesFooter').css('display', 'none'); // hidden until first headlines load
+    Contacts.loadPersonal();
 
-    function SetupEvents() {
-        $(window).resize(function() {
-            CloseFoldersMenu();
-            $('#bigheader,#bigbody').hide();
-            $('#bigbody').css({ height:($(window).height() - $('#bigheader').outerHeight())+'px',
-                top:$('#bigheader').outerHeight()+'px' });
-            $('#bigheader,#bigbody').show();
+    // Load templates of widgets.
+    $.when(
+        Cache.layout.load(),
+        Cache.treeFolders.load(),
+        Cache.listHeadlines.load(),
+        Cache.listMessages.load(),
+        Cache.wndCompose.load()
+    ).done(function() {
+        $('#btnUpdateFolders,#btnCompose').css('display', 'none');
+        Cache.layout.setLeftMenuVisibleOnPhone(true).done(function() {
+            Cache.treeFolders.loadRoot().done(function() {
+                Cache.treeFolders.expand(Cache.folders[0]).done(function() { // expand 1st folder (probably inbox)...
+                    Cache.treeFolders.setCurrent(Cache.folders[0]); // ...and select it
+                    $('#btnUpdateFolders,#btnCompose').css('display', '');
+                });
+            });
         });
 
-        $('.logoff').on('click', DoLogoff);
-        $('#updateFolders').on('click', UpdateFolders);
-        $('.compose').on('click', function() { Cache.wndCompose.show({ curFolder:Cache.lstFolder.getCurrent() }); });
-        $('#headerMenu').on('click', FoldersMenuClick);
+        // Setup events.
+        Cache.layout
+            .onKeepAlive(function() { $('#btnUpdateFolders').trigger('click'); })
+            .onSearch(Search);
+        Cache.treeFolders
+            .onClick(LoadFirstHeadlines)
+            .onTreeChanged(RebuildHeadlinesContextMenu)
+            .onFolderUpdated(LoadNewHeadlines);
+        Cache.listHeadlines
+            .onClick(HeadlineClicked)
+            .onCheck(RebuildHeadlinesContextMenu)
+            .onMarkRead(function(folder) { SetMessagesPanelVisible(false); Cache.treeFolders.redraw(folder); UpdatePageTitle(); })
+            .onMove(ThreadMoved);
+        Cache.listMessages
+            .onView(function(folder, headline) { Cache.listHeadlines.redraw(headline); Cache.treeFolders.redraw(folder); })
+            .onMarkRead(function(folder, headline) { Cache.listHeadlines.redraw(headline); Cache.treeFolders.redraw(folder); UpdatePageTitle(); })
+            .onMove(MailMoved);
+        Cache.wndCompose
+            //~ .onClose(function() { $('#composeFoldersSlot').show(); });
+            .onSend(MailSent)
+            .onDraft(DraftSaved);
+
         $('#loadMore').on('click', LoadMoreHeadlines);
-        $('#closeMessages,#headerCloseMessage').on('click', CloseMailView);
+        $('#btnUpdateFolders').on('click', UpdateFolders);
+        $('#btnCompose').on('click', ShowComposePopup);
+    });
+});
 
-        Cache.lstFolder.onClick(LoadFirstHeadlines);
-        //~ Cache.lstFolder.onTreeChanged(function() { Cache.lstHeadline.buildContextMenu(); });
-        Cache.lstFolder.onFolderUpdated(LoadNewHeadlines);
-        Cache.lstHeadline.onClick(HeadlineClicked);
-        Cache.lstHeadline.onCheck(HeadlineChecked);
-        Cache.lstHeadline.onMarkRead(function(folder) { CloseMailView(); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
-        Cache.lstHeadline.onMove(ThreadMoved);
-        Cache.lstMessage.onView(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); });
-        Cache.lstMessage.onMarkRead(function(folder, headline) { Cache.lstHeadline.redraw(headline); Cache.lstFolder.redraw(folder); UpdatePageTitle(); });
-        Cache.lstMessage.onMove(MailMoved);
-        Cache.wndCompose.onClose(function() { $('#composeFoldersSlot').show(); });
-        Cache.wndCompose.onSend(MailSent);
-        Cache.wndCompose.onDraft(DraftSaved);
+function UpdatePageTitle() {
+    var folder = Cache.treeFolders.getCurrent();
+    var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
+    document.title = folder.localName+' '+counter+'- '+$('#mailAddress').val()+' - Expresso Lite';
+    Cache.layout.setTitle(folder.localName + (folder.unreadMails ? ' ('+folder.unreadMails+')' : ''));
+}
 
-        $(document).on('keydown', function(ev) { if (ev.keyCode === 27) EscKey(); });
-    }
-
-    function DoLogoff(ev) {
-        $(ev.target).replaceWith( $('#icons .throbber').serialize() );
-
-        $.post('../', { r:'logoff' }).done(function(data) {
-            location.href = '.';
-        });
-    }
-
-    function EscKey() {
-        if ($('#centerColumn').hasClass('headlinesForReading')) { // email being read
-            Cache.lstMessage.count() > 1 && Cache.lstMessage.countOpen() > 0 ?
-                Cache.lstMessage.closeAll() :
-                $('#closeMessages').trigger('click'); // close reading panel
-        } else {
-            Cache.lstHeadline.clearChecked();
-        }
-    }
-
-    function UpdatePageTitle() {
-        var folder = Cache.lstFolder.getCurrent();
-        var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
-        document.title = folder.localName+' '+counter+'- '+$('.userAddr:first').text()+' - Expresso Lite';
-        $('#headerFolderCounter').text(' ('+folder.unreadMails+'/'+folder.totalMails+')');
-    }
-
-    function UpdateFolders() {
-        $('#updateFolders').hide();
-        $('#updateFoldersWait').show();
-        Cache.lstFolder.updateAll(function() {
-            $('#updateFoldersWait').hide();
-            $('#updateFolders').show();
-        });
-    }
-
-    function FoldersMenuClick() {
-        var $divMenu = $('#leftColumn');
-        if (!$divMenu.hasClass('foldersShown')) { // will show
-            $divMenu.addClass('foldersShown'); // has effect only on smartphones
-            UrlStack.push('#foldersMenu', CloseFoldersMenu);
-        } else { // will hide
-            CloseFoldersMenu();
-        }
-    }
-
-    function CloseFoldersMenu() {
-        var $divMenu = $('#leftColumn');
-        $divMenu.removeClass('foldersShown');
-        UrlStack.pop('#foldersMenu');
-    }
-
-    function UpdateHeadlineFooter() {
-        var folder = Cache.lstFolder.getCurrent();
+function UpdateHeadlineFooter() {
+    var folder = Cache.treeFolders.getCurrent();
+    if (!folder.messages.length) {
+        $('#loadedCount').text('A pasta '+folder.localName+' está vazia.');
+    } else {
+        var num = (folder.messages.length < folder.totalMails) ?
+            folder.messages.length+' de '+folder.totalMails : folder.messages.length;
         var s = folder.messages.length > 1 ? 's' : '';
-        $('#loadedCount').text(folder.messages.length+' email'+s+' carregado'+s);
-        (folder.messages.length >= folder.totalMails) ? // no more emails to be fetched from server
-            $('#loadMore').hide() :
-            $('#loadMore').val('carregar mais ' +
-                Math.min(folder.totalMails - folder.messages.length, Cache.MAILBATCH)).show();
+        $('#loadedCount').text(num+' email'+s+' carregado'+s);
     }
+    (folder.messages.length >= folder.totalMails) ? // no more emails to be fetched from server
+        $('#loadMore').hide() :
+        $('#loadMore').val('carregar +' +
+            Math.min(folder.totalMails - folder.messages.length, Cache.MAILBATCH)).show();
+}
 
-    function LoadFirstHeadlines(folder) {
-        CloseFoldersMenu();
-        $('#headerMenuFolderName').text(folder.localName);
-        $('#headerFolderCounter').text(' ('+folder.unreadMails+'/'+folder.totalMails+')');
-        $('#headerHeadlinesMenu,#headlinesFooter').hide();
-        UpdatePageTitle();
-        Cache.lstHeadline.loadFolder(folder, Cache.MAILBATCH, function() {
-            $('#centerColumn').scrollTop(0);
-            $('#headlinesFooter').show();
-            UpdateHeadlineFooter();
-        });
-    }
-
-    function LoadMoreHeadlines() {
-        $('#headerHeadlinesMenu,#headlinesFooter').hide();
-        CloseMailView();
-        Cache.lstHeadline.loadMore(Cache.MAILBATCH, function() {
-            $('#headlinesFooter').show();
-            UpdateHeadlineFooter();
-            $('#centerColumn').scrollTop( $('#centerColumn')[0].scrollHeight ); // scroll to bottom
-        });
-    }
-
-    function LoadNewHeadlines(folder) {
-        Cache.lstHeadline.loadNew(Cache.MAILBATCH, function() {
-            UpdateHeadlineFooter();
-            $('#centerColumn').scrollTop(0); // scroll to top
-        });
-    }
-
-    function OpenMailView() {
-        var isMessagesOpened = $('#rightColumn').hasClass('messagesShown');
-        if (!isMessagesOpened) {
-            CloseFoldersMenu();
-            $('#leftColumn').addClass('foldersForReading'); // folder tree is hidden both in desktop and phone
-            $('#headerMenu').addClass('headerElemHidden'); // in phones, hide folders menu
-            $('#headerCloseMessage').removeClass('headerElemHidden'); // ...and show specific back button
-            $('#headerHeadlinesMenu').hide();
-
-            $('#centerColumn').addClass('headlinesForReading'); // desktop, goes left and small; phone, hides
-            $('#rightColumn').addClass('messagesShown'); // desktop, gets 1/3 of screen; phone, whole screen
-            $('.headlines_check').hide();
-
-            UrlStack.push('#mailView', CloseMailView);
-        }
-    }
-
-    function HeadlineClicked(thread) {
-        var curFolder = Cache.lstFolder.getCurrent();
-        if (curFolder.globalName === 'INBOX/Drafts') {
-            Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
-        } else {
-            OpenMailView();
-            $('#subjectText').text(thread[thread.length-1].subject);
-            Cache.lstMessage.render(thread, curFolder); // headlines sorted newest first
-        }
-
-        var cyPos = Cache.lstHeadline.calcScrollTopOf(thread), // scroll headlines to have selected at center
-            cyHalf = $('#centerColumn').outerHeight() / 2;
-        $('#centerColumn').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
-    }
-
-    function HeadlineChecked() {
-        var isMessagesOpened = $('#rightColumn').hasClass('messagesShown');
-        $('#headerHeadlinesMenu').toggle(!isMessagesOpened && Cache.lstHeadline.getChecked().length > 0); // show dropdown button if any checked
-        Cache.menuHeadlines.purge(); // rebuild context dropdown menu
-
-        Cache.menuHeadlines
-            .addOption('Desselecionar todas', Cache.lstHeadline.clearChecked)
-            .addOption('Marcar como lida', function() { Cache.lstHeadline.markRead(true); })
-            .addOption('Marcar como não lida', function() { Cache.lstHeadline.markRead(false); })
-            .addOption('Alterar destaque', Cache.lstHeadline.toggleStarred)
-            .addOption('Apagar', Cache.lstHeadline.deleteMessages)
+function RebuildHeadlinesContextMenu() {
+    Cache.layout.getContextMenu().purge(); // rebuild the headlines context menu
+    if (Cache.listHeadlines.getChecked().length === 0) {
+        Cache.layout.setContextMenuVisible(false);
+    } else {
+        Cache.layout.getContextMenu()
+            .addOption('Desselecionar todas', Cache.listHeadlines.clearChecked)
+            .addOption('Marcar como lida', function() { Cache.listHeadlines.markRead(true); })
+            .addOption('Marcar como não lida', function() { Cache.listHeadlines.markRead(false); })
+            .addOption('Alterar destaque', Cache.listHeadlines.toggleStarred)
+            .addOption('Apagar', Cache.listHeadlines.deleteMessages)
             .addHeader('Mover para...');
 
-        var curFolder = Cache.lstFolder.getCurrent();
+        var curFolder = Cache.treeFolders.getCurrent();
         var MenuRenderFolderLevel = function(folders, level) {
             $.each(folders, function(idx, folder) {
                 if (folder.globalName !== curFolder.globalName) { // avoid move to current folder
-                    Cache.menuHeadlines.addOption(folder.localName, function() {
-                        Cache.lstHeadline.moveMessages(folder); // pass folder object
+                    Cache.layout.getContextMenu().addOption(folder.localName, function() {
+                        Cache.listHeadlines.moveMessages(folder); // pass folder object
                     }, level); // indentation
                 }
                 MenuRenderFolderLevel(folder.subfolders, level + 1);
             });
         };
         MenuRenderFolderLevel(Cache.folders, 0);
+        Cache.layout.setContextMenuVisible(true);
     }
+}
 
-    function ThreadMoved(destFolder) {
-        CloseMailView();
-        if (destFolder !== null)
-            Cache.lstFolder.redraw(destFolder);
-        Cache.lstFolder.redraw(Cache.lstFolder.getCurrent());
-        UpdateHeadlineFooter();
+function SetMessagesPanelVisible(isVisible) {
+    if (isVisible) {
+        Cache.layout.setTitle('voltar');
+        Cache.layout.setContextMenuVisible(false);
+        Cache.layout.setContentFullWidth(true)
+            .onUnset(function() { SetMessagesPanelVisible(false); });
+    } else {
         UpdatePageTitle();
+        Cache.layout.setContentFullWidth(false);
+        RebuildHeadlinesContextMenu();
+        window.setTimeout(function() { Cache.listHeadlines.clearCurrent(); }, 400); // flash hint before go
+
+        var openedThread = Cache.listHeadlines.getCurrent();
+        if (openedThread !== null) {
+            var cyPos = Cache.listHeadlines.calcScrollTopOf(openedThread), // scroll headlines to have selected at center
+                cyHalf = $('#middleBody').outerHeight() / 2;
+            $('#middleBody').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
+        }
     }
 
-    function MailMoved(destFolder, origThread) {
-        Cache.lstHeadline.redrawByThread(origThread, function() {
-            if (!Cache.lstMessage.count())
-                CloseMailView();
-            if (destFolder !== null)
-                Cache.lstFolder.redraw(destFolder);
-            Cache.lstFolder.redraw(Cache.lstFolder.getCurrent());
+    Cache.listHeadlines.setCheckboxesVisible(!isVisible);
+    $('#middleBody')
+        .toggleClass('middleBody_noMessages', !isVisible)
+        .toggleClass('middleBody_withMessages', isVisible);
+    $('#rightBody')
+        .toggleClass('rightBody_noMessages', !isVisible)
+        .toggleClass('rightBody_withMessages', isVisible);
+}
+
+function Search(text) {
+    console.log(text);
+}
+
+function LoadFirstHeadlines(folder) {
+    Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+        $('#headlinesFooter').css('display', 'none');
+        UpdatePageTitle();
+        Cache.listHeadlines.loadFolder(folder, Cache.MAILBATCH).done(function() {
+            $('#headlinesFooter').css('display', '');
             UpdateHeadlineFooter();
         });
-    }
+    });
+}
 
-    function CloseMailView() {
-        var openedThread = Cache.lstHeadline.getCurrent();
-
-        $('#headerCloseMessage').addClass('headerElemHidden'); // in phones, hide back button
-        $('#headerMenu').removeClass('headerElemHidden'); // ...and show folders menu
-        $('#headerHeadlinesMenu').toggle(Cache.lstHeadline.getChecked().length > 0);
-
-        $('#leftColumn').removeClass('foldersForReading');
-        $('#centerColumn').removeClass('headlinesForReading');
-        $('#rightColumn').removeClass('messagesShown');
-        $('.headlines_check').show();
-        window.setTimeout(function() { Cache.lstHeadline.clearCurrent(); }, 400); // flash hint before go
-        $('#subjectText').text('');
-        Cache.lstMessage.empty();
-
-        if (openedThread !== null) {
-            var cyPos = Cache.lstHeadline.calcScrollTopOf(openedThread), // scroll headlines to have selected at center
-                cyHalf = $('#centerColumn').outerHeight() / 2;
-            $('#centerColumn').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
-        }
-
-        UrlStack.pop('#mailView');
-    }
-
-    function MailSent(reMsg, fwdMsg, draftMsg) {
-        var sentFolder = ThreadMail.FindFolderByGlobalName('INBOX/Sent', Cache.folders);
-        ++sentFolder.totalMails;
-        Cache.lstFolder.redraw(sentFolder);
-
-        if (reMsg !== null) {
-            Cache.lstHeadline.redraw(reMsg); // if currently shown, will redraw
-            Cache.lstMessage.redrawIcons(reMsg);
-        } else if (fwdMsg !== null) {
-            Cache.lstHeadline.redraw(fwdMsg);
-            Cache.lstMessage.redrawIcons(fwdMsg);
-        }
-
-        if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Sent') {
-            Cache.lstHeadline.loadNew(1);
-        } else {
-            sentFolder.messages.length = 0; // force cache rebuild
-            sentFolder.threads.length = 0;
-        }
-
-        if (draftMsg !== null) { // a draft was sent
-            var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
-            Cache.lstFolder.redraw(draftFolder);
-            draftFolder.messages.length = 0; // force cache rebuild
-            draftFolder.threads.length = 0;
-            if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
-                LoadFirstHeadlines(draftFolder);
-        }
-
+function LoadMoreHeadlines() {
+    $('#headlinesFooter').css('display', 'none');
+    SetMessagesPanelVisible(false);
+    Cache.listHeadlines.loadMore(Cache.MAILBATCH).done(function() {
+        $('#headlinesFooter').css('display', '');
+        UpdatePageTitle();
         UpdateHeadlineFooter();
+    });
+}
 
-        //~ Compose.SaveNewPersonalContacts(message);
+function LoadNewHeadlines(folder) {
+    Cache.listHeadlines.loadNew(Cache.MAILBATCH, function() {
+        UpdatePageTitle();
+        UpdateHeadlineFooter();
+        $('#middleBody').scrollTop(0); // scroll to top
+    });
+}
+
+function HeadlineClicked(thread) {
+    var curFolder = Cache.treeFolders.getCurrent();
+    if (curFolder.globalName === 'INBOX/Drafts') {
+        Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
+    } else {
+        SetMessagesPanelVisible(true);
+        var curFolder = Cache.treeFolders.getCurrent();
+        Cache.listMessages.render(thread, curFolder); // headlines sorted newest first
+        $('#subjectText').text(thread[thread.length-1].subject);
     }
 
-    function DraftSaved() {
+    var cyPos = Cache.listHeadlines.calcScrollTopOf(thread), // scroll headlines to have selected at center
+        cyHalf = $('#middleBody').outerHeight() / 2;
+    $('#middleBody').scrollTop(cyPos > cyHalf ? cyPos - cyHalf : 0);
+}
+
+function ThreadMoved(destFolder) {
+    SetMessagesPanelVisible(false);
+    if (destFolder !== null)
+        Cache.treeFolders.redraw(destFolder);
+    Cache.treeFolders.redraw(Cache.treeFolders.getCurrent());
+    UpdateHeadlineFooter();
+    UpdatePageTitle();
+    RebuildHeadlinesContextMenu();
+}
+
+function MailMoved(destFolder, origThread) {
+    Cache.listHeadlines.redrawByThread(origThread, function() {
+        if (!Cache.listMessages.count())
+            SetMessagesPanelVisible(false);
+        if (destFolder !== null)
+            Cache.treeFolders.redraw(destFolder);
+        Cache.treeFolders.redraw(Cache.treeFolders.getCurrent());
+        UpdateHeadlineFooter();
+    });
+}
+
+function UpdateFolders() {
+    $('#btnUpdateFolders,#btnCompose').css('display', 'none');
+    $('#txtUpdateFolders').css('display', 'inline-block');
+    Cache.treeFolders.updateAll().done(function() {
+        $('#btnUpdateFolders,#txtUpdateFolders,#btnCompose').css('display', '');
+    });
+}
+
+function ShowComposePopup() {
+    $('#btnCompose').blur();
+    Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+        Cache.wndCompose.show({ curFolder:Cache.treeFolders.getCurrent() });
+    });
+}
+
+function MailSent(reMsg, fwdMsg, draftMsg) {
+    var sentFolder = ThreadMail.FindFolderByGlobalName('INBOX/Sent', Cache.folders);
+    ++sentFolder.totalMails;
+    Cache.treeFolders.redraw(sentFolder);
+
+    if (reMsg !== null) {
+        Cache.listHeadlines.redraw(reMsg); // if currently shown, will redraw
+        Cache.listMessages.redrawIcons(reMsg);
+    } else if (fwdMsg !== null) {
+        Cache.listHeadlines.redraw(fwdMsg);
+        Cache.listMessages.redrawIcons(fwdMsg);
+    }
+
+    if (Cache.treeFolders.getCurrent().globalName === 'INBOX/Sent') {
+        Cache.listHeadlines.loadNew(1);
+    } else {
+        sentFolder.messages.length = 0; // force cache rebuild
+        sentFolder.threads.length = 0;
+    }
+
+    if (draftMsg !== null) { // a draft was sent
         var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
-        ++draftFolder.totalMails;
-        Cache.lstFolder.redraw(draftFolder);
+        Cache.treeFolders.redraw(draftFolder);
         draftFolder.messages.length = 0; // force cache rebuild
         draftFolder.threads.length = 0;
-        if (Cache.lstFolder.getCurrent().globalName === 'INBOX/Drafts')
+        if (Cache.treeFolders.getCurrent().globalName === 'INBOX/Drafts') {
             LoadFirstHeadlines(draftFolder);
+        }
     }
-})( jQuery, Contacts, UrlStack, DropdownMenu );
+
+    UpdateHeadlineFooter();
+}
+
+function DraftSaved() {
+    var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', Cache.folders);
+    ++draftFolder.totalMails;
+    Cache.treeFolders.redraw(draftFolder);
+    draftFolder.messages.length = 0; // force cache rebuild
+    draftFolder.threads.length = 0;
+    if (Cache.treeFolders.getCurrent().globalName === 'INBOX/Drafts') {
+        LoadFirstHeadlines(draftFolder);
+    }
+}
+})( jQuery, UrlStack, Contacts );

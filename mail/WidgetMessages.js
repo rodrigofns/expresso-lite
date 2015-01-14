@@ -8,17 +8,19 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, Contacts, DateFormat, ThreadMail, DropdownMenu ) {
+LoadCss('WidgetMessages.css');
+
+(function( $, Contacts, DateFormat, ThreadMail, ContextMenu ) {
 window.WidgetMessages = function(options) {
     var userOpts = $.extend({
-        elem: '', // jQuery selector for the target DIV
+        $elem: null, // jQuery object for the target DIV
         folderCache: [],
         wndCompose: null, // WidgetCompose object
         genericMugshot: '../img/person-generic.gif'
     }, options);
 
-    var obj          = this;
-    var $targetDiv   = $(userOpts.elem);
+    var THIS         = this;
+    var $targetDiv   = userOpts.$elem; // shorthand
     var curFolder    = null; // folder object currently loaded
     var menu         = null; // context menu object
     var onViewCB     = null; // user callbacks
@@ -40,18 +42,19 @@ window.WidgetMessages = function(options) {
 
     function _FormatManyAddresses(addrs) {
         if (!addrs.length) return '<i>(ninguém)</i>';
-        var ret = '';
+        var ret = [];
         for (var i = 0; i < addrs.length; ++i) {
-            var $span = $('#templates .messages_addrPerson').clone();
+            var $span = $('#Messages_template .Messages_addrPerson').clone();
             var ad = addrs[i].toLowerCase();
-            ret += $span.find('.messages_addrName').text( ad.substr(0, ad.indexOf('@')) ).serialize() +
-                $span.find('.messages_addrDomain').text( ad.substr(ad.indexOf('@')) ).serialize() + ', ';
+            ret.push($span.find('.Messages_addrName').text(ad.substr(0, ad.indexOf('@'))).clone());
+            ret.push($span.find('.Messages_addrDomain').text(ad.substr(ad.indexOf('@'))).clone())
+            if (i !== addrs.length - 1) ret.push(', ');
         }
-        return ret.substr(0, ret.length - 2);
+        return ret;
     }
 
     function _BuildDropdownMenu($divUnit) {
-        var menu = new DropdownMenu({ btn:$divUnit.find('.messages_dropdown') });
+        var menu = new ContextMenu({ $btn:$divUnit.find('.Messages_dropdown') });
         menu.addOption('Marcar como não lida', function() { _MarkRead($divUnit, false); })
             .addOption('Responder', function() { _NewMail($divUnit, 're'); })
             .addOption('Encaminhar', function() { _NewMail($divUnit, 'fwd'); })
@@ -72,12 +75,14 @@ window.WidgetMessages = function(options) {
     }
 
     function _BuildIcons(headline) {
-        return (headline.replied       ? $('#icons .icoReplied').serialize()   : '')+' ' +
-            (headline.wantConfirm   ? $('#icons .icoConfirm').serialize()   : '')+' ' +
-            (headline.important     ? $('#icons .icoImportant').serialize() : '')+' ' +
-            (headline.signed        ? $('#icons .icoSigned').serialize()    : '')+' ' +
-            (headline.hasAttachment ? $('#icons .icoAttach').serialize()    : '')+' ' +
-            (headline.forwarded     ? $('#icons .icoForwarded').serialize() : '')+' ';
+        var icons = [];
+        if (headline.replied)       icons.push($('#icons .icoReplied').clone());
+        if (headline.wantConfirm)   icons.push($('#icons .icoConfirm').clone());
+        if (headline.important)     icons.push($('#icons .icoImportant').clone());
+        if (headline.signed)        icons.push($('#icons .icoSigned').clone());
+        if (headline.hasAttachment) icons.push($('#icons .icoAttach').clone());
+        if (headline.forwarded)     icons.push($('#icons .icoForwarded').clone());
+        return icons;
     }
 
     function _BuildDivMail(headline) {
@@ -85,23 +90,23 @@ window.WidgetMessages = function(options) {
         if (mugshot === '')
             mugshot = userOpts.genericMugshot;
 
-        var unreadClass = headline.unread ? 'messages_unread' : 'messages_read';
+        var unreadClass = headline.unread ? 'Messages_unread' : 'Messages_read';
 
-        var $div = $('#templates .messages_unit').clone();
-        $div.find('.messages_top1').addClass(unreadClass);
-        $div.find('.messages_mugshot > img').attr('src', mugshot);
-        $div.find('.messages_fromName').text(headline.from.name);
-        $div.find('.messages_fromMail').text('('+headline.from.email+')');
-        $div.find('.messages_icons').html(_BuildIcons(headline));
-        $div.find('.messages_when').text(DateFormat.Long(headline.received));
-        $div.find('.messages_top2').addClass(unreadClass);
-        $div.find('.messages_addrTo').html(_FormatManyAddresses(headline.to));
+        var $div = $('#Messages_template .Messages_unit').clone();
+        $div.find('.Messages_top1').addClass(unreadClass);
+        $div.find('.Messages_mugshot > img').attr('src', mugshot);
+        $div.find('.Messages_fromName').text(headline.from.name);
+        $div.find('.Messages_fromMail').text('('+headline.from.email+')');
+        $div.find('.Messages_icons').append(_BuildIcons(headline));
+        $div.find('.Messages_when').text(DateFormat.Long(headline.received));
+        $div.find('.Messages_top2').addClass(unreadClass);
+        $div.find('.Messages_addrTo').append(_FormatManyAddresses(headline.to));
         headline.cc.length ?
-            $div.find('.messages_addrCc').html(_FormatManyAddresses(headline.cc)) :
-            $div.find('.messages_addrCc').parent().remove();
+            $div.find('.Messages_addrCc').append(_FormatManyAddresses(headline.cc)) :
+            $div.find('.Messages_addrCc').parent().remove();
         headline.bcc.length ?
-            $div.find('.messages_addrBcc').html(_FormatManyAddresses(headline.bcc)) :
-            $div.find('.messages_addrBcc').parent().remove();
+            $div.find('.Messages_addrBcc').append(_FormatManyAddresses(headline.bcc)) :
+            $div.find('.Messages_addrBcc').parent().remove();
 
         _BuildDropdownMenu($div);
 
@@ -110,9 +115,9 @@ window.WidgetMessages = function(options) {
     }
 
     function _NewMail($div, action) {
-        if (!$div.hasClass('messages_unit'))
-            $div = $div.closest('.messages_unit');
-        if (!$div.children('.messages_content').is(':visible')) {
+        if (!$div.hasClass('Messages_unit'))
+            $div = $div.closest('.Messages_unit');
+        if (!$div.children('.Messages_content').is(':visible')) {
             window.alert('Abra a mensagem antes de '+(action==='fwd'?'encaminhá':'respondê')+'-la.');
         } else {
             var opts = { curFolder:curFolder };
@@ -125,45 +130,52 @@ window.WidgetMessages = function(options) {
     }
 
     function _MarkRead($elem, asRead) {
-        if (!$elem.hasClass('messages_unit'))
-            $elem = $elem.closest('.messages_unit');
+        if (!$elem.hasClass('Messages_unit')) {
+            $elem = $elem.closest('.Messages_unit');
+        }
         var headline = $elem.data('headline');
+
         if ( (asRead && !headline.unread) || (!asRead && headline.unread) ) {
             window.alert('Mensagem já marcada como '+(asRead?'':'não')+' lida.');
         } else {
-            $elem.find('.messages_from:first').append(
-                '<span class="messages_throbber">&nbsp; '+$('#icons .throbber').serialize()+'</span>' );
-            if (!asRead && $elem.find('.messages_content').is(':visible'))
-                    $elem.children('.messages_top1').trigger('click'); // collapse if expanded
+            $elem.find('.Messages_from:first').append(
+                $(document.createElement('span'))
+                    .addClass('Messages_throbber')
+                    .append('&nbsp; ')
+                    .append($('#icons .throbber').clone()) );
+
+            if (!asRead && $elem.find('.Messages_content').is(':visible'))
+                    $elem.children('.Messages_top1').trigger('click'); // collapse if expanded
 
             $.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:headline.id })
-            .always(function() { $elem.find('.messages_throbber').remove(); })
+            .always(function() { $elem.find('.Messages_throbber').remove(); })
             .fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function() {
                 headline.unread = !headline.unread; // update cache
                 asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
-                $elem.children('.messages_top1,.messages_top2')
-                    .toggleClass('messages_read', asRead).toggleClass('.messages_unread', !asRead);
-                if (onMarkReadCB !== null)
+                $elem.children('.Messages_top1,.Messages_top2')
+                    .toggleClass('Messages_read', asRead).toggleClass('.Messages_unread', !asRead);
+                if (onMarkReadCB !== null) {
                     onMarkReadCB(curFolder, headline); // invoke user callback
+                }
             });
         }
     }
 
     function _MoveMessage($elem, destFolder) {
-        if (!$elem.hasClass('messages_unit'))
-            $elem = $elem.closest('.messages_unit');
+        if (!$elem.hasClass('Messages_unit'))
+            $elem = $elem.closest('.Messages_unit');
         if ($elem.find('.throbber').length) // already working?
             return;
         var headline = $elem.data('headline');
 
         function ProceedMoving() {
-            $elem.find('.messages_fromName').hide();
-            $elem.find('.messages_fromMail').html(' &nbsp; <i>Movendo para '+destFolder.localName+'...</i>');
-            $elem.find('.messages_from').append($('#icons .throbber').serialize());
-            $elem.children('.messages_top2,.messages_attachs,.messages_content').remove(); // won't expand anymore
+            $elem.find('.Messages_fromName').hide();
+            $elem.find('.Messages_fromMail').html(' &nbsp; <i>Movendo para '+destFolder.localName+'...</i>');
+            $elem.find('.Messages_from').append($('#icons .throbber').clone());
+            $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
             $.post('../', { r:'moveMessages', messages:headline.id, folder:destFolder.id })
             .always(function() { $elem.find('.throbber').remove(); })
@@ -189,14 +201,14 @@ window.WidgetMessages = function(options) {
             });
         }
 
-        $elem.find('.messages_top2').is(':visible') ?
-            $elem.find('.messages_top1').trigger('click', ProceedMoving) : // if expanded, collapse
+        $elem.find('.Messages_top2').is(':visible') ?
+            $elem.find('.Messages_top1').trigger('click', ProceedMoving) : // if expanded, collapse
             ProceedMoving();
     }
 
     function _DeleteMessage($elem) {
-        if (!$elem.hasClass('messages_unit'))
-            $elem = $elem.closest('.messages_unit');
+        if (!$elem.hasClass('Messages_unit'))
+            $elem = $elem.closest('.Messages_unit');
         if ($elem.find('.throbber').length) // already working?
             return;
         var headline = $elem.data('headline');
@@ -205,10 +217,10 @@ window.WidgetMessages = function(options) {
             _MoveMessage($elem, ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
         } else if (window.confirm('Deseja apagar esta mensagem?')) { // we're in trash folder, add deleted flag
             function ProceedDeleting() {
-                $elem.find('.messages_fromName').hide();
-                $elem.find('.messages_fromMail').html(' &nbsp; <i>Excluindo...</i>');
-                $elem.find('.messages_from').append($('#icons .throbber').serialize());
-                $elem.children('.messages_top2,.messages_attachs,.messages_content').remove(); // won't expand anymore
+                $elem.find('.Messages_fromName').hide();
+                $elem.find('.Messages_fromMail').html(' &nbsp; <i>Excluindo...</i>');
+                $elem.find('.Messages_from').append($('#icons .throbber').clone());
+                $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
                 $.post('../', { r:'deleteMessages', messages:headline.id, forever:1 })
                 .always(function() { $elem.find('.throbber').remove(); })
@@ -229,8 +241,8 @@ window.WidgetMessages = function(options) {
                 });
             }
 
-            $elem.find('.messages_top2').is(':visible') ?
-                $elem.find('.messages_top1').trigger('click', ProceedDeleting) : // if expanded, collapse
+            $elem.find('.Messages_top2').is(':visible') ?
+                $elem.find('.Messages_top1').trigger('click', ProceedDeleting) : // if expanded, collapse
                 ProceedDeleting();
         }
     }
@@ -239,124 +251,143 @@ window.WidgetMessages = function(options) {
         var mugshotAddrs = []; // email addresses to have mugshot fetched
         for (var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
             var fromAddr = thread[i].from.email.toLowerCase();
-            if (fromAddr.indexOf('@serpro.gov.br') !== -1 && mugshotAddrs.indexOf(fromAddr) === -1) // only @serpro addresses
+            if (fromAddr.indexOf('@serpro.gov.br') !== -1 && mugshotAddrs.indexOf(fromAddr) === -1) { // only @serpro addresses
                 mugshotAddrs.push(fromAddr);
+            }
         }
 
-        Contacts.loadMugshots(mugshotAddrs, function() {
+        Contacts.loadMugshots(mugshotAddrs).done(function() {
             for (var i = 0; i < unitDivs.length; ++i) {
                 if (!unitDivs[i].closest('body').length) // not in DOM anymore
                     continue;
-                if (unitDivs[i].find('.messages_mugshot > img').attr('src') === userOpts.genericMugshot) {
+                if (unitDivs[i].find('.Messages_mugshot > img').attr('src') === userOpts.genericMugshot) {
                     var imgsrc = Contacts.getMugshotSrc(unitDivs[i].data('headline').from.email);
                     if (imgsrc !== '') {
-                        unitDivs[i].find('.messages_mugshot > img')
+                        unitDivs[i].find('.Messages_mugshot > img')
                             .attr('src', imgsrc)
                             .hide()
                             .fadeIn(500);
                     }
                 }
             }
-            if (onDone !== undefined)
-                onDone();
+            if (onDone !== undefined) onDone();
         });
     }
 
-    obj.empty = function() {
-        $targetDiv.children('.messages_unit').remove();
-        return obj;
+    THIS.load = function() {
+        var defer = $.Deferred();
+        $.get('WidgetMessages.html', function(elems) { // should be pretty fast, possibly cached
+            $(document.body).append(elems); // our templates
+            defer.resolve();
+        });
+        return defer.promise();
     };
 
-    obj.render = function(thread, currentFolder) {
+    THIS.empty = function() {
+        $targetDiv.children('.Messages_unit').remove();
+        return THIS;
+    };
+
+    THIS.render = function(thread, currentFolder) {
         curFolder = currentFolder; // keep
-        $targetDiv.children('.messages_unit').remove(); // clear, if any
+        $targetDiv.children('.Messages_unit').remove(); // clear, if any
         var divs = [];
         var firstUnread = -1;
         thread.reverse(); // headlines now sorted oldest first
         for (var i = 0; i < thread.length; ++i) { // each thread is an array of headlines
             divs.push(_BuildDivMail(thread[i]));
-            if (firstUnread === -1 && thread[i].unread)
+            if (firstUnread === -1 && thread[i].unread) {
                 firstUnread = i;
+            }
         }
         thread.reverse(); // headlines now sorted newest first again
         $targetDiv.append(divs);
         firstUnread = (firstUnread !== -1) ? firstUnread : thread.length - 1; // open 1st unread, or last
-        $targetDiv.find('.messages_top1:eq('+firstUnread+')').trigger('click', function() {
+        $targetDiv.find('.Messages_top1:eq('+firstUnread+')').trigger('click', function() {
             _LoadMugshots(thread, divs);
         });
-        return obj;
+        return THIS;
     };
 
-    obj.redrawIcons = function(headline) {
-        $targetDiv.children('.messages_unit').each(function(idx, elem) {
+    THIS.redrawIcons = function(headline) {
+        $targetDiv.children('.Messages_unit').each(function(idx, elem) {
             var $div = $(elem);
-            if ($div.data('headline').id === headline.id)
-                $div.find('.messages_icons').html(_BuildIcons(headline));
+            if ($div.data('headline').id === headline.id) {
+                $div.find('.Messages_icons').html(_BuildIcons(headline));
+            }
         });
-        return obj;
+        return THIS;
     };
 
-    obj.count = function() {
-        return $targetDiv.find('div.messages_unit').length;
+    THIS.count = function() {
+        return $targetDiv.find('div.Messages_unit').length;
     };
 
-    obj.countOpen = function() {
-        return $targetDiv.find('div.messages_body:visible').length;
+    THIS.countOpen = function() {
+        return $targetDiv.find('div.Messages_body:visible').length;
     };
 
-    obj.closeAll = function() {
-        $targetDiv.find('div.messages_content:visible')
-            .prevAll('div.messages_top1').trigger('click');
-        return obj;
+    THIS.closeAll = function() {
+        $targetDiv.find('div.Messages_content:visible')
+            .prevAll('div.Messages_top1').trigger('click');
+        return THIS;
     };
 
-    obj.onView = function(callback) {
+    THIS.onView = function(callback) {
         onViewCB = callback;
-        return obj;
+        return THIS;
     };
 
-    obj.onMarkRead = function(callback) {
+    THIS.onMarkRead = function(callback) {
         onMarkReadCB = callback;
-        return obj;
+        return THIS;
     };
 
-    obj.onMove = function(callback) {
+    THIS.onMove = function(callback) {
         onMoveCB = callback;
-        return obj;
+        return THIS;
     };
 
-    $targetDiv.on('click', '.messages_top1,.messages_top2', function(ev, onDone) { // open message
-        var $divUnit = $(this).closest('.messages_unit');
+    $targetDiv.on('click', '.Messages_top1,.Messages_top2', function(ev, onDone) { // open message
+        var $divUnit = $(this).closest('.Messages_unit');
         var headline = $divUnit.data('headline');
-        if (!$divUnit.find('.messages_top2').is(':visible')) { // will expand
+        if (!$divUnit.find('.Messages_top2').is(':visible')) { // will expand
 
             function PutContentsAndSlideDown() {
-                $divUnit.find('.messages_attachs').html(_FormatAttachments(headline.attachments));
-                $divUnit.find('.messages_body').html(headline.body.message);
+                $divUnit.find('.Messages_attachs').html(_FormatAttachments(headline.attachments));
+                $divUnit.find('.Messages_body').html(headline.body.message);
                 if (headline.body.quoted !== null) {
-                    $divUnit.find('.messages_showQuote').show();
-                    $divUnit.find('.messages_quote').html(headline.body.quoted);
+                    $divUnit.find('.Messages_showQuote').show();
+                    $divUnit.find('.Messages_quote').html(headline.body.quoted);
                 }
                 var toSlide = headline.attachments.length ?
-                    '.messages_top2,.messages_attachs,.messages_content' :
-                    '.messages_top2,.messages_content';
+                    '.Messages_top2,.Messages_attachs,.Messages_content' :
+                    '.Messages_top2,.Messages_content';
                 $divUnit.find(toSlide).slideDown(200).promise('fx').done(function() {
-                    $divUnit.children('.messages_top1,.messages_top2')
-                        .removeClass('messages_unread').addClass('messages_read');
+                    $divUnit.children('.Messages_top1,.Messages_top2')
+                        .removeClass('Messages_unread').addClass('Messages_read');
 
-                    if (headline.unread) _MarkRead($divUnit, true);
-                    if (onViewCB !== null)
+                    if (headline.unread) {
+                        _MarkRead($divUnit, true);
+                    }
+                    if (onViewCB !== null) {
                         onViewCB(curFolder, headline); // invoke user callback
-                    if (onDone !== undefined)
+                    }
+                    if (onDone !== undefined) {
                         onDone();
+                    }
                 });
             }
 
             if (headline.body === null) { // not cached yet
-                $divUnit.append('<div class="loadingMessage">' +
-                    'Carregando mensagem... '+$('#icons .throbber').serialize()+'</div>');
+                $divUnit.append(
+                    $('#Messages_template .Messages_loading').clone()
+                        .append('Carregando mensagem... ')
+                        .append($('#icons .throbber').clone())
+                );
+
                 $.post('../', { r:'getMessage', id:headline.id })
-                .always(function() { $divUnit.find('.loadingMessage').remove(); })
+                .always(function() { $divUnit.find('.Messages_loading').remove(); })
                 .fail(function(resp) {
                     window.alert('Erro ao carregar email.\n' +
                         'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -369,23 +400,24 @@ window.WidgetMessages = function(options) {
                 PutContentsAndSlideDown();
             }
         } else { // will collapse
-            $divUnit.find('.messages_quote').hide();
-            var toGo = headline.attachments.length ?
-                '.messages_top2,.messages_attachs,.messages_content' :
-                '.messages_top2,.messages_content';
+            $divUnit.find('.Messages_quote').hide();
+            var toGo = (headline.attachments !== null && headline.attachments.length) ?
+                '.Messages_top2,.Messages_attachs,.Messages_content' :
+                '.Messages_top2,.Messages_content';
             $divUnit.find(toGo).slideUp(200).promise('fx').done(function() {
-                if (onDone !== undefined)
+                if (onDone !== undefined) {
                     onDone();
+                }
             });
         }
         return false;
     });
 
-    $targetDiv.on('click', '.messages_attachs a', function() { // click attachment
+    $targetDiv.on('click', '.Messages_attachs a', function() { // click attachment
         var $lnk = $(this);
         $lnk.blur();
         var idx = $lnk.parent('span').index(); // child index; 0 is "<b>Anexo</b>", others are the link spans
-        var headline = $lnk.closest('.messages_unit').data('headline');
+        var headline = $lnk.closest('.Messages_unit').data('headline');
         var attach = headline.attachments[idx - 1];
         window.open('../?' +
             'r=downloadAttachment&' +
@@ -396,18 +428,18 @@ window.WidgetMessages = function(options) {
         return false;
     });
 
-    $targetDiv.on('click', '.messages_showQuote', function() {
-        $(this).next('.messages_quote').slideToggle(200);
+    $targetDiv.on('click', '.Messages_showQuote', function() {
+        $(this).next('.Messages_quote').slideToggle(200);
     });
 
-    $targetDiv.on('mouseenter', '.messages_mugshot > img', function(ev) {
+    $targetDiv.on('mouseenter', '.Messages_mugshot > img', function(ev) {
         var $img = $(this);
         var src = $img.attr('src');
         if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
             $img.css('box-shadow', '3px 3px 3px #888')
                 .animate({ width:'90px' }, { duration:70, queue:false });
         }
-    }).on('mouseleave', '.messages_mugshot > img', function(ev) {
+    }).on('mouseleave', '.Messages_mugshot > img', function(ev) {
         var $img = $(this);
         var src = $img.attr('src');
         if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
@@ -417,4 +449,4 @@ window.WidgetMessages = function(options) {
         }
     });
 };
-})( jQuery, Contacts, DateFormat, ThreadMail, DropdownMenu );
+})( jQuery, Contacts, DateFormat, ThreadMail, ContextMenu );

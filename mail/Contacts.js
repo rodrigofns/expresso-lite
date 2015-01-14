@@ -30,22 +30,27 @@ window.Contacts = (function( $ ) {
         return JSON.parse(sessionStorage.getItem('contacts'));
     }
 
-    exp.loadPersonal = function(onDone) {
+    exp.loadPersonal = function() {
+        var defer = $.Deferred();
         if (_ReadContactsList() === null) {
             $.post('../', { r:'getPersonalContacts' }).done(function(contacts) {
                 sessionStorage.setItem('contacts', JSON.stringify(contacts));
-                if (onDone !== undefined && onDone !== null)
-                    onDone(); // invoke user callback
+                defer.resolve();
             });
+        } else {
+            defer.resolve();
         }
-        return exp;
+        return defer.promise();
     };
 
-    exp.loadMugshots = function(addrs, onDone) {
-        for (var a = addrs.length - 1; a >= 0; --a) {
+    exp.loadMugshots = function(addrs) {
+        var defer = $.Deferred();
+
+        for (var a = addrs.length; a-- > 0; ) {
             var mugshot = sessionStorage.getItem('pic$'+addrs[a]);
-            if (mugshot !== null)
+            if (mugshot !== null) {
                 addrs.splice(a, 1); // mugshot already cached, won't be queried
+            }
         }
 
         if (addrs.length) {
@@ -64,14 +69,12 @@ window.Contacts = (function( $ ) {
                     }
                     sessionStorage.setItem('pic$'+contacts[i].email, contacts[i].mugshot);
                 }
-                if (onDone !== undefined && onDone !== null)
-                    onDone(); // invoke user callback
+                defer.resolve();
             });
         } else {
-            if (onDone !== undefined && onDone !== null)
-                onDone(); // invoke user callback
+            defer.resolve();
         }
-        return exp;
+        return defer.promise();
     };
 
     exp.getMugshotSrc = function(email) {

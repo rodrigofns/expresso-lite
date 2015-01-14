@@ -9,7 +9,7 @@
  */
 
 window.ThreadMail = (function() {
-    var exp = { };
+    var exp = { }; // exported functions
 
     function _UniqueSenders(threads, useAddressee) {
         var senders = []; // unique senders present in all email threads given
@@ -183,13 +183,13 @@ window.ThreadMail = (function() {
     };
 
     exp.RemoveHeadlinesFromFolder = function(msgIds, folder) {
-        for (var i = folder.messages.length - 1; i >= 0; --i) {
+        for (var i = folder.messages.length; i-- > 0; ) {
             if (msgIds.indexOf(folder.messages[i].id) !== -1)
                 folder.messages.splice(i, 1); // remove headline from flat headlines array of folder
         }
-        for (var i = folder.threads.length - 1; i >= 0; --i) {
+        for (var i = folder.threads.length; i-- > 0; ) {
             var thread = folder.threads[i]; // a thread is an array of headlines
-            for (var j = thread.length - 1; j >= 0; --j) {
+            for (var j = thread.length; j-- > 0; ) {
                 if (msgIds.indexOf(thread[j].id) !== -1)
                     thread.splice(j, 1); // remove headline from thread
             }
@@ -223,9 +223,9 @@ window.ThreadMail = (function() {
         if (bytes < 100) {
             return bytes + ' bytes';
         } else if (bytes < 1024 * 200) {
-            return sprintf('%.1f KB', bytes / 1024).replace('.', ',');
+            return (bytes / 1024).toFixed(1).replace('.', ',')+' KB';
         }
-        return sprintf('%.1f MB', bytes / (1024 * 1024)).replace('.', ',');
+        return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',')+' MB';
     };
 
     return exp;

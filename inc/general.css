@@ -15,8 +15,8 @@ input::-moz-focus-inner, button::-moz-focus-inner { border:0; padding:0; }
 ::-moz-placeholder { font-style:italic; color:#555; }
 ::-webkit-input-placeholder { font-style:italic; color:#949494; }
 
-body
-{ height:100%; margin:0; }
+html { height:100%; }
+body { height:100%; margin:0; }
 
 @media (max-width:767px) { /* phones */
     body, table, input[type=button], input[type=text], input[type=password], input[type=submit], select, button, textarea
@@ -37,7 +37,7 @@ input[type=text], input[type=password], textarea
 { color:white; background-color:#4479BA; border:1px solid #4272B2; line-height:1; }*/
 
 button, input[type=button], input[type=submit]
-{ padding:3px 10px; background:#4479BA; color:white; border:1px solid #4272B2; border-radius:1px;
+{ padding:5px 10px; background:#4479BA; color:white; border:1px solid #4272B2; border-radius:1px;
     cursor:pointer; -moz-user-select:none; -webkit-user-select:none; }
 
 blockquote

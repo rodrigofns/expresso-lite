@@ -8,15 +8,17 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
+LoadCss('WidgetFolders.css');
+
 (function( $ ) {
 window.WidgetFolders = function(options) {
     var userOpts = $.extend({
-        elem: '', // jQuery selector for the target DIV
+        $elem: null, // jQuery object for the target DIV
         folderCache: []
     }, options);
 
-    var obj          = this;
-    var $targetDiv   = $(userOpts.elem);
+    var THIS         = this;
+    var $targetDiv   = userOpts.$elem; // shorthand
     var menu         = null; // context menu object
     var isFirstClick = true; // flag to avoid immediate refresh (unnecessary) on 1st click
     var curFolder    = null; // cache currently selected folder
@@ -41,20 +43,20 @@ window.WidgetFolders = function(options) {
         var lnkToggle = '';
         if (folder.hasSubfolders) {
             lnkToggle = isExpanded ?
-            '<a href="#" class="folders_toggle" title="Recolher pasta"><div class="arrowDown"></div></a>' :
-                '<a href="#" class="folders_toggle" title="Expandir pasta"><div class="arrowRite"></div></a>';
+            '<a href="#" class="Folders_toggle" title="Recolher pasta"><div class="Folders_arrowDown"></div></a>' :
+                '<a href="#" class="Folders_toggle" title="Expandir pasta"><div class="Folders_arrowRite"></div></a>';
         }
-        var lnkText = '<div class="folders_folderName">'+folder.localName+'</div> ' +
-            '<span class="folders_counter">('+folder.unreadMails+'/'+folder.totalMails+')</span>';
+        var lnkText = '<div class="Folders_folderName">'+folder.localName+'</div> ' +
+            '<span class="Folders_counter">('+folder.unreadMails+'/'+folder.totalMails+')</span>';
         var text = folder.unreadMails ? '<b>'+lnkText+'</b>' : lnkText;
-        var $div = $('<div class="folders_text" role="button">'+lnkToggle+' '+text+'</div>');
+        var $div = $('<div class="Folders_text">'+lnkToggle+' '+text+'</div>');
         return $div;
     }
 
     function _BuildUl(folders, isRootLevel) {
-        var $ul = $('<ul class="folders_ul" style="padding-left:'+(isRootLevel?'0':'11')+'px;"></ul>');
+        var $ul = $('<ul class="Folders_ul" style="padding-left:'+(isRootLevel?'0':'11')+'px;"></ul>');
         for (var i = 0; i < folders.length; ++i) {
-            var $li = $('<li class="folders_li"></li>');
+            var $li = $('<li class="Folders_li"></li>');
             $li.data('folder', folders[i]); // keep folder object within LI
             $li.append(_BuildDiv(folders[i], false));
             if (folders[i].subfolders.length)
@@ -64,17 +66,20 @@ window.WidgetFolders = function(options) {
         return $ul;
     }
 
-    function _UpdateOneFolder($li, onDone) {
-        if (!$li.hasClass('folders_li'))
-            $li = $li.closest('.folders_li');
+    function _UpdateOneFolder($li) {
+        var defer = $.Deferred();
+        if (!$li.hasClass('Folders_li')) {
+            $li = $li.closest('.Folders_li');
+        }
         var folder = $li.data('folder');
-        var $counter = $li.find('.folders_counter:first').replaceWith($('#icons .throbber').serialize());
+        var $counter = $li.find('.Folders_counter:first').replaceWith($('#icons .throbber').clone());
 
         $.post('../', { r:'updateMessageCache', folderId:folder.id })
         .always(function() { $li.find('.throbber:first').replaceWith($counter); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+folder.localName+'".\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            defer.reject();
         }).done(function(stats) {
             var hasChanged = (folder.totalMails !== stats.totalMails) ||
                 (folder.unreadMails !== stats.unreadMails);
@@ -83,34 +88,44 @@ window.WidgetFolders = function(options) {
                 folder.unreadMails = stats.unreadMails;
 
                 if (folder.id === curFolder.id) { // current folder
-                    obj.redraw(folder);
+                    THIS.redraw(folder);
                     if (onFolderUpdatedCB !== null) onFolderUpdatedCB(folder);
                 } else { // not current folder
                     folder.messages.length = 0; // force cache rebuild
                     folder.threads.length = 0;
-                    obj.redraw(folder);
+                    THIS.redraw(folder);
                 }
             }
-            if (onDone !== undefined) onDone();
+            defer.resolve();
         });
+        return defer.promise();
     }
 
-    function _UpdateSubfolders($li, onDone) {
-        if (!$li.hasClass('folders_li'))
-            $li = $li.closest('.folders_li');
-
-        _UpdateOneFolder($li, function() {
-            var all = $li.find('.folders_li:visible').toArray(); // all updateable
+    function _UpdateSubfolders($li) {
+        var defer = $.Deferred();
+        if (!$li.hasClass('Folders_li')) {
+            $li = $li.closest('.Folders_li');
+        }
+        _UpdateOneFolder($li).done(function() {
+            var all = $li.find('.Folders_li:visible').toArray(); // all updateable
             (function GoNext() {
-                if (all.length) _UpdateOneFolder($(all.shift()), GoNext);
-                else if (onDone !== undefined && onDone !== null) onDone();
+                all.length ?
+                    _UpdateOneFolder( $(all.shift()) ).done(GoNext) :
+                    defer.resolve();
             })();
         });
+        return defer.promise();
     }
 
-    function _LoadSubfolders(parentFolder, onDone) {
-        var $divLoading = $('<div class="loadingMessage">' +
-            'Carregando pastas... '+$('#icons .throbber').serialize()+'</div>');
+    function _LoadSubfolders(parentFolder) {
+        var defer = $.Deferred();
+        var $divLoading = $(document.createElement('div'))
+            .addClass('Folders_loading')
+            .append('Carregando pastas... ')
+            .append($(document.createElement('div'))
+                .addClass('Folders_throbber')
+            );
+
         if (parentFolder === null) { // root folder
             $divLoading.appendTo($targetDiv);
 
@@ -119,11 +134,12 @@ window.WidgetFolders = function(options) {
             .fail(function(resp) {
                 window.alert('Erro na primeira consulta das pastas.\n' +
                     'Atualize a página para tentar novamente.\n' + resp.responseText);
+                defer.reject();
             }).done(function(folders) {
                 userOpts.folderCache.length = 0;
                 userOpts.folderCache.push.apply(userOpts.folderCache, folders); // cache
                 _BuildUl(folders, true).appendTo($targetDiv);
-                if (onDone !== undefined && onDone !== null) onDone();
+                defer.resolve();
             });
         } else { // non-root folder
             var $li = _FindFolderLi(parentFolder);
@@ -134,90 +150,97 @@ window.WidgetFolders = function(options) {
             .fail(function(resp) {
                 window.alert('Erro na consulta das subpastas de '+parentFolder.localName+'\n' +
                     resp.responseText);
+                defer.reject();
             }).done(function(subfolders) {
                 parentFolder.subfolders.length = 0;
                 parentFolder.subfolders.push.apply(parentFolder.subfolders, subfolders); // cache
                 _BuildUl(subfolders, false).appendTo($li);
-                if (onDone !== undefined && onDone !== null) onDone();
-                if (onTreeChangedCB !== null) onTreeChangedCB();
+                defer.resolve();
+                if (onTreeChangedCB !== null) {
+                    onTreeChangedCB();
+                }
             });
         }
+        return defer.promise();
     }
 
-    obj.loadRoot = function(onDone) {
-        _LoadSubfolders(null, onDone);
-        return obj;
+    THIS.load = function() {
+        var defer = $.Deferred();
+        defer.resolve();
+        return defer.promise();
     };
 
-    obj.setCurrent = function(folder) {
-        _FindFolderLi(folder).children('.folders_text').trigger('click');
-        return obj;
+    THIS.loadRoot = function() {
+        return _LoadSubfolders(null);
     };
 
-    obj.getCurrent = function() {
+    THIS.setCurrent = function(folder) {
+        _FindFolderLi(folder).children('.Folders_text').trigger('click');
+        return THIS;
+    };
+
+    THIS.getCurrent = function() {
         return curFolder;
     };
 
-    obj.redraw = function(folder) {
+    THIS.redraw = function(folder) {
         var $li = _FindFolderLi(folder);
         var $div = $li.children('div:first');
         var $childUl = $div.next('ul');
         var isExpanded = $childUl.length && $childUl.is(':visible');
         var $newDiv = _BuildDiv(folder, isExpanded);
-        if ($div.hasClass('folders_current'))
-            $newDiv.addClass('folders_current');
+        if ($div.hasClass('Folders_current'))
+            $newDiv.addClass('Folders_current');
         $div.replaceWith($newDiv);
-        return obj;
+        return THIS;
     };
 
-    obj.expand = function(folder) {
-        _FindFolderLi(folder).find('.folders_text > .folders_toggle:first').trigger('click');
-        return obj;
-    };
-
-    obj.updateAll = function(onDone) {
-        _UpdateSubfolders($targetDiv.find('.folders_li:first'), onDone);
-        return obj;
-    };
-
-    obj.onClick = function(callback) {
-        onClickCB = callback; // onClick(folder)
-        return obj;
-    };
-
-    obj.onTreeChanged = function(callback) {
-        onTreeChangedCB = callback; // onTreeChanged()
-        return obj;
-    };
-
-    obj.onFolderUpdated = function(callback) {
-        onFolderUpdatedCB = callback; // onFolderUpdated(folder)
-        return obj;
-    };
-
-    $targetDiv.on('click', 'a.folders_toggle', function() { // expand/collapse a folder
-        $(this).blur();
-        var $li = $(this).closest('li');
-        var folder = $li.data('folder');
-
+    THIS.expand = function(folder) {
+        var $li = _FindFolderLi(folder);
         if (folder.hasSubfolders && !folder.subfolders.length) { // subfolders not cached yet
-            _LoadSubfolders(folder);
-            $(this).find('div').removeClass('arrowRite').addClass('arrowDown');
+            $(this).find('div').removeClass('Folders_arrowRite').addClass('Folders_arrowDown');
+            return _LoadSubfolders(folder);
         } else {
             var $childUl = $li.children('ul:first');
             $childUl.toggle();
             $childUl.is(':visible') ?
-                $(this).find('div').removeClass('arrowRite').addClass('arrowDown') :
-                $(this).find('div').removeClass('arrowDown').addClass('arrowRite');
+                $(this).find('div').removeClass('Folders_arrowRite').addClass('Folders_arrowDown') :
+                $(this).find('div').removeClass('Folders_arrowDown').addClass('Folders_arrowRite');
+            return $.Deferred().resolve().promise();
         }
+    };
+
+    THIS.updateAll = function(onDone) {
+        return _UpdateSubfolders($targetDiv.find('.Folders_li:first'));
+    };
+
+    THIS.onClick = function(callback) {
+        onClickCB = callback; // onClick(folder)
+        return THIS;
+    };
+
+    THIS.onTreeChanged = function(callback) {
+        onTreeChangedCB = callback; // onTreeChanged()
+        return THIS;
+    };
+
+    THIS.onFolderUpdated = function(callback) {
+        onFolderUpdatedCB = callback; // onFolderUpdated(folder)
+        return THIS;
+    };
+
+    $targetDiv.on('click', 'a.Folders_toggle', function() { // expand/collapse a folder
+        $(this).blur();
+        var $li = $(this).closest('li');
+        THIS.expand($li.data('folder'));
         return false;
     });
 
-    $targetDiv.on('click', 'div.folders_text', function() { // click on folder name
+    $targetDiv.on('click', 'div.Folders_text', function() { // click on folder name
         var $li = $(this).closest('li');
         curFolder = $li.data('folder'); // cache
-        $targetDiv.find('.folders_current').removeClass('folders_current');
-        $(this).addClass('folders_current');
+        $targetDiv.find('.Folders_current').removeClass('Folders_current');
+        $(this).addClass('Folders_current');
 
         if (!curFolder.messages.length) { // if messages not cached yet
             if (isFirstClick) {
@@ -225,8 +248,8 @@ window.WidgetFolders = function(options) {
                 if (onClickCB !== null)
                     onClickCB(curFolder); // invoke user callback
             } else {
-                var $counter = $li.find('.folders_counter:first')
-                    .replaceWith( $('#icons .throbber').serialize() );
+                var $counter = $li.find('.Folders_counter:first')
+                    .replaceWith($('#icons .throbber').clone());
 
                 $.post('../', { r:'updateMessageCache', folderId:curFolder.id })
                 .always(function() { $li.find('.throbber:first').replaceWith($counter); })
@@ -241,7 +264,7 @@ window.WidgetFolders = function(options) {
                         curFolder.unreadMails = stats.unreadMails;
                         curFolder.messages.length = 0; // clear cache, will force reload
                         curFolder.threads.length = 0;
-                        obj.redraw(curFolder);
+                        THIS.redraw(curFolder);
                     }
                     if (onClickCB !== null)
                         onClickCB(curFolder); // invoke user callback

@@ -14,7 +14,7 @@ window.WidgetAttacher = function(options) {
         elem: '' // jQuery selector for the target DIV
     }, options);
 
-    var obj        = this;
+    var THIS = this;
     var $targetDiv = $(userOpts.elem);
     var onContentChangeCB = null; // user callback
 
@@ -29,7 +29,7 @@ window.WidgetAttacher = function(options) {
             '</tr></table></div>');
     }
 
-    obj.getAll = function() {
+    THIS.getAll = function() {
         var ret = [];
         $targetDiv.children('.attacher_unit').each(function(idx, div) {
             var attachmentObj = $(div).data('file'); // previously kept into DIV
@@ -38,14 +38,14 @@ window.WidgetAttacher = function(options) {
         return ret;
     };
 
-    obj.rebuildFromMsg = function(headline) {
+    THIS.rebuildFromMsg = function(headline) {
         for (var i = 0; i < headline.attachments.length; ++i) {
             var file = headline.attachments[i];
             var $divSlot = _BuildDivSlot();
             $divSlot.find('.attacher_pro').remove();
-            $divSlot.find('.attacher_text').html(
-                sprintf('%s <span style="font-size:90%%; color:#777;">(%s)</span>',
-                    file.filename, ThreadMail.FormatBytes(file.size)) );
+            $divSlot.find('.attacher_text').html(file.filename+' ' +
+                '<span style="font-size:90%%; color:#777;">' +
+                '('+ThreadMail.FormatBytes(file.size)+')</span>');
             $divSlot.appendTo($targetDiv);
             $divSlot.data('file', { // keep attachment object into DIV
                 name: file.filename,
@@ -56,10 +56,10 @@ window.WidgetAttacher = function(options) {
         }
         if (headline.attachments.length && onContentChangeCB !== null)
             onContentChangeCB(); // invoke user callback
-        return obj;
+        return THIS;
     };
 
-    obj.newAttachment = function() {
+    THIS.newAttachment = function() {
         var $divSlot = null;
         var tempFiles = [];
 
@@ -75,7 +75,7 @@ window.WidgetAttacher = function(options) {
             }
             tempFiles.push(xhr.responseJSON.tempFile); // object returned by Tinebase.uploadTempFile
             $divSlot.find('.attacher_text')
-                .text(sprintf('Carregando... %.0f%%', pct * 100));
+                .text('Carregando... '+(pct * 100).toFixed(0)+'%');
             $divSlot.find('.attacher_pro')[0].value = pct;
         }).onDone(function(file, xhr) {
             if ($divSlot === null) {
@@ -91,9 +91,9 @@ window.WidgetAttacher = function(options) {
                         type: file.type,
                         tempFile: tmpf
                     });
-                    $divSlot.find('.attacher_text').html(
-                        sprintf('%s <span style="font-size:90%%; color:#777;">(%s)</span>',
-                            file.name, ThreadMail.FormatBytes(file.size)) );
+                    $divSlot.find('.attacher_text').html(file.name+' ' +
+                        '<span style="font-size:90%%; color:#777;">' +
+                        '('+ThreadMail.FormatBytes(file.size)+')</span>');
                     $divSlot.find('.attacher_pro').remove();
                 });
             } else {
@@ -104,17 +104,17 @@ window.WidgetAttacher = function(options) {
             alert(str);
         });
 
-        return obj;
+        return THIS;
     };
 
-    obj.removeAll = function() {
+    THIS.removeAll = function() {
         $targetDiv.children('.attacher_unit').remove();
-        return obj;
+        return THIS;
     };
 
-    obj.onContentChange = function(callback) {
+    THIS.onContentChange = function(callback) {
         onContentChangeCB = callback;
-        return obj;
+        return THIS;
     };
 
     $targetDiv.on('click', '.attacher_remove', function() {

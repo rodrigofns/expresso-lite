@@ -25,7 +25,7 @@ window.ModelessDialog = function(options) {
         cxPhone: 767 // max smartphone width, in pixels
     }, options);
 
-    var obj           = this;
+    var THIS          = this;
     var onUserCloseCB = null; // user callbacks
     var onCloseCB     = null;
     var onResizeCB    = null;
@@ -62,37 +62,39 @@ window.ModelessDialog = function(options) {
                 'min-height': userOpts.minHeight+'px',
                 left:($(window).outerWidth() / 2 - $popupDiv.outerWidth() / 2)+'px', // center screen
                 top:Math.max(0, $(window).outerHeight() / 2 - $popupDiv.outerHeight() / 2)+'px' });
-            if (!userOpts.resizable)
+            if (!userOpts.resizable) {
                 $('#ModelessDialog_resz').hide();
+            }
         }
         cyTitle = $('#ModelessDialog_bar').outerHeight();
     })();
 
-    obj.getContentArea = function() {
+    THIS.getContentArea = function() {
         return { cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() - cyTitle };
     };
 
-    obj.isOpen = function() {
+    THIS.isOpen = function() {
         return $popupDiv !== null;
     };
 
-    obj.close = function() {
+    THIS.close = function() {
         $targetDiv.detach().appendTo(document.body).hide();
         $popupDiv.remove();
         $popupDiv = null;
         UrlStack.pop('#ModelessDialog');
-        if (onCloseCB !== null)
+        if (onCloseCB !== null) {
             onCloseCB(); // invoke user callback
-        return obj;
+        }
+        return THIS;
     };
 
-    obj.isMinimized = function() {
+    THIS.isMinimized = function() {
         return !$('#ModelessDialog_content').is(':visible');
     };
 
-    obj.toggleMinimize = function() {
+    THIS.toggleMinimize = function() {
         //~ var willMin = $('#ModelessDialog_content').is(':visible');
-        var willMin = !obj.isMinimized();
+        var willMin = !THIS.isMinimized();
         $('#ModelessDialog_content,#ModelessDialog_resz').toggle();
         $('#ModelessDialog_closeCage').toggle(!willMin);
         $('#ModelessDialog_minCage input').val(willMin ? '¯' : '_');
@@ -108,29 +110,29 @@ window.ModelessDialog = function(options) {
         }
     };
 
-    obj.setCaption = function(htmlText) {
-        $('#ModelessDialog_title').html(htmlText);
-        return obj;
+    THIS.setCaption = function(text) {
+        $('#ModelessDialog_title').empty().append(text);
+        return THIS;
     };
 
-    obj.removeCloseButton = function() {
+    THIS.removeCloseButton = function() {
         $('#ModelessDialog_closeCage').remove();
-        return obj;
+        return THIS;
     };
 
-    obj.onUserClose = function(callback) {
+    THIS.onUserClose = function(callback) {
         onUserCloseCB = callback; // triggered only when the user clicks the close button
-        return obj;
+        return THIS;
     };
 
-    obj.onClose = function(callback) {
+    THIS.onClose = function(callback) {
         onCloseCB = callback; // onClose()
-        return obj;
+        return THIS;
     };
 
-    obj.onResize = function(callback) {
+    THIS.onResize = function(callback) {
         onResizeCB = callback; // onResize()
-        return obj;
+        return THIS;
     };
 
     $('#ModelessDialog_bar').on('mousedown', function(ev) {
@@ -157,7 +159,7 @@ window.ModelessDialog = function(options) {
                 $(document).off('.ModelessDialog');
             });
         } else {
-            obj.toggleMinimize();
+            THIS.toggleMinimize();
         }
     });
 
@@ -170,6 +172,7 @@ window.ModelessDialog = function(options) {
                     ($popupDiv.offset().top === userOpts.marginMaximized) &&
                     ($popupDiv.outerWidth() === wnd.cx - userOpts.marginLeftMaximized - userOpts.marginMaximized) &&
                     ($popupDiv.outerHeight() === wnd.cy - userOpts.marginMaximized * 2);
+
                 if (!isMaximized) {
                     prevMaxPos = { x:$popupDiv.offset().left, y:$popupDiv.offset().top,
                         cx:$popupDiv.outerWidth(), cy:$popupDiv.outerHeight() }; // keep current pos
@@ -183,10 +186,12 @@ window.ModelessDialog = function(options) {
                     $popupDiv.css({ left:prevMaxPos.x+'px', top:prevMaxPos.y+'px',
                         width:prevMaxPos.cx+'px', height:prevMaxPos.cy+'px' }); // restore previous pos
                 }
-                if (onResizeCB !== null)
+
+                if (onResizeCB !== null) {
                     onResizeCB(); // invoke user callback
+                }
             } else { // if minimized, simply restore; never happens because mousedown comes first
-                obj.toggleMinimize();
+                THIS.toggleMinimize();
             }
         }
     });
@@ -203,11 +208,16 @@ window.ModelessDialog = function(options) {
             ev.stopImmediatePropagation();
             var newSz = { cx:pop.cx + ev.clientX - orig.x, cy:pop.cy + ev.clientY - orig.y };
             var destCss = { };
-            if (pop.x + newSz.cx < wnd.cx) destCss.width = newSz.cx+'px';
-            if (pop.y + newSz.cy < wnd.cy) destCss.height = newSz.cy+'px';
+            if (pop.x + newSz.cx < wnd.cx) {
+                destCss.width = newSz.cx+'px';
+            }
+            if (pop.y + newSz.cy < wnd.cy) {
+                destCss.height = newSz.cy+'px';
+            }
             $popupDiv.css(destCss);
-            if (onResizeCB !== null)
+            if (onResizeCB !== null) {
                 onResizeCB();
+            }
         });
 
         $(document).on('mouseup.ModelessDialog', function(ev) {
@@ -218,13 +228,14 @@ window.ModelessDialog = function(options) {
 
     $('#ModelessDialog_minCage input').on('click', function(ev) {
         ev.stopImmediatePropagation();
-        obj.toggleMinimize();
+        THIS.toggleMinimize();
     });
 
     $('#ModelessDialog_closeCage input').on('click', function(ev) {
         ev.stopImmediatePropagation();
-        if (onUserCloseCB !== null)
+        if (onUserCloseCB !== null) {
             onUserCloseCB(); // invoke user callback, user must call close() himself
+        }
     });
 };
 })( jQuery, UrlStack );
