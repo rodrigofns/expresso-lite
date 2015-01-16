@@ -46,8 +46,9 @@ window.WidgetFolders = function(options) {
             '<a href="#" class="Folders_toggle" title="Recolher pasta"><div class="Folders_arrowDown"></div></a>' :
                 '<a href="#" class="Folders_toggle" title="Expandir pasta"><div class="Folders_arrowRite"></div></a>';
         }
+        var count = folder.unreadMails ? (folder.unreadMails+'/'+folder.totalMails) : folder.totalMails;
         var lnkText = '<div class="Folders_folderName">'+folder.localName+'</div> ' +
-            '<span class="Folders_counter">('+folder.unreadMails+'/'+folder.totalMails+')</span>';
+            '<span class="Folders_counter">('+count+')</span>';
         var text = folder.unreadMails ? '<b>'+lnkText+'</b>' : lnkText;
         var $div = $('<div class="Folders_text">'+lnkToggle+' '+text+'</div>');
         return $div;
@@ -197,15 +198,16 @@ window.WidgetFolders = function(options) {
 
     THIS.expand = function(folder) {
         var $li = _FindFolderLi(folder);
+        var $arrow = $li.find('.Folders_toggle:first > div[class^=Folders_arrow]');
         if (folder.hasSubfolders && !folder.subfolders.length) { // subfolders not cached yet
-            $(this).find('div').removeClass('Folders_arrowRite').addClass('Folders_arrowDown');
+            $arrow.removeClass('Folders_arrowRite').addClass('Folders_arrowDown');
             return _LoadSubfolders(folder);
         } else {
             var $childUl = $li.children('ul:first');
             $childUl.toggle();
-            $childUl.is(':visible') ?
-                $(this).find('div').removeClass('Folders_arrowRite').addClass('Folders_arrowDown') :
-                $(this).find('div').removeClass('Folders_arrowDown').addClass('Folders_arrowRite');
+            var isVisible = $childUl.is(':visible');
+            $arrow.toggleClass('Folders_arrowRite', !isVisible)
+                .toggleClass('Folders_arrowDown', isVisible);
             return $.Deferred().resolve().promise();
         }
     };
@@ -231,8 +233,7 @@ window.WidgetFolders = function(options) {
 
     $targetDiv.on('click', 'a.Folders_toggle', function() { // expand/collapse a folder
         $(this).blur();
-        var $li = $(this).closest('li');
-        THIS.expand($li.data('folder'));
+        THIS.expand($(this).closest('li').data('folder'));
         return false;
     });
 

@@ -19,7 +19,13 @@
 .Folders_current    { background:#D9E8FB; }
 .Folders_folderName { display:inline-block; padding:5px 3px 5px 0; }
 .Folders_counter    { color:#8C8C8C; }
-.Folders_arrowDown  { width:14px; height:14px; display:inline-block; background:url(../img/arrows.png) 0 0; }
-.Folders_arrowRite  { width:14px; height:14px; display:inline-block; background:url(../img/arrows.png) 0 -14px; }
-.Folders_loading    { text-align:center; margin:10px; color:#999; font-style:italic; }
-.Folders_throbber   { display:inline-block; width:16px; height:16px; background:url(../img/chromiumthrobber.svg); }
+
+.Folders_arrowDown,.Folders_arrowRite { height:14px; display:inline-block;
+    background-image:url(../img/arrows.png); background-repeat:no-repeat; }
+@media (min-width:768px) { .Folders_arrowDown,.Folders_arrowRite { width:20px; } } /* desktop */
+@media (max-width:767px) { .Folders_arrowDown,.Folders_arrowRite { width:26px; } } /* phone */
+.Folders_arrowDown { background-position:0 0; }
+.Folders_arrowRite { background-position:0 -14px; }
+
+.Folders_loading  { text-align:center; margin:10px; color:#999; font-style:italic; }
+.Folders_throbber { display:inline-block; width:16px; height:16px; background:url(../img/chromiumthrobber.svg); }

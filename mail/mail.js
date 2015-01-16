@@ -80,7 +80,7 @@ $(document).ready(function() {
             .onDraft(DraftSaved);
 
         $('#loadMore').on('click', LoadMoreHeadlines);
-        $('#btnUpdateFolders').on('click', UpdateFolders);
+        $('#btnUpdateFolders').on('click', CheckNewMessagesInFolders);
         $('#btnCompose').on('click', ShowComposePopup);
     });
 });
@@ -236,7 +236,7 @@ function MailMoved(destFolder, origThread) {
     });
 }
 
-function UpdateFolders() {
+function CheckNewMessagesInFolders() {
     $('#btnUpdateFolders,#btnCompose').css('display', 'none');
     $('#txtUpdateFolders').css('display', 'inline-block');
     Cache.treeFolders.updateAll().done(function() {

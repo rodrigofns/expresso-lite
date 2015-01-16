@@ -12,7 +12,7 @@
 
 #btnUpdateFolders,#txtUpdateFolders,#btnCompose { margin-bottom:16px; }
 #btnUpdateFolders { }
-#txtUpdateFolders { display:none; font-style:italic; color:#888; }
+#txtUpdateFolders { display:none; font-style:italic; color:#888; padding:4px 0 5px 0; }
 #btnCompose       { margin-left:6px }
 
 /* --- Page content --- */
