@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 (function( $ ) {
@@ -16,16 +16,17 @@ window.UploadFile = function(options) {
         chunkSize: 102400 // file sliced into 100 KB chunks
     }, options);
 
-    var obj = this;
+    var THIS         = this;
     var onProgressCB = null; // (pct, xhr)
-    var onDoneCB = null; // (file, xhr)
-    var onFailCB = null; // (xhr, str, err)
+    var onDoneCB     = null; // (file, xhr)
+    var onFailCB     = null; // (xhr, str, err)
 
     function _ToBlob(dataChunk) {
         // http://stackoverflow.com/questions/7211902/corruption-with-filereader-into-formdata
         var ui8a = new Uint8Array(dataChunk.length);
-        for (var i = 0; i < dataChunk.length; ++i)
+        for (var i = 0; i < dataChunk.length; ++i) {
             ui8a[i] = dataChunk.charCodeAt(i);
+        }
         return new Blob([ ui8a.buffer ]);
     }
 
@@ -36,7 +37,7 @@ window.UploadFile = function(options) {
             .append( $(document.createElement('input'))
                 .attr('type', 'file')
                 .attr('name', userOpts.fileName)
-            ).appendTo('body').children(':file').change(function() {
+            ).appendTo(document.body).children(':file').change(function() {
                 // http://stackoverflow.com/questions/166221/how-can-i-upload-files-asynchronously-with-jquery
                 var file = this.files[0];
                 var binaryReader = new FileReader();
@@ -65,14 +66,14 @@ window.UploadFile = function(options) {
 
                             if (curSlice < file.size) { // still more chunks to upload
                                 ReadNextChunk();
-                            } else { // finished last chunk
-                                if (onDoneCB !== null)
-                                    onDoneCB(file, jqxhr);
+                            } else if (onDoneCB !== null) {
+                                onDoneCB(file, jqxhr);
                             }
                         },
                         error: function(jqxhr, txtStatus, errThrown) {
-                            if (onFailCB !== null)
+                            if (onFailCB !== null) {
                                 onFailCB(jqxhr, txtStatus, errThrown);
+                            }
                         }
                     });
                 };
@@ -81,8 +82,8 @@ window.UploadFile = function(options) {
             }).click();
     })();
 
-    obj.onProgress = function(callback) { onProgressCB = callback; return obj; };
-    obj.onDone =     function(callback) { onDoneCB = callback; return obj; };
-    obj.onFail =     function(callback) { onFailCB = callback; return obj; };
+    THIS.onProgress = function(callback) { onProgressCB = callback; return THIS; };
+    THIS.onDone     = function(callback) { onDoneCB = callback; return THIS; };
+    THIS.onFail     = function(callback) { onFailCB = callback; return THIS; };
 };
 })( jQuery );

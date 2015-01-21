@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 LoadCss('WidgetCompose.css');
@@ -78,6 +78,13 @@ window.WidgetCompose = function(options) {
     }
 
     function _UserWroteSomethingNew() {
+        if ($('#Compose_to').val() !== '' ||
+            $('#Compose_cc').val() !== '' ||
+            $('#Compose_bcc').val() !== '')
+        {
+            return true;
+        }
+
         var origAction = 'new';
         var origMsg = null;
 
@@ -248,8 +255,13 @@ window.WidgetCompose = function(options) {
         var defer = $.Deferred();
         $.get('WidgetCompose.html', function(elems) { // should be pretty fast, possibly cached
             $(document.body).append(elems); // our templates
-            _SetEvents();
-            defer.resolve();
+            $.when(
+                WidgetSearchAddr.Load(),
+                WidgetAttacher.Load()
+            ).done(function() {
+                _SetEvents();
+                defer.resolve();
+            });
         });
         return defer.promise();
     };

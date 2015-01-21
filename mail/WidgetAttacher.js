@@ -5,8 +5,10 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
+
+LoadCss('WidgetAttacher.css');
 
 (function( $, UploadFile ) {
 window.WidgetAttacher = function(options) {
@@ -18,20 +20,16 @@ window.WidgetAttacher = function(options) {
     var $targetDiv = $(userOpts.elem);
     var onContentChangeCB = null; // user callback
 
-    function _BuildDivSlot() {
-        return $('<div class="attacher_unit" style="border:1px solid #BBB; margin-bottom:2px; background:rgba(192,192,192,.15);">' +
-            '<table width="100%"><tr>' +
-            '<td class="attacher_text">aguardando arquivo...</td>' +
-            '<td style="text-align:right;"><progress class="attacher_pro"></progress></td>' +
-            '<td style="text-align:right;">' +
-                '<input type="button" class="attacher_remove" title="Remover este arquivo anexo" value="remover"/>' +
-            '</td>' +
-            '</tr></table></div>');
+    function _BuildDisplayName(fileObj) {
+        var $disp = $('#Attacher_template > .Attacher_fileNameDisplay').clone();
+        $disp.find('.Attacher_fileTitle').text(fileObj.name);
+        $disp.find('.Attacher_fileSize').text('('+ThreadMail.FormatBytes(fileObj.size)+')');
+        return $disp;
     }
 
     THIS.getAll = function() {
         var ret = [];
-        $targetDiv.children('.attacher_unit').each(function(idx, div) {
+        $targetDiv.children('.Attacher_unit').each(function(idx, div) {
             var attachmentObj = $(div).data('file'); // previously kept into DIV
             ret.push(attachmentObj);
         });
@@ -41,11 +39,9 @@ window.WidgetAttacher = function(options) {
     THIS.rebuildFromMsg = function(headline) {
         for (var i = 0; i < headline.attachments.length; ++i) {
             var file = headline.attachments[i];
-            var $divSlot = _BuildDivSlot();
-            $divSlot.find('.attacher_pro').remove();
-            $divSlot.find('.attacher_text').html(file.filename+' ' +
-                '<span style="font-size:90%%; color:#777;">' +
-                '('+ThreadMail.FormatBytes(file.size)+')</span>');
+            var $divSlot = $('#Attacher_template > .Attacher_unit').clone();
+            $divSlot.find('.Attacher_pro').remove();
+            $divSlot.find('.Attacher_text').empty().append(_BuildDisplayName(file));
             $divSlot.appendTo($targetDiv);
             $divSlot.data('file', { // keep attachment object into DIV
                 name: file.filename,
@@ -68,20 +64,24 @@ window.WidgetAttacher = function(options) {
             chunkSize: 1024 * 200 // file sliced into 200 KB chunks
         });
         up.onProgress(function(pct, xhr) {
-            if ($divSlot === null) {
-                ($divSlot = _BuildDivSlot()).appendTo($targetDiv);
-                if (onContentChangeCB !== null)
+            if ($divSlot === null) { // first call, create DIV entry with progress bar and stuff
+                $divSlot = $('#Attacher_template > .Attacher_unit').clone();
+                $divSlot.appendTo($targetDiv);
+                if (onContentChangeCB !== null) {
                     onContentChangeCB(); // invoke user callback
+                }
             }
             tempFiles.push(xhr.responseJSON.tempFile); // object returned by Tinebase.uploadTempFile
-            $divSlot.find('.attacher_text')
+            $divSlot.find('.Attacher_text')
                 .text('Carregando... '+(pct * 100).toFixed(0)+'%');
-            $divSlot.find('.attacher_pro')[0].value = pct;
+            $divSlot.find('.Attacher_pro')[0].value = pct;
         }).onDone(function(file, xhr) {
             if ($divSlot === null) {
-                ($divSlot = _BuildDivSlot()).appendTo($targetDiv);
-                if (onContentChangeCB !== null)
+                $divSlot = $('#Attacher_template > .Attacher_unit').clone();
+                $divSlot.appendTo($targetDiv);
+                if (onContentChangeCB !== null) {
                     onContentChangeCB(); // invoke user callback
+                }
             }
             if (xhr.responseJSON.status === 'success') {
                 $.post('../', { r:'joinTempFiles', tempFiles:JSON.stringify(tempFiles) }).done(function(tmpf) {
@@ -91,13 +91,11 @@ window.WidgetAttacher = function(options) {
                         type: file.type,
                         tempFile: tmpf
                     });
-                    $divSlot.find('.attacher_text').html(file.name+' ' +
-                        '<span style="font-size:90%%; color:#777;">' +
-                        '('+ThreadMail.FormatBytes(file.size)+')</span>');
-                    $divSlot.find('.attacher_pro').remove();
+                    $divSlot.find('.Attacher_text').empty().append(_BuildDisplayName(file));
+                    $divSlot.find('.Attacher_pro').remove();
                 });
             } else {
-                $divSlot.find('.attacher_text').text('Erro no carregamento do anexo.');
+                $divSlot.find('.Attacher_text').text('Erro no carregamento do anexo.');
             }
         }).onFail(function(xhr, str) {
             console.log(xhr);
@@ -108,7 +106,7 @@ window.WidgetAttacher = function(options) {
     };
 
     THIS.removeAll = function() {
-        $targetDiv.children('.attacher_unit').remove();
+        $targetDiv.children('.Attacher_unit').remove();
         return THIS;
     };
 
@@ -117,11 +115,21 @@ window.WidgetAttacher = function(options) {
         return THIS;
     };
 
-    $targetDiv.on('click', '.attacher_remove', function() {
-        var $slot = $(this).closest('.attacher_unit');
+    $targetDiv.on('click', '.Attacher_remove', function() {
+        var $slot = $(this).closest('.Attacher_unit');
         $slot.remove();
-        if (onContentChangeCB !== null)
+        if (onContentChangeCB !== null) {
             onContentChangeCB(); // invoke user callback
+        }
     });
+};
+
+window.WidgetAttacher.Load = function() { // static method, since this class can be instantied ad-hoc
+    var defer = $.Deferred();
+    $.get('WidgetAttacher.html', function(elems) { // should be pretty fast, possibly cached
+        $(document.body).append(elems); // our templates
+        defer.resolve();
+    });
+    return defer.promise();
 };
 })( jQuery, UploadFile );

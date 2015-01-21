@@ -264,11 +264,14 @@ class Ajax
         }
         else if ($_REQUEST['r'] === 'uploadTempFile')
         {
-            if (isset($_SERVER['HTTP_X_FILE_NAME']) && isset($_SERVER['HTTP_X_FILE_TYPE'])) {
+            $fileType = isset($_SERVER['HTTP_X_FILE_TYPE']) ?
+                isset($_SERVER['HTTP_X_FILE_TYPE']) : 'text/plain';
+
+            if (isset($_SERVER['HTTP_X_FILE_NAME'])) {
                 try {
                     // http://stackoverflow.com/questions/9553168/undefined-variable-http-raw-post-data
                     $status = self::$tine->uploadTempFile(file_get_contents('php://input'),
-                        $_SERVER['HTTP_X_FILE_NAME'], $_SERVER['HTTP_X_FILE_TYPE']);
+                        $_SERVER['HTTP_X_FILE_NAME'], $fileType);
                 } catch (Exception $e) {
                     self::_HttpError(500, $e->getMessage());
                 }

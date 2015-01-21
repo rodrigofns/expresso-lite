@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 LoadCss('WidgetSearchAddr.css');
@@ -25,10 +25,12 @@ window.WidgetSearchAddr = function(options) {
     function _InsertNamesIntoList(contacts) {
         var $list = $('#SearchAddr_list');
         for (var c = 0; c < contacts.length; ++c) {
-            var addr = contacts[c].emails.length > 1 ?
-                (contacts[c].emails.length)+' emails' : contacts[c].emails[0];
-            var $opt = $('<option>'+contacts[c].name+' ('+addr+')'+'</option>');
-            $opt.data('contact', contacts[c]) // keep contact object into entry
+            var addr = (contacts[c].emails.length > 1) ?
+                (contacts[c].emails.length)+' emails' : // more than 1 email, probably a group
+                contacts[c].emails[0];
+            var $opt = $(document.createElement('option'))
+                .text(contacts[c].name+' ('+addr+')')
+                .data('contact', contacts[c]) // keep contact object into entry
                 .appendTo($list);
         }
     }
@@ -60,25 +62,23 @@ window.WidgetSearchAddr = function(options) {
     }
 
     function _BuildPopup(numContacts) {
-        var size = (numContacts <= 2 ? 2 :
-            Math.min(numContacts, userOpts.maxVisibleContacts));
-        var $popup = $('<div id="SearchAddr_popup">' +
-            '<select id="SearchAddr_list" size="'+size+'"></select>' +
-            '<div id="SearchAddr_more">' +
-                '<a href="#" title="Buscar também no catálogo geral do Expresso">mais resultados...</a>' +
-            '</div>' +
-            '</div>');
+        var size = (numContacts <= 2) ? 2 :
+            Math.min(numContacts, userOpts.maxVisibleContacts);
+        var $popup = $('#SearchAddr_popup');
+        $popup.find('#SearchAddr_list').attr('size', size);
         $popup.css({
             left: ($txtbox.offset().left + 3)+'px',
             top: ($txtbox.offset().top + $txtbox.outerHeight() - 2)+'px',
             width: $txtbox.width()+'px'
         });
-        $popup.appendTo(document.body);
+        $popup.appendTo(document.body); // removed from template section, becomes visible
         return $popup;
     }
 
     THIS.close = function() {
-        $('#SearchAddr_popup').remove(); // if any
+        $('#SearchAddr_list').off('.SearchAddr').empty();
+        $('#SearchAddr_more > a').off('.SearchAddr');
+        $('#SearchAddr_popup').appendTo('#SearchAddr_template'); // becomes hidden
         return THIS;
     };
 
@@ -109,7 +109,7 @@ window.WidgetSearchAddr = function(options) {
     };
 
     THIS.onClick = function(callback) {
-        onClickCB = callback;
+        onClickCB = callback; // onClick(token, contact)
         return THIS;
     };
 
@@ -117,7 +117,9 @@ window.WidgetSearchAddr = function(options) {
         THIS.close(); // there can be only one
         token = $txtbox.val(); // string to be searched among contacts
         var lastComma = token.lastIndexOf(',');
-        if (lastComma > 0) token = $.trim(token.substr(lastComma + 1));
+        if (lastComma > 0) {
+            token = $.trim(token.substr(lastComma + 1));
+        }
         if (token.length >= 2) {
             var contacts = Contacts.searchByToken(token);
             _BuildPopup(contacts.length);
@@ -125,20 +127,24 @@ window.WidgetSearchAddr = function(options) {
         }
     })();
 
-    $('#SearchAddr_list').on('mousedown', 'option', function(ev) {
+    $('#SearchAddr_list').on('mousedown.SearchAddr', 'option', function(ev) {
         if (onClickCB !== null) {
-            onClickCB(token, $(this).data('contact')); // invoke user callback
+            var $opt = $(this);
+            onClickCB(token, $opt.data('contact')); // invoke user callback
         }
     });
 
-    $('#SearchAddr_more > a').on('mousedown', function(ev) {
+    $('#SearchAddr_more > a').on('mousedown.SearchAddr', function(ev) {
         ev.preventDefault();
         ev.stopImmediatePropagation();
-        $('#SearchAddr_more > a').hide();
+        $('#SearchAddr_more > a').css('display', 'none');
         $('#SearchAddr_more').append($('#icons .throbber').clone());
 
         $.post('../', { r:'searchContactsByToken', token:token })
-        .always(function() { $('#SearchAddr_more').hide(); })
+        .always(function() {
+            $('#SearchAddr_more').find('.throbber').remove();
+            $('#SearchAddr_more > a').css('display', ''); // restore from "display:none"
+        })
         .fail(function(resp) {
             window.alert('Erro na pesquisa de contatos no catálogo do Expresso.\n' + resp.responseText);
         }).done(function(contacts) {
@@ -150,5 +156,14 @@ window.WidgetSearchAddr = function(options) {
             }
         });
     });
+};
+
+window.WidgetSearchAddr.Load = function() { // static method, since this class can be instantied ad-hoc
+    var defer = $.Deferred();
+    $.get('WidgetSearchAddr.html', function(elems) { // should be pretty fast, possibly cached
+        $(document.body).append(elems); // our templates
+        defer.resolve();
+    });
+    return defer.promise();
 };
 })( jQuery, Contacts );

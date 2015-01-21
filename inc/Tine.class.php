@@ -810,7 +810,7 @@ class Tine
     public function uploadTempFile($rawData, $fileDisplayName, $mimeType)
     {
         $req = new Request();
-        $req->url($_SESSION['ourtine_url'].'?method=Tinebase.uploadTempFile');
+        $req->url($_SESSION['ourtine_url'].'?method=Tinebase.uploadTempFile&eid='.sha1(mt_rand().microtime()));
         $req->cookies(true);
         $req->postFields($rawData);
         $req->headers(array(

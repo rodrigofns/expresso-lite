@@ -6,7 +6,7 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Charles Wust <charles.wust@serpro.gov.br>
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
 LoadCss('../inc/Layout.css');
