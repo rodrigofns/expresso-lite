@@ -5,13 +5,12 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('../inc/ModelessDialog.css');
-
-(function( $, UrlStack ) {
-window.ModelessDialog = function(options) {
+define(['jquery', 'inc/App', 'inc/UrlStack'], function($, App, UrlStack) {
+App.LoadCss('inc/ModelessDialog.css');
+return function(options) {
     var userOpts = $.extend({
         elem: null, // jQuery object for the target DIV
         caption: 'Modeless popup',
@@ -238,4 +237,4 @@ window.ModelessDialog = function(options) {
         }
     });
 };
-})( jQuery, UrlStack );
+});

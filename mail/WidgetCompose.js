@@ -8,10 +8,11 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetCompose.css');
-
-(function( $, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat, ModelessDialog ) {
-window.WidgetCompose = function(options) {
+define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/ModelessDialog',
+    'mail/ThreadMail', 'mail/WidgetAttacher', 'mail/WidgetSearchAddr'],
+function($, App, DateFormat, ModelessDialog, ThreadMail, WidgetAttacher, WidgetSearchAddr) {
+App.LoadCss('mail/WidgetCompose.css');
+return function(options) {
     var userOpts = $.extend({
         folderCache: []
     }, options);
@@ -31,7 +32,7 @@ window.WidgetCompose = function(options) {
             popup.setCaption( $(document.createElement('span'))
                 .append('Atualizando rascunho... ')
                 .append($('#icons .throbber').clone()) );
-            $.post('../', { r:'deleteMessages', messages:draftMsgObj.id, forever:1 })
+            App.Post('deleteMessages', { messages:draftMsgObj.id, forever:1 })
             .fail(function(resp) {
                 window.alert('Erro ao apagar o rascunho antigo.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -253,8 +254,7 @@ window.WidgetCompose = function(options) {
 
     THIS.load = function() {
         var defer = $.Deferred();
-        $.get('WidgetCompose.html', function(elems) { // should be pretty fast, possibly cached
-            $(document.body).append(elems); // our templates
+        App.LoadTemplate('WidgetCompose.html').done(function() {
             $.when(
                 WidgetSearchAddr.Load(),
                 WidgetAttacher.Load()
@@ -395,7 +395,7 @@ window.WidgetCompose = function(options) {
                     fwdMsg = msg.fwd,
                     draftMsg = msg.draft;
 
-                $.post('../', $.extend({ r:'saveMessage' }, message))
+                App.Post('saveMessage', message)
                 .fail(function(resp) {
                     window.alert('Erro ao enviar email.\n' +
                         'Sua interface está inconsistente, pressione F5.\n'+resp.responseText);
@@ -429,7 +429,7 @@ window.WidgetCompose = function(options) {
                     .after('<div class="loadingMessage"><br/><br/><br/>Salvando rascunho...</div>');
                 var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', userOpts.folderCache);
 
-                $.post('../', $.extend({ r:'saveMessageDraft', draftFolderId:draftFolder.id }, message))
+                App.Post('saveMessageDraft', $.extend({ draftFolderId:draftFolder.id }, message))
                 .fail(function(resp) {
                     window.alert('Erro ao salvar rascunho.\n' +
                         'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -483,4 +483,4 @@ window.WidgetCompose = function(options) {
         });
     }
 };
-})( jQuery, WidgetAttacher, WidgetSearchAddr, ThreadMail, DateFormat, ModelessDialog );
+});

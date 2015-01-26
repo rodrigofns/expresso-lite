@@ -8,12 +8,11 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetSearchAddr.css');
-
-(function( $, Contacts ) {
-window.WidgetSearchAddr = function(options) {
+define(['jquery', 'inc/App', 'mail/Contacts'], function($, App, Contacts) {
+App.LoadCss('mail/WidgetSearchAddr.css');
+var WidgetSearchAddr = function(options) {
     var userOpts = $.extend({
-        $elem: '', // jQuery object for the target DIV
+        $elem: null, // jQuery object for the target DIV
         maxVisibleContacts: 10
     }, options);
 
@@ -140,7 +139,7 @@ window.WidgetSearchAddr = function(options) {
         $('#SearchAddr_more > a').css('display', 'none');
         $('#SearchAddr_more').append($('#icons .throbber').clone());
 
-        $.post('../', { r:'searchContactsByToken', token:token })
+        App.Post('searchContactsByToken', { token:token })
         .always(function() {
             $('#SearchAddr_more').find('.throbber').remove();
             $('#SearchAddr_more > a').css('display', ''); // restore from "display:none"
@@ -158,12 +157,10 @@ window.WidgetSearchAddr = function(options) {
     });
 };
 
-window.WidgetSearchAddr.Load = function() { // static method, since this class can be instantied ad-hoc
-    var defer = $.Deferred();
-    $.get('WidgetSearchAddr.html', function(elems) { // should be pretty fast, possibly cached
-        $(document.body).append(elems); // our templates
-        defer.resolve();
-    });
-    return defer.promise();
+WidgetSearchAddr.Load = function() {
+    // Static method, since this class can be instantied ad-hoc.
+    return App.LoadTemplate('WidgetSearchAddr.html');
 };
-})( jQuery, Contacts );
+
+return WidgetSearchAddr;
+});

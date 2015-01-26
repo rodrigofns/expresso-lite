@@ -8,10 +8,10 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetAttacher.css');
-
-(function( $, UploadFile ) {
-window.WidgetAttacher = function(options) {
+define(['jquery', 'inc/App', 'inc/UploadFile', 'mail/ThreadMail'],
+function($, App, UploadFile, ThreadMail) {
+App.LoadCss('mail/WidgetAttacher.css');
+var WidgetAttacher = function(options) {
     var userOpts = $.extend({
         elem: '' // jQuery selector for the target DIV
     }, options);
@@ -22,7 +22,7 @@ window.WidgetAttacher = function(options) {
 
     function _BuildDisplayName(fileObj) {
         var $disp = $('#Attacher_template > .Attacher_fileNameDisplay').clone();
-        $disp.find('.Attacher_fileTitle').text(fileObj.name);
+        $disp.find('.Attacher_fileTitle').text(fileObj.name !== undefined ? fileObj.name : fileObj.filename);
         $disp.find('.Attacher_fileSize').text('('+ThreadMail.FormatBytes(fileObj.size)+')');
         return $disp;
     }
@@ -50,8 +50,9 @@ window.WidgetAttacher = function(options) {
                 partId: file.partId
             });
         }
-        if (headline.attachments.length && onContentChangeCB !== null)
+        if (headline.attachments.length && onContentChangeCB !== null) {
             onContentChangeCB(); // invoke user callback
+        }
         return THIS;
     };
 
@@ -84,7 +85,8 @@ window.WidgetAttacher = function(options) {
                 }
             }
             if (xhr.responseJSON.status === 'success') {
-                $.post('../', { r:'joinTempFiles', tempFiles:JSON.stringify(tempFiles) }).done(function(tmpf) {
+                App.Post('joinTempFiles', { tempFiles:JSON.stringify(tempFiles) })
+                .done(function(tmpf) {
                     $divSlot.data('file', { // keep attachment object into DIV
                         name: file.name,
                         size: file.size,
@@ -111,7 +113,7 @@ window.WidgetAttacher = function(options) {
     };
 
     THIS.onContentChange = function(callback) {
-        onContentChangeCB = callback;
+        onContentChangeCB = callback; // onContentChange()
         return THIS;
     };
 
@@ -124,12 +126,10 @@ window.WidgetAttacher = function(options) {
     });
 };
 
-window.WidgetAttacher.Load = function() { // static method, since this class can be instantied ad-hoc
-    var defer = $.Deferred();
-    $.get('WidgetAttacher.html', function(elems) { // should be pretty fast, possibly cached
-        $(document.body).append(elems); // our templates
-        defer.resolve();
-    });
-    return defer.promise();
+WidgetAttacher.Load = function() {
+    // Static method, since this class can be instantied ad-hoc.
+    return App.LoadTemplate('WidgetAttacher.html');
 };
-})( jQuery, UploadFile );
+
+return WidgetAttacher;
+});

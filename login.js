@@ -8,7 +8,11 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $ ) {
+require.config({
+    paths: { jquery: 'inc/jquery.min' }
+});
+
+require(['jquery', 'inc/App'], function($, App) {
     $(document).ready(function() {
         // Browser validation.
         if (!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
@@ -22,7 +26,7 @@
         if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
         LoadServerStatus();
-        $.post('.', { r:'setLocale' }); // default to PT/BR
+        App.Post('setLocale'); // default to PT/BR
         $('#user').focus();
         $('#frmLogin').submit(DoLogin);
         $('#frmChangePwd').submit(DoChangePassword);
@@ -59,7 +63,7 @@
 
     function LoadServerStatus() {
         $('#versionInfo').hide();
-        $.post('.', { r:'getAllRegistryData', validateLogin:0 })
+        App.Post('getAllRegistryData', { validateLogin:0 })
         .fail(function(resp) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+
                 'É possível que o Expresso esteja fora do ar.');
@@ -81,7 +85,7 @@
             $('#user').focus();
         }
 
-        $.post('.', { r:'login', user:$('#user').val(), pwd:$('#pwd').val() })
+        App.Post('login', { user:$('#user').val(), pwd:$('#pwd').val() })
         .fail(function(resp) {
             window.alert('Não foi possível efetuar login.\n' +
                 'O usuário ou a senha estão incorretos.');
@@ -95,7 +99,7 @@
             } else {
                 $('#frmLogin .throbber').children('span').text('Autenticando...');
 
-                $.post('.', { r:'getAllRegistryData', validateLogin:1 })
+                App.Post('getAllRegistryData', { validateLogin:1 })
                 .fail(function(resp) {
                     window.alert('Erro na consulta aos dados do usuário.\n'+resp.responseText);
                     RestoreLoginState();
@@ -131,7 +135,7 @@
                 $('#cpNewPwd').focus();
             }
 
-            $.post('.', { r: 'changeExpiredPassword',
+            App.Post('changeExpiredPassword', {
                 userName: $('#user').val(), // from login form
                 oldPassword: $('#cpOldPwd').val(),
                 newPassword: $('#cpNewPwd').val()
@@ -167,4 +171,4 @@
         }
         return true;
     }
-})( jQuery );
+});

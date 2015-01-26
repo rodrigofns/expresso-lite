@@ -5,13 +5,13 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetMessages.css');
-
-(function( $, Contacts, DateFormat, ThreadMail, ContextMenu ) {
-window.WidgetMessages = function(options) {
+define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/ContextMenu', 'mail/Contacts', 'mail/ThreadMail'],
+function($, App, DateFormat, ContextMenu, Contacts, ThreadMail) {
+App.LoadCss('mail/WidgetMessages.css');
+return function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
         folderCache: [],
@@ -147,7 +147,7 @@ window.WidgetMessages = function(options) {
             if (!asRead && $elem.find('.Messages_content').is(':visible'))
                     $elem.children('.Messages_top1').trigger('click'); // collapse if expanded
 
-            $.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:headline.id })
+            App.Post('markAsRead', { asRead:(asRead?1:0), ids:headline.id })
             .always(function() { $elem.find('.Messages_throbber').remove(); })
             .fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
@@ -177,7 +177,7 @@ window.WidgetMessages = function(options) {
             $elem.find('.Messages_from').append($('#icons .throbber').clone());
             $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
-            $.post('../', { r:'moveMessages', messages:headline.id, folder:destFolder.id })
+            App.Post('moveMessages', { messages:headline.id, folder:destFolder.id })
             .always(function() { $elem.find('.throbber').remove(); })
             .fail(function(resp) {
                 window.alert('Erro ao mover mensagem.\n' +
@@ -222,7 +222,7 @@ window.WidgetMessages = function(options) {
                 $elem.find('.Messages_from').append($('#icons .throbber').clone());
                 $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
-                $.post('../', { r:'deleteMessages', messages:headline.id, forever:1 })
+                App.Post('deleteMessages', { messages:headline.id, forever:1 })
                 .always(function() { $elem.find('.throbber').remove(); })
                 .fail(function(resp) {
                     window.alert('Erro ao apagar email.\n' +
@@ -275,12 +275,7 @@ window.WidgetMessages = function(options) {
     }
 
     THIS.load = function() {
-        var defer = $.Deferred();
-        $.get('WidgetMessages.html', function(elems) { // should be pretty fast, possibly cached
-            $(document.body).append(elems); // our templates
-            defer.resolve();
-        });
-        return defer.promise();
+        return App.LoadTemplate('WidgetMessages.html');
     };
 
     THIS.empty = function() {
@@ -386,7 +381,7 @@ window.WidgetMessages = function(options) {
                         .append($('#icons .throbber').clone())
                 );
 
-                $.post('../', { r:'getMessage', id:headline.id })
+                App.Post('getMessage', { id:headline.id })
                 .always(function() { $divUnit.find('.Messages_loading').remove(); })
                 .fail(function(resp) {
                     window.alert('Erro ao carregar email.\n' +
@@ -449,4 +444,4 @@ window.WidgetMessages = function(options) {
         }
     });
 };
-})( jQuery, Contacts, DateFormat, ThreadMail, ContextMenu );
+});

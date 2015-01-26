@@ -5,10 +5,17 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $, UrlStack, Contacts ) {
+require.config({
+    baseUrl: '..',
+    paths: { jquery: 'inc/jquery.min' }
+});
+
+require(['jquery', 'inc/App', 'inc/UrlStack', 'inc/Layout', 'mail/Contacts', 'mail/ThreadMail',
+    'mail/WidgetCompose', 'mail/WidgetFolders', 'mail/WidgetHeadlines', 'mail/WidgetMessages'],
+function($, App, UrlStack, Layout, Contacts, ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
     MAILBATCH: 50, // overwritten with value from conf in document.ready
     folders: [], // all folder objects
@@ -72,7 +79,7 @@ $(document).ready(function() {
             .onMove(ThreadMoved);
         Cache.listMessages
             .onView(function(folder, headline) { Cache.listHeadlines.redraw(headline); Cache.treeFolders.redraw(folder); })
-            .onMarkRead(function(folder, headline) { Cache.listHeadlines.redraw(headline); Cache.treeFolders.redraw(folder); UpdatePageTitle(); })
+            .onMarkRead(MailMarkedRead)
             .onMove(MailMoved);
         Cache.wndCompose
             //~ .onClose(function() { $('#composeFoldersSlot').show(); });
@@ -141,8 +148,9 @@ function SetMessagesPanelVisible(isVisible) {
     if (isVisible) {
         Cache.layout.setTitle('voltar');
         Cache.layout.setContextMenuVisible(false);
-        Cache.layout.setContentFullWidth(true)
-            .onUnset(function() { SetMessagesPanelVisible(false); });
+        Cache.layout.setContentFullWidth(true).onUnset(function() {
+            SetMessagesPanelVisible(false);
+        });
     } else {
         UpdatePageTitle();
         Cache.layout.setContentFullWidth(false);
@@ -172,6 +180,7 @@ function Search(text) {
 
 function LoadFirstHeadlines(folder) {
     Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+        $('#middleBody').scrollTop(0);
         $('#headlinesFooter').css('display', 'none');
         UpdatePageTitle();
         Cache.listHeadlines.loadFolder(folder, Cache.MAILBATCH).done(function() {
@@ -225,12 +234,25 @@ function ThreadMoved(destFolder) {
     RebuildHeadlinesContextMenu();
 }
 
+function MailMarkedRead(folder, headline) {
+    Cache.listHeadlines.redraw(headline);
+    Cache.treeFolders.redraw(folder);
+    UpdatePageTitle();
+
+    var curThread = Cache.listHeadlines.getCurrent();
+    if (curThread.length === 1 && headline.unread) {
+        SetMessagesPanelVisible(false);
+    }
+}
+
 function MailMoved(destFolder, origThread) {
     Cache.listHeadlines.redrawByThread(origThread, function() {
-        if (!Cache.listMessages.count())
+        if (!Cache.listMessages.count()) {
             SetMessagesPanelVisible(false);
-        if (destFolder !== null)
+        }
+        if (destFolder !== null) {
             Cache.treeFolders.redraw(destFolder);
+        }
         Cache.treeFolders.redraw(Cache.treeFolders.getCurrent());
         UpdateHeadlineFooter();
     });
@@ -294,4 +316,4 @@ function DraftSaved() {
         LoadFirstHeadlines(draftFolder);
     }
 }
-})( jQuery, UrlStack, Contacts );
+});

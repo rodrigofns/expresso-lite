@@ -8,9 +8,7 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-window.DateFormat = (function() {
-    var exp = { };
-
+define([], function() {
     function _Pad2(num) {
         return (num < 10) ? '0'+num : num;
     }
@@ -28,9 +26,10 @@ window.DateFormat = (function() {
         date2.setMinutes(date2.getMinutes() - date2.getTimezoneOffset()); // apply timezone offset
         var week = [ 'domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado' ];
         return week[date2.getUTCDay()];
-    };
+    }
 
-    exp.Humanize = function(dateObj) {
+return {
+    Humanize: function(dateObj) {
         if (_IsToday(dateObj, 0)) {
             return 'hoje, ' +
                 _Pad2(dateObj.getHours()) + ':' +
@@ -51,24 +50,23 @@ window.DateFormat = (function() {
                 _Pad2(dateObj.getMonth() + 1) + '/' +
                 _Pad2(dateObj.getFullYear());
         }
-    };
+    },
 
-    exp.Long = function(dateObj) {
+    Long: function(dateObj) {
         return _GetWeekDay(dateObj) + ', ' +
             _Pad2(dateObj.getDate()) + '/' +
             _Pad2(dateObj.getMonth() + 1) + '/' +
             dateObj.getFullYear() + ', ' +
             _Pad2(dateObj.getHours()) + ':' +
             _Pad2(dateObj.getMinutes());
-    };
+    },
 
-    exp.Medium = function(dateObj) {
+    Medium: function(dateObj) {
         return _Pad2(dateObj.getDate()) + '/' +
             _Pad2(dateObj.getMonth() + 1) + '/' +
             dateObj.getFullYear() + ' ' +
             _Pad2(dateObj.getHours()) + ':' +
             _Pad2(dateObj.getMinutes());
-    };
-
-    return exp;
-})();
+    }
+};
+});

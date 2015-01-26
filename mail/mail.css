@@ -5,10 +5,10 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-#info,#icons { display:none; }
+#info,#icons,#sections { display:none; }
 
 #btnUpdateFolders,#txtUpdateFolders,#btnCompose { margin-bottom:16px; }
 #btnUpdateFolders { }

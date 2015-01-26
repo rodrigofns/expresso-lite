@@ -5,13 +5,13 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetHeadlines.css');
-
-(function( $, ThreadMail, DateFormat, Contacts ) {
-window.WidgetHeadlines = function(options) {
+define(['jquery', 'inc/App', 'inc/DateFormat', 'mail/ThreadMail', 'mail/Contacts'],
+function($, App, DateFormat, ThreadMail, Contacts) {
+App.LoadCss('mail/WidgetHeadlines.css');
+return function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
         folderCache: []
@@ -74,8 +74,9 @@ window.WidgetHeadlines = function(options) {
                 who.push( msg.from.name.indexOf('@') !== -1 ? // an actual email address
                     Contacts.HumanizeLogin(msg.from.name, false) : msg.from.name );
             } else { // on Sent folder, show "to" field instead of "from"
-                for (var t = 0; t < msg.to.length; ++t)
+                for (var t = 0; t < msg.to.length; ++t) {
                     who.push(Contacts.HumanizeLogin(msg.to[t], msg.to.length > 1));
+                }
             }
         }
         names.read.reverse(); // senders in chronological order, originally newest first
@@ -84,13 +85,16 @@ window.WidgetHeadlines = function(options) {
         names.unread = _RemoveDuplicates(names.unread);
 
         if (names.read.length + names.unread.length > 1) {
-            for (var i = 0; i < names.read.length; ++i)
+            for (var i = 0; i < names.read.length; ++i) {
                 names.read[i] = names.read[i].split(' ')[0]; // many people, remove surnames
-            for (var i = 0; i < names.unread.length; ++i)
+            }
+            for (var i = 0; i < names.unread.length; ++i) {
                 names.unread[i] = names.unread[i].split(' ')[0]; // unread also in bold
+            }
         }
-        for (var i = 0; i < names.unread.length; ++i)
+        for (var i = 0; i < names.unread.length; ++i) {
             names.unread[i] = '<b>'+names.unread[i]+'</b>'; // unread in bold
+        }
 
         if (!names.read.length && !names.unread.length) {
             return '(ninguém)';
@@ -149,8 +153,9 @@ window.WidgetHeadlines = function(options) {
 
     function _BuildAllThreadsDivs() {
         var divs = [];
-        for (var i = 0; i < curFolder.threads.length; ++i)
+        for (var i = 0; i < curFolder.threads.length; ++i) {
             divs.push(_BuildDiv(curFolder.threads[i], curFolder.globalName === 'INBOX/Sent'));
+        }
         return divs;
     }
 
@@ -158,12 +163,14 @@ window.WidgetHeadlines = function(options) {
         var $newDiv = _BuildDiv($div.data('thread'), curFolder.globalName === 'INBOX/Sent');
         //~ if (!$div.children('.Headlines_check').is(':visible'))
             //~ $newDiv.find('.Headlines_check').hide();
-        if ($div.hasClass('Headlines_entryCurrent'))
+        if ($div.hasClass('Headlines_entryCurrent')) {
             $newDiv.addClass('Headlines_entryCurrent');
+        }
         var isChecked = $div.hasClass('Headlines_entryChecked');
         $div.replaceWith($newDiv);
-        if (isChecked)
+        if (isChecked) {
             $newDiv.find('.Headlines_check > div').trigger('click');
+        }
     }
 
     function _FetchDraftMessage($div, headline, onDone) {
@@ -173,7 +180,7 @@ window.WidgetHeadlines = function(options) {
             $div.find('.Headlines_check > [class^=icoCheck]').replaceWith(
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
 
-            $.post('../', { r:'getMessage', id:headline.id })
+            App.Post('getMessage', { id:headline.id })
             .always(function() {
                 $div.find('.throbber').replaceWith($check); // restore checkbox
             }).fail(function(resp) {
@@ -190,12 +197,7 @@ window.WidgetHeadlines = function(options) {
     }
 
     THIS.load = function() {
-        var defer = $.Deferred();
-        $.get('WidgetHeadlines.html', function(elems) { // should be pretty fast, possibly cached
-            $(document.body).append(elems); // our templates
-            defer.resolve();
-        });
-        return defer.promise();
+        return App.LoadTemplate('WidgetHeadlines.html');
     };
 
     THIS.markRead = function(asRead) {
@@ -222,11 +224,12 @@ window.WidgetHeadlines = function(options) {
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
             var relevantIds = $.map(relevantHeadlines, function(elem) { return elem.id; });
 
-            $.post('../', { r:'markAsRead', asRead:(asRead?1:0), ids:relevantIds.join(',') })
+            App.Post('markAsRead', { asRead:(asRead?1:0), ids:relevantIds.join(',') })
             .always(function() {
                 $checkedDivs.find('.throbber').replaceWith($check); // restore checkbox
-                if (onMarkReadCB !== null)
+                if (onMarkReadCB !== null) {
                     onMarkReadCB(curFolder);
+                }
             }).fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -241,8 +244,9 @@ window.WidgetHeadlines = function(options) {
 
     THIS.moveMessages = function(destFolder) {
         var $checkedDivs = $targetDiv.find('.Headlines_entryChecked');
-        if ($checkedDivs.find('.throbber').length) // already working?
+        if ($checkedDivs.find('.throbber').length) { // already working?
             return;
+        }
         var headlines = []; // will hold all individual headlines
         $checkedDivs.each(function(idx, elem) { // each selected row
             var thread = $(elem).data('thread'); // thread to be moved, a thread is an array of headlines
@@ -266,15 +270,16 @@ window.WidgetHeadlines = function(options) {
         destFolder.messages.length = 0; // force cache rebuild
         destFolder.threads.length = 0;
 
-        $.post('../', { r:'moveMessages', messages:msgIds.join(','), folder:destFolder.id })
+        App.Post('moveMessages', { messages:msgIds.join(','), folder:destFolder.id })
         .fail(function(resp) {
             window.alert('Erro ao mover email.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
         }).done(function() {
             $checkedDivs.slideUp(200).promise('fx').done(function() {
                 $checkedDivs.remove();
-                if (onMoveCB !== null)
+                if (onMoveCB !== null) {
                     onMoveCB(destFolder);
+                }
             });
         });
         return THIS;
@@ -290,16 +295,18 @@ window.WidgetHeadlines = function(options) {
             var thread = $div.data('thread');
             for (var i = 0; i < thread.length; ++i) {
                 headlines.push(thread[i]);
-                if (!thread[i].flagged)
+                if (!thread[i].flagged) {
                     willStar = true; // at least 1 unstarred? star all
+                }
             }
         });
         var msgIds = $.map(headlines, function(elem) { return elem.id; });
         $checkedDivs.find('div[class^=icoHigh]').replaceWith(_CreateDivLoading(null));
-        for (var i = 0; i < headlines.length; ++i)
+        for (var i = 0; i < headlines.length; ++i) {
             headlines[i].flagged = willStar; // update cache
+        }
 
-        $.post('../', { r:'markAsHighlighted', ids:msgIds.join(','), asHighlighted:(willStar?'1':'0') })
+        App.Post('markAsHighlighted', { ids:msgIds.join(','), asHighlighted:(willStar?'1':'0') })
         .always(function() {
             $checkedDivs.find('.Headlines_loading').replaceWith(
                 (willStar ? $('#icons .icoHigh1') : $('#icons .icoHigh0')).clone() );
@@ -315,8 +322,9 @@ window.WidgetHeadlines = function(options) {
             THIS.moveMessages(ThreadMail.FindFolderByGlobalName('INBOX/Trash', userOpts.folderCache));
         } else if (window.confirm('Deseja apagar as mensagens selecionadas?')) { // we're in trash folder, add deleted flag
             var $checkedDivs = $targetDiv.find('.Headlines_entryChecked');
-            if ($checkedDivs.find('.throbber').length) // already working?
+            if ($checkedDivs.find('.throbber').length) { // already working?
                 return;
+            }
             var headlines = [];
             $checkedDivs.each(function(idx, elem) {
                 var thread = $(elem).data('thread');
@@ -327,22 +335,25 @@ window.WidgetHeadlines = function(options) {
                     .append('&nbsp; <i>Excluindo...</i>');
 
                 curFolder.totalMails -= thread.length; // update cache
-                for (var i = 0; i < thread.length; ++i)
-                    if (thread[i].unread)
+                for (var i = 0; i < thread.length; ++i) {
+                    if (thread[i].unread) {
                         --curFolder.unreadMails;
+                    }
+                }
             });
             var msgIds = $.map(headlines, function(elem) { return elem.id; });
             ThreadMail.RemoveHeadlinesFromFolder(msgIds, curFolder);
 
-            $.post('../', { r:'deleteMessages', messages:msgIds.join(','), forever:1 })
+            App.Post('deleteMessages', { messages:msgIds.join(','), forever:1 })
             .fail(function(resp) {
                 window.alert('Erro ao apagar email.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function(status) {
                 $checkedDivs.slideUp(200).promise('fx').done(function() {
                     $checkedDivs.remove();
-                    if (onMoveCB !== null)
+                    if (onMoveCB !== null) {
                         onMoveCB(null);
+                    }
                 });
             });
         }
@@ -360,7 +371,7 @@ window.WidgetHeadlines = function(options) {
             $targetDiv.css('height', '100%'); // important for showFancy()
             var $loading = _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
             if (!curFolder.messages.length) { // not cached yet
-                $.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
+                App.Post('getFolderHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
                 .fail(function(resp) {
                     window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
                     $targetDiv.children('.Headlines_loading').remove();
@@ -410,7 +421,7 @@ window.WidgetHeadlines = function(options) {
         var $divLoading = _CreateDivLoading('Carregando mensagens...')
         $divLoading.appendTo($targetDiv);
 
-        $.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
+        App.Post('getFolderHeadlines', { folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
@@ -432,10 +443,11 @@ window.WidgetHeadlines = function(options) {
 
         var headl0 = null;
         var $current = $targetDiv.find('.Headlines_entryCurrent');
-        if ($current.length)
+        if ($current.length) {
             headl0 = $current.data('thread')[0]; // 1st headline of thread being read
+        }
 
-        $.post('../', { r:'getFolderHeadlines', folderId:curFolder.id, start:0, limit:howMany })
+        App.Post('getFolderHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+curFolder.localName+'".\n' +
@@ -444,11 +456,12 @@ window.WidgetHeadlines = function(options) {
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
             curFolder.threads = ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts'); // in thread: oldest first
             $targetDiv.empty().append(_BuildAllThreadsDivs());
-            if (headl0 !== null)
+            if (headl0 !== null) {
                 _FindHeadlineDiv(headl0).addClass('Headlines_entryCurrent');
-
-            if (onDone !== undefined && onDone !== null)
+            }
+            if (onDone !== undefined && onDone !== null) {
                 onDone(); // invoke user callback
+            }
         });
 
         return THIS;
@@ -457,8 +470,9 @@ window.WidgetHeadlines = function(options) {
     THIS.getCurrent = function() {
         var curThread = null;
         var $cur = $targetDiv.find('.Headlines_entryCurrent');
-        if ($cur.length)
+        if ($cur.length) {
             curThread = $cur.data('thread');
+        }
         return curThread;
     };
 
@@ -480,8 +494,9 @@ window.WidgetHeadlines = function(options) {
         var $checkeds = $targetDiv.find('.Headlines_entryChecked');
         $checkeds.removeClass('Headlines_entryChecked');
         $checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
-        if (onCheckCB !== null)
+        if (onCheckCB !== null) {
             onCheckCB(); // invoke user callback
+        }
         return THIS;
     };
 
@@ -492,8 +507,9 @@ window.WidgetHeadlines = function(options) {
 
     THIS.redraw = function(headline) {
         var $div = _FindHeadlineDiv(headline); // the DIV which contains the headline
-        if ($div !== null)
+        if ($div !== null) {
             _RedrawDiv($div);
+        }
         return THIS;
     };
 
@@ -504,18 +520,22 @@ window.WidgetHeadlines = function(options) {
                 if (!thread.length) { // headline entry will be deleted
                     $div.slideUp(200, function() {
                         $div.remove();
-                        if (onDone !== undefined && onDone !== null)
+                        if (onDone !== undefined && onDone !== null) {
                             onDone();
+                        }
                     });
                 } else { // headline entry will be just updated
                     var $newDiv = _BuildDiv($div.data('thread'), curFolder.globalName === 'INBOX/Sent');
-                    if (!$div.children('.Headlines_check').is(':visible'))
+                    if (!$div.children('.Headlines_check').is(':visible')) {
                         $newDiv.find('.Headlines_check').hide();
-                    if ($div.hasClass('Headlines_entryCurrent'))
+                    }
+                    if ($div.hasClass('Headlines_entryCurrent')) {
                         $newDiv.addClass('Headlines_entryCurrent');
+                    }
                     $div.replaceWith($newDiv);
-                    if (onDone !== undefined && onDone !== null)
+                    if (onDone !== undefined && onDone !== null) {
                         onDone();
+                    }
                 }
                 return false; // break
             }
@@ -617,4 +637,4 @@ window.WidgetHeadlines = function(options) {
         }
     });
 };
-})( jQuery, ThreadMail, DateFormat, Contacts );
+});

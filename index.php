@@ -11,9 +11,7 @@
 
 @session_start();
 require_once(dirname(__FILE__).'/conf.php');
-
 define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
-
 if (!function_exists('curl_init')) die('PHP cURL (php5-curl) library not installed.');
 if (isset($_REQUEST['r'])) { // that's an AJAX request
     require('inc/Ajax.class.php');
@@ -21,8 +19,7 @@ if (isset($_REQUEST['r'])) { // that's an AJAX request
     exit; // nothing is outputted here
 }
 require('inc/Tine.class.php');
-if (Tine::IsLogged())
-    header('location: ./mail');
+if (Tine::IsLogged()) header('location: ./mail');
 $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] : '';
 ?>
 <!DOCTYPE html>
@@ -33,9 +30,7 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
     <link type="text/css" rel="stylesheet" href="inc/general.css"/>
     <link type="text/css" rel="stylesheet" href="login.css"/>
     <title>Expresso Lite</title>
-    <script src="inc/jquery-2.1.3.min.js"></script>
-    <script src="inc/LoadCss.js"></script>
-    <script src="login.js"></script>
+    <script src="inc/require.min.js" data-main="login.js"></script>
 </head>
 <body>
     <div id="topgray"></div>

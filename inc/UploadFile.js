@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-(function( $ ) {
-window.UploadFile = function(options) {
+define(['jquery'], function($) {
+return function(options) {
     var userOpts = $.extend({
         url: '',
         fileName: 'file',
@@ -86,4 +86,4 @@ window.UploadFile = function(options) {
     THIS.onDone     = function(callback) { onDoneCB = callback; return THIS; };
     THIS.onFail     = function(callback) { onFailCB = callback; return THIS; };
 };
-})( jQuery );
+});

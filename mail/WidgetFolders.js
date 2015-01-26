@@ -5,13 +5,12 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('WidgetFolders.css');
-
-(function( $ ) {
-window.WidgetFolders = function(options) {
+define(['jquery', 'inc/App'], function($, App) {
+App.LoadCss('mail/WidgetFolders.css');
+return function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
         folderCache: []
@@ -75,7 +74,7 @@ window.WidgetFolders = function(options) {
         var folder = $li.data('folder');
         var $counter = $li.find('.Folders_counter:first').replaceWith($('#icons .throbber').clone());
 
-        $.post('../', { r:'updateMessageCache', folderId:folder.id })
+        App.Post('updateMessageCache', { folderId:folder.id })
         .always(function() { $li.find('.throbber:first').replaceWith($counter); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+folder.localName+'".\n' +
@@ -130,7 +129,7 @@ window.WidgetFolders = function(options) {
         if (parentFolder === null) { // root folder
             $divLoading.appendTo($targetDiv);
 
-            $.post('../', { r:'searchFolders' })
+            App.Post('searchFolders')
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
                 window.alert('Erro na primeira consulta das pastas.\n' +
@@ -146,7 +145,7 @@ window.WidgetFolders = function(options) {
             var $li = _FindFolderLi(parentFolder);
             $divLoading.appendTo($li);
 
-            $.post('../', { r:'searchFolders', parentFolder:parentFolder.globalName })
+            App.Post('searchFolders', { parentFolder:parentFolder.globalName })
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
                 window.alert('Erro na consulta das subpastas de '+parentFolder.localName+'\n' +
@@ -252,7 +251,7 @@ window.WidgetFolders = function(options) {
                 var $counter = $li.find('.Folders_counter:first')
                     .replaceWith($('#icons .throbber').clone());
 
-                $.post('../', { r:'updateMessageCache', folderId:curFolder.id })
+                App.Post('updateMessageCache', { folderId:curFolder.id })
                 .always(function() { $li.find('.throbber:first').replaceWith($counter); })
                 .fail(function(resp) {
                     window.alert('Erro ao atualizar a pasta "'+curFolder.localName+'".\n' +
@@ -278,4 +277,4 @@ window.WidgetFolders = function(options) {
         return false;
     });
 };
-})( jQuery );
+});

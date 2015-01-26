@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-window.ThreadMail = (function() {
-    var exp = { }; // exported functions
+define([], function() {
+    var ThreadMail = { };
 
     function _UniqueSenders(threads, useAddressee) {
         var senders = []; // unique senders present in all email threads given
@@ -61,13 +61,15 @@ window.ThreadMail = (function() {
 
     function _CountUnread(arrMails) {
         var count = 0;
-        for (var i = 0; i < arrMails.length; ++i)
-            if (arrMails[i].unread)
+        for (var i = 0; i < arrMails.length; ++i) {
+            if (arrMails[i].unread) {
                 ++count;
+            }
+        }
         return count;
     }
 
-    exp.GroupBySender = function(threads) {
+    ThreadMail.GroupBySender = function(threads) {
         var senders = _UniqueSenders(threads, false);
         for (var s = 0; s < senders.length; ++s) {
             for (var t = 0; t < threads.length; ++t) { // each thread is an array of emails
@@ -80,14 +82,15 @@ window.ThreadMail = (function() {
                         break;
                     }
                 }
-                if (wasAdded && _CountUnread(threads[t]))
+                if (wasAdded && _CountUnread(threads[t])) {
                     ++senders[s].unreads;
+                }
             }
         }
         return senders;
     };
 
-    exp.GroupByAddressee = function(threads) {
+    ThreadMail.GroupByAddressee = function(threads) {
         var addressees = _UniqueSenders(threads, true);
         for (var a = 0; a < addressees.length; ++a) {
             var addressee = addressees[a];
@@ -105,18 +108,20 @@ window.ThreadMail = (function() {
                     }
                     if (wasAdded) break;
                 }
-                if (wasAdded && _CountUnread(threads[t]))
+                if (wasAdded && _CountUnread(threads[t])) {
                     ++addressee.unreads;
+                }
             }
         }
         return addressees;
     };
 
-    exp.MakeThreads = function(headlines, isForDrafts) {
+    ThreadMail.MakeThreads = function(headlines, isForDrafts) {
         var threads = [];
         if (isForDrafts) {
-            for (var i = 0; i < headlines.length; ++i)
+            for (var i = 0; i < headlines.length; ++i) {
                 threads.push([ headlines[i] ]); // drafts folder actually has no threads
+            }
         } else {
             for (var h = 0; h < headlines.length; ++h) {
                 headlines[h].subject2 = headlines[h].subject
@@ -139,8 +144,9 @@ window.ThreadMail = (function() {
             }
 
             for (var t = 0; t < threads.length; ++t) {
-                for (var i = 0; i < threads[t].length; ++i)
+                for (var i = 0; i < threads[t].length; ++i) {
                     delete threads[t][i].subject2; // normalized subject was added just for our internal processing
+                }
                 threads[t].reverse(); // thread now sorted newest first
             }
 
@@ -151,9 +157,9 @@ window.ThreadMail = (function() {
             headlines.reverse(); // sorted newest first, as it came to us
         }
         return threads;
-    }
+    };
 
-    exp.Merge = function(base, more) {
+    ThreadMail.Merge = function(base, more) {
         var toBeJoined = [];
         for (var m = 0; m < more.length; ++m) { // array of messages
             var existent = false;
@@ -174,52 +180,61 @@ window.ThreadMail = (function() {
         return base; // new messages merged into first array
     };
 
-    exp.FindThread = function(threads, headline) {
-        for (var i = 0; i < threads.length; ++i)
-            for (var j = 0; j < threads[i].length; ++j) // a thread is an array of headlines
-                if (threads[i][j].id === headline.id)
+    ThreadMail.FindThread = function(threads, headline) {
+        for (var i = 0; i < threads.length; ++i) {
+            for (var j = 0; j < threads[i].length; ++j) { // a thread is an array of headlines
+                if (threads[i][j].id === headline.id) {
                     return threads[i];
+                }
+            }
+        }
         return null;
     };
 
-    exp.RemoveHeadlinesFromFolder = function(msgIds, folder) {
+    ThreadMail.RemoveHeadlinesFromFolder = function(msgIds, folder) {
         for (var i = folder.messages.length; i-- > 0; ) {
-            if (msgIds.indexOf(folder.messages[i].id) !== -1)
+            if (msgIds.indexOf(folder.messages[i].id) !== -1) {
                 folder.messages.splice(i, 1); // remove headline from flat headlines array of folder
+            }
         }
         for (var i = folder.threads.length; i-- > 0; ) {
             var thread = folder.threads[i]; // a thread is an array of headlines
             for (var j = thread.length; j-- > 0; ) {
-                if (msgIds.indexOf(thread[j].id) !== -1)
+                if (msgIds.indexOf(thread[j].id) !== -1) {
                     thread.splice(j, 1); // remove headline from thread
+                }
             }
-            if (!thread.length) // thread is empty now, remove it from folder
+            if (!thread.length) { // thread is empty now, remove it from folder
                 folder.threads.splice(i, 1);
+            }
         }
     };
 
-    exp.FindFolderByGlobalName = function(name, folderCache) {
+    ThreadMail.FindFolderByGlobalName = function(name, folderCache) {
         for (var i = 0; i < folderCache.length; ++i) { // the global array with all top folders
             if (folderCache[i].globalName === name) {
                 return folderCache[i];
             } else if (folderCache[i].subfolders.length) {
-                var folder = exp.FindFolderByGlobalName(name, folderCache[i].subfolders);
-                if (folder !== null)
+                var folder = ThreadMail.FindFolderByGlobalName(name, folderCache[i].subfolders);
+                if (folder !== null) {
                     return folder;
+                }
             }
         }
         return null;
     };
 
-    exp.ParseTimestamps = function(arrMails) {
-        for (var i = 0; i < arrMails.length; ++i)
+    ThreadMail.ParseTimestamps = function(arrMails) {
+        for (var i = 0; i < arrMails.length; ++i) {
             arrMails[i].received = new Date(arrMails[i].received * 1000);
+        }
         return arrMails;
     };
 
-    exp.FormatBytes = function(bytes) {
-        if (typeof bytes !== 'number')
+    ThreadMail.FormatBytes = function(bytes) {
+        if (typeof bytes !== 'number') {
             bytes = parseInt(bytes);
+        }
         if (bytes < 100) {
             return bytes + ' bytes';
         } else if (bytes < 1024 * 200) {
@@ -228,5 +243,5 @@ window.ThreadMail = (function() {
         return (bytes / (1024 * 1024)).toFixed(1).replace('.', ',')+' MB';
     };
 
-    return exp;
-})();
+    return ThreadMail;
+});

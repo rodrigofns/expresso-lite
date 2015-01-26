@@ -5,16 +5,14 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('../inc/ContextMenu.css');
-
-(function( $, UrlStack ) {
-window.ContextMenu = function(options) {
+define(['jquery', 'inc/App', 'inc/UrlStack'], function($, App, UrlStack) {
+App.LoadCss('inc/ContextMenu.css');
+return function(options) {
     var userOpts = $.extend({
-        $btn: null, // jQuery object for the target button
-        cxPhone: 767 // max smartphone width, in pixels
+        $btn: null // jQuery object for the target button
     }, options);
 
     var THIS = this;
@@ -73,7 +71,9 @@ window.ContextMenu = function(options) {
 
     $btn.add($ul).on('mouseenter.ContextMenu', function() {
         var szPage = { cx:$(window).width(), cy:$(window).height() };
-        if (szPage.cx <= 767) return; // we're in phone, no mouseover event
+        if (App.IsPhone()) {
+            return; // we're in phone, no mouseover event
+        }
 
         var posBtn = { x:$btn.offset().left, y:$btn.offset().top };
         var szBtn = { cx:$btn.outerWidth(), cy:$btn.outerHeight() };
@@ -97,7 +97,7 @@ window.ContextMenu = function(options) {
     });
 
     $btn.add($ul).on('mouseleave.ContextMenu', function() {
-        if ($(window).width() > 767) {
+        if (!App.IsPhone()) {
             _HidePopup();
         }
     });
@@ -105,7 +105,9 @@ window.ContextMenu = function(options) {
     $btn.on('click.ContextMenu', function(ev) {
         ev.stopImmediatePropagation();
         var szPage = { cx:$(window).width(), cy:$(window).height() };
-        if (szPage.cx > 767) return; // we're in desktop, no click event
+        if (!App.IsPhone()) {
+            return; // we're in desktop, no click event
+        }
 
         $(document.createElement('div'))
             .addClass('ContextMenu_darkCover')
@@ -145,7 +147,9 @@ window.ContextMenu = function(options) {
         ev.stopImmediatePropagation();
         _HidePopup();
         var cb = $(this).data('callback');
-        if (cb !== null && cb !== undefined) cb(); // invoke user callback
+        if (cb !== null && cb !== undefined) {
+            cb(); // invoke user callback
+        }
     });
 };
-})( jQuery, UrlStack );
+});

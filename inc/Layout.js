@@ -9,10 +9,10 @@
  * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-LoadCss('../inc/Layout.css');
-
-(function( $, UrlStack, ContextMenu ) {
-window.Layout = function(options) {
+define(['jquery', 'inc/App', 'inc/UrlStack', 'inc/ContextMenu'],
+function($, App, UrlStack, ContextMenu) {
+App.LoadCss('inc/Layout.css');
+return function(options) {
     var userOpts = $.extend({
         userMail: '',   // string with user email, for displaying purposes
         $menu: null,    // jQuery object with the DIV for the left menu
@@ -27,15 +27,10 @@ window.Layout = function(options) {
     var onKeepAliveCB = null;
     var onSearchCB = null;
 
-    function _IsPhone() {
-        return $('#Layout_logo').css('cursor') === 'pointer';
-    }
-
     THIS.load = function() {
         var defer = $.Deferred();
-        $.get('../inc/Layout.html', function(elems) { // should be pretty fast, possibly cached
+        App.LoadTemplate('../inc/Layout.html').done(function() {
             // Detach and attach the user DIVs on the layout structure.
-            $(document.body).append(elems);
             $('#Layout_menuDarkCover,#Layout_arrowLeft').css('display', 'none');
             $('#Layout_menu').append(userOpts.$menu); // user elements are detached and attached
             $('#Layout_content').append(userOpts.$content);
@@ -67,7 +62,7 @@ window.Layout = function(options) {
             $('#Layout_logoff').on('click.Layout', function(ev) { // logoff the whole application
                 $('#Layout_logoff').css('display', 'none');
                 $('#Layout_loggingOff').css('display', 'inline-block');
-                $.post('../', { r:'logoff' }).done(function(data) {
+                App.Post('logoff').done(function(data) {
                     location.href = '.';
                 });
             });
@@ -96,7 +91,7 @@ window.Layout = function(options) {
         // Intended to be used when the page is loading, so any loading occurring
         // on the left menu is shown, after that user calls method(false) to hide it.
         var defer = $.Deferred();
-        if (!_IsPhone()) {
+        if (!App.IsPhone()) {
             window.setTimeout(function() { defer.resolve(); }, 10);
         } else if (isVisible) { // show left menu on phones, does nothing on desktops
             $('#Layout_menuDarkCover').css('display', ''); // reverting from "none"
@@ -128,39 +123,48 @@ window.Layout = function(options) {
         return defer.promise();
     };
 
-    THIS.setContentFullWidth = function(isFullWith) {
+    THIS.setContentFullWidth = function(isFullWidth) {
         // Hides the left menu and sets the content to fill page width.
         // Does nothing on phone, since left menu is hidden by default.
 
-        var retCallback = { };
+        var retCallback = { },
+            isAlreadyFullWidth = (THIS.isAlreadyFullWidth !== undefined);
 
-        if (isFullWith) {
-            if (!_IsPhone()) {
-                var $layoutTop = $('#Layout_top');
-                $('#Layout_content').css({ left:0, width:'100%' });
-                $('#Layout_leftSection').css({
-                    height: $layoutTop.outerHeight()+'px',
-                    overflow: 'hidden',
-                    'border-bottom-width': $layoutTop.css('border-bottom-width'), // copy border-bottom
-                    'border-bottom-style': $layoutTop.css('border-bottom-style'),
-                    'border-bottom-color': $layoutTop.css('border-bottom-color')
-                });
+        if (isFullWidth) {
+            if (!isAlreadyFullWidth) {
+                THIS.isAlreadyFullWidth = 'yes'; // set flag
+                if (!App.IsPhone()) {
+                    var $layoutTop = $('#Layout_top');
+                    $('#Layout_content').css({ left:0, width:'100%' });
+                    $('#Layout_leftSection').scrollTop(0).css({
+                        height: $layoutTop.outerHeight()+'px',
+                        overflow: 'hidden',
+                        'border-bottom-width': $layoutTop.css('border-bottom-width'), // copy border-bottom
+                        'border-bottom-style': $layoutTop.css('border-bottom-style'),
+                        'border-bottom-color': $layoutTop.css('border-bottom-color')
+                    });
+                }
+                $('#Layout_logo3Lines').css('display', 'none');
+                $('#Layout_arrowLeft').css('display', '');
+                UrlStack.push('#fullContent', function() { THIS.setContentFullWidth(false); });
             }
-            $('#Layout_logo3Lines').css('display', 'none');
-            $('#Layout_arrowLeft').css('display', '');
-            UrlStack.push('#fullContent', function() { THIS.setContentFullWidth(false); });
-            retCallback = { onUnset: function(callback) { THIS.setContentFullWidthCB = callback; } };
-        } else {
-            if (!_IsPhone()) {
-                $('#Layout_content').css({ left:'', width:'' });
-                $('#Layout_leftSection').css({
-                    height: '',
-                    overflow: '',
-                    'border-bottom': ''
-                });
+            retCallback = { // return value will allow onUnset() chained call
+                onUnset: function(callback) { THIS.setContentFullWidthCB = callback; }
+            };
+        } else if (!isFullWidth) {
+            if (isAlreadyFullWidth) {
+                delete THIS.isAlreadyFullWidth; // clear flag
+                if (!App.IsPhone()) {
+                    $('#Layout_content').css({ left:'', width:'' });
+                    $('#Layout_leftSection').css({
+                        height: '',
+                        overflow: '',
+                        'border-bottom': ''
+                    });
+                }
+                $('#Layout_logo3Lines').css('display', '');
+                $('#Layout_arrowLeft').css('display', 'none');
             }
-            $('#Layout_logo3Lines').css('display', '');
-            $('#Layout_arrowLeft').css('display', 'none');
             UrlStack.pop('#fullContent');
             if (THIS.setContentFullWidthCB !== undefined) {
                 var userCb = THIS.setContentFullWidthCB;
@@ -195,4 +199,4 @@ window.Layout = function(options) {
         return THIS;
     };
 };
-})( jQuery, UrlStack, ContextMenu );
+});
