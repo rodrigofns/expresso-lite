@@ -157,10 +157,10 @@ class Ajax
             }
             self::_EchoJson($msg);
         }
-        else if ($_REQUEST['r'] === 'searchMessages')
+        else if ($_REQUEST['r'] === 'searchHeadlines')
         {
             try {
-                $headlines = self::$tine->searchMessages($_REQUEST['what'],
+                $headlines = self::$tine->searchHeadlines($_REQUEST['what'],
                     explode(',', $_REQUEST['folderIds']), // comma-separated into array
                     (int)$_REQUEST['start'], (int)$_REQUEST['limit']);
             } catch (Exception $e) {

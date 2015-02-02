@@ -23,18 +23,18 @@
 
     #Layout_context { top:10px; cursor:pointer; }
     @media (min-width:768px) { #Layout_context { left:8px; } } /* desktop */
-    @media (max-width:767px) { #Layout_context { right:16px;/*56px; with search*/ } } /* phone */
+    @media (max-width:767px) { #Layout_context { right:60px; } } /* phone */
 
     #Layout_title { font-size:110%; padding-top:10px; }
     @media (min-width:768px) { #Layout_title { left:50px; } } /* desktop */
     @media (max-width:767px) { #Layout_title { left:42px; } } /* phone */
 
-    #Layout_txtSearch { width:360px; right:110px; top:16px; }
-    @media (max-width:767px) { #Layout_txtSearch { display:none !important; } } /* phone */
+    @media (min-width:768px) { #Layout_txtSearch { width:360px; right:110px; top:16px; } } /* desktop */
+    @media (max-width:767px) { #Layout_txtSearch { display:none; } } /* phone */
 
     #Layout_btnSearch { top:10px; cursor:pointer; }
     @media (min-width:768px) { #Layout_btnSearch { right:74px; } } /* desktop */
-    @media (max-width:767px) { #Layout_btnSearch { right:10px; } } /* phone */
+    @media (max-width:767px) { #Layout_btnSearch { right:12px; } } /* phone */
 
 #Layout_leftSection { position:fixed; height:100%; padding:15px 12px; overflow-y:auto;
     background:linear-gradient(to bottom,#CCC,white 70px); }

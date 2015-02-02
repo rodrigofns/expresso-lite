@@ -300,7 +300,8 @@ class Tine
 
     public function getFolderHeadlines($folderId, $start, $limit)
     {
-        return $this->_searchHeadlines('', array('/'.$_SESSION['ourtine_id'].'/'.$folderId), $start, $limit);
+        $res = $this->_searchHeadlines('', array('/'.$_SESSION['ourtine_id'].'/'.$folderId), $start, $limit);
+        return $res->headlines;
     }
 
     public function getMessage($id)
@@ -390,43 +391,31 @@ class Tine
             preg_replace('/<\/div>/i', '', $text, 1) : $text;
     }
 
-    public function searchMessages($what, array $folderIds, $start, $limit)
+    public function searchHeadlines($what, array $folderIds, $start, $limit)
     {
         $folderCompoundIds = array();
-        foreach ($folderIds as $folderId)
+        foreach ($folderIds as $folderId) {
             $folderCompoundIds[] = '/'.$_SESSION['ourtine_id'].'/'.$folderId;
-        $headlines = $this->_searchHeadlines($what, $folderCompoundIds, $start, $limit);
-        $unreadCount = 0;
-        foreach ($headlines as $headline)
-            if ($headline->unread) ++$unreadCount;
+        }
+        $res = $this->_searchHeadlines($what, $folderCompoundIds, $start, $limit);
+        //~ $unreadCount = 0;
+        //~ foreach ($res->headlines as $hl) {
+            //~ if ($hl->unread) ++$unreadCount;
+        //~ }
         return (object)array( // return an artificial folder
             'id'            => null,
-            'globalName'    => 'search',
-            'localName'     => 'Resultados de buscas',
-            'hasSubfolders' => true,
-            'subfolders'    => array((object)array( // unique subfolder with search results
-                'id'            => null,
-                'globalName'    => null,
-                'localName'     => $what,
-                'hasSubfolders' => false,
-                'subfolders'    => array(),
-                'totalMails'    => count($headlines),
-                'unreadMails'   => 0,//$unreadCount,
-                'recentMails'   => 0,
-                'quotaLimit'    => 0,
-                'quotaUsage'    => 0,
-                'systemFolder'  => false,
-                'messages'      => $headlines,
-                'threads'       => array()  // not populated here
-            )),
-            'totalMails'    => 0,
-            'unreadMails'   => 0,
+            'globalName'    => null,
+            'localName'     => $what,
+            'hasSubfolders' => false,
+            'subfolders'    => array(),
+            'totalMails'    => $res->totalCount,
+            'unreadMails'   => 0,//$unreadCount,
             'recentMails'   => 0,
             'quotaLimit'    => 0,
             'quotaUsage'    => 0,
             'systemFolder'  => false,
-            'messages'      => array(),
-            'threads'       => array()
+            'messages'      => $res->headlines,
+            'threads'       => array()  // not populated here
         );
     }
 
@@ -436,19 +425,14 @@ class Tine
             $jreq = $this->_jsonRpc(self::MAILMODULE.'.searchMessages', (object)array(
                 'filter' => array(
                     (object)array(
-                        'condition' => 'AND',
-                        'filters'   => array(
-                            (object)array(
-                                'field'    => 'query',
-                                'operator' => 'contains',
-                                'value'    => $what
-                            ),
-                            (object)array(
-                                'field'    => 'path',
-                                'operator' => 'in',
-                                'value'    => $folderIds
-                            )
-                        )
+                        'field'    => 'query',
+                        'operator' => 'contains',
+                        'value'    => $what
+                    ),
+                    (object)array(
+                        'field'    => 'path',
+                        'operator' => 'in',
+                        'value'    => $folderIds
                     )
                 ),
                 'paging' => (object)array(
@@ -465,6 +449,7 @@ class Tine
         foreach ($jreq->result->results as $mail) {
             $headlines[] = (object)array(
                 'id'            => $mail->id,
+                'folder'        => $this->_extractFolderOfMessage($mail->id),
                 'subject'       => $mail->subject !== null ? $mail->subject : '',
                 'to'            => $mail->to !== null ? $mail->to : array(),
                 'cc'            => $mail->cc !== null ? $mail->cc : array(),
@@ -489,7 +474,22 @@ class Tine
                 'body'          => null  // not populated here
             );
         }
-        return $headlines;
+        return (object)array(
+            'headlines'  => $headlines,
+            'totalCount' => $jreq->result->totalcount // for paging
+        );
+    }
+
+    private function _extractFolderOfMessage($msgId) {
+        // [0] user ID;
+        // [1] folder ID;
+        // [2] sequential IMAP msg no.
+        $partsMsg = explode(';', base64_decode($msgId));
+
+        // [0] user ID;
+        // [1] unique folder global name.
+        $partsFld = explode(';', base64_decode($partsMsg[1]));
+        return trim($partsFld[1]);
     }
 
     public function markMessageHighlighted($asHighlighted, array $msgIds)

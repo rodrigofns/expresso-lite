@@ -16,6 +16,7 @@
 .Headlines_entryRead { background:#F3F3F3; }
 .Headlines_entryChecked { background:#FFC; }
 .Headlines_sender { font-weight:normal; }
+.Headlines_folderName { font-size:80%; color:#87A6D2; }
 @media (max-width:767px) { /* phones */
     .Headlines_entry     { display:block; padding:2px 4px; position:relative; }
     .Headlines_check     { display:inline-block; float:left; }

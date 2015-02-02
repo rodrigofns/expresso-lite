@@ -154,7 +154,11 @@ return function(options) {
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function() {
                 headline.unread = !headline.unread; // update cache
-                asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
+                if (curFolder.id !== null) { // if not a search result
+                    asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
+                } else {
+                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                }
                 $elem.children('.Messages_top1,.Messages_top2')
                     .toggleClass('Messages_read', asRead).toggleClass('.Messages_unread', !asRead);
                 if (onMarkReadCB !== null) {
@@ -189,14 +193,19 @@ return function(options) {
                     --curFolder.totalMails; // update cache
                     ++destFolder.totalMails;
                     if (headline.unread) {
-                        --curFolder.unreadMails;
+                        if (curFolder.id !== null) --curFolder.unreadMails;
                         ++destFolder.unreadMails;
                     }
                     ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
-                    destFolder.messages.length = 0; // force cache rebuild
-                    destFolder.threads.length = 0;
-                    if (onMoveCB !== null)
+                    if (curFolder.id === null) { // if a search result
+                        ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                    } else {
+                        destFolder.messages.length = 0; // force cache rebuild
+                        destFolder.threads.length = 0;
+                    }
+                    if (onMoveCB !== null) {
                         onMoveCB(destFolder, origThread);
+                    }
                 });
             });
         }
@@ -207,10 +216,12 @@ return function(options) {
     }
 
     function _DeleteMessage($elem) {
-        if (!$elem.hasClass('Messages_unit'))
+        if (!$elem.hasClass('Messages_unit')) {
             $elem = $elem.closest('.Messages_unit');
-        if ($elem.find('.throbber').length) // already working?
+        }
+        if ($elem.find('.throbber').length) { // already working?
             return;
+        }
         var headline = $elem.data('headline');
 
         if (curFolder.globalName !== 'INBOX/Trash') { // just move to trash folder
@@ -232,11 +243,16 @@ return function(options) {
                         $elem.remove();
                         var origThread = ThreadMail.FindThread(curFolder.threads, headline);
                         --curFolder.totalMails; // update cache
-                        if (headline.unread)
+                        if (headline.unread && curFolder.id !== null) {
                             --curFolder.unreadMails;
+                        }
                         ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
-                        if (onMoveCB !== null)
+                        if (curFolder.id === null) { // if a search result
+                            ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                        }
+                        if (onMoveCB !== null) {
                             onMoveCB(null, origThread);
+                        }
                     });
                 });
             }

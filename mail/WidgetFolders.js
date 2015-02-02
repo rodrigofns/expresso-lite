@@ -175,7 +175,12 @@ return function(options) {
     };
 
     THIS.setCurrent = function(folder) {
-        _FindFolderLi(folder).children('.Folders_text').trigger('click');
+        if (folder.id === null) { // usually when a search is made
+            curFolder = folder;
+            $targetDiv.find('.Folders_current').removeClass('Folders_current');
+        } else {
+            _FindFolderLi(folder).children('.Folders_text').trigger('click');
+        }
         return THIS;
     };
 
@@ -185,13 +190,16 @@ return function(options) {
 
     THIS.redraw = function(folder) {
         var $li = _FindFolderLi(folder);
-        var $div = $li.children('div:first');
-        var $childUl = $div.next('ul');
-        var isExpanded = $childUl.length && $childUl.is(':visible');
-        var $newDiv = _BuildDiv(folder, isExpanded);
-        if ($div.hasClass('Folders_current'))
-            $newDiv.addClass('Folders_current');
-        $div.replaceWith($newDiv);
+        if ($li !== null) {
+            var $div = $li.children('div:first');
+            var $childUl = $div.next('ul');
+            var isExpanded = $childUl.length && $childUl.is(':visible');
+            var $newDiv = _BuildDiv(folder, isExpanded);
+            if ($div.hasClass('Folders_current')) {
+                $newDiv.addClass('Folders_current');
+            }
+            $div.replaceWith($newDiv);
+        }
         return THIS;
     };
 
@@ -245,8 +253,9 @@ return function(options) {
         if (!curFolder.messages.length) { // if messages not cached yet
             if (isFirstClick) {
                 isFirstClick = false;
-                if (onClickCB !== null)
+                if (onClickCB !== null) {
                     onClickCB(curFolder); // invoke user callback
+                }
             } else {
                 var $counter = $li.find('.Folders_counter:first')
                     .replaceWith($('#icons .throbber').clone());
@@ -266,13 +275,15 @@ return function(options) {
                         curFolder.threads.length = 0;
                         THIS.redraw(curFolder);
                     }
-                    if (onClickCB !== null)
+                    if (onClickCB !== null) {
                         onClickCB(curFolder); // invoke user callback
+                    }
                 });
             }
         } else { // messages already cached, won't look for more right now
-            if (onClickCB !== null)
+            if (onClickCB !== null) {
                 onClickCB(curFolder); // invoke user callback
+            }
         }
         return false;
     });

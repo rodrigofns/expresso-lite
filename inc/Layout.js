@@ -22,10 +22,11 @@ return function(options) {
         keepAliveTime: 10 * 60 * 1000 // 10 minutes, Tine default
     }, options);
 
-    var THIS = this;
-    var contextMenu = null; // ContextMenu object
-    var onKeepAliveCB = null;
-    var onSearchCB = null;
+    var THIS               = this;
+    var contextMenu        = null; // ContextMenu object
+    var isContentFullWidth = false;
+    var onKeepAliveCB      = null;
+    var onSearchCB         = null;
 
     THIS.load = function() {
         var defer = $.Deferred();
@@ -37,47 +38,7 @@ return function(options) {
             $('#Layout_userMail').text(userOpts.userMail);
 
             // Layout internal events.
-            $('#Layout_logo3Lines').on('click.Layout', function() {
-                THIS.setLeftMenuVisibleOnPhone(true);
-            });
-
-            $('#Layout_arrowLeft').on('click.Layout', function() {
-                THIS.setContentFullWidth(false);
-            });
-
-            $('#Layout_btnSearch').on('click.Layout', function() {
-                if (onSearchCB !== null) {
-                    onSearchCB($('#Layout_txtSearch').val()); // terms being searched
-                }
-            });
-
-            $('#Layout_logo,#Layout_menuArrowLeft').on('click.Layout', function() {
-                THIS.setLeftMenuVisibleOnPhone(false);
-            });
-
-            $('#Layout_menuDarkCover').on('click.Layout', function() {
-                THIS.setLeftMenuVisibleOnPhone(false);
-            });
-
-            $('#Layout_logoff').on('click.Layout', function(ev) { // logoff the whole application
-                $('#Layout_logoff').css('display', 'none');
-                $('#Layout_loggingOff').css('display', 'inline-block');
-                App.Post('logoff').done(function(data) {
-                    location.href = '.';
-                });
-            });
-
-            $(document).ajaxComplete(function AjaxComplete() {
-                if (onKeepAliveCB !== null) {
-                    if (AjaxComplete.timer !== undefined && AjaxComplete.timer !== null) {
-                        window.clearTimeout(AjaxComplete.timer);
-                    }
-                    AjaxComplete.timer = window.setTimeout(function() {
-                        AjaxComplete.timer = null;
-                        onKeepAliveCB(); // invoke user callback
-                    }, userOpts.keepAliveTime); // X minutes after the last request, an update should be performed (keep-alive)
-                }
-            });
+            _SetEvents();
 
             // Init some stuff.
             contextMenu = new ContextMenu({ $btn:$('#Layout_context') });
@@ -127,12 +88,11 @@ return function(options) {
         // Hides the left menu and sets the content to fill page width.
         // Does nothing on phone, since left menu is hidden by default.
 
-        var retCallback = { },
-            isAlreadyFullWidth = (THIS.isAlreadyFullWidth !== undefined);
+        var retCallback = { };
 
         if (isFullWidth) {
-            if (!isAlreadyFullWidth) {
-                THIS.isAlreadyFullWidth = 'yes'; // set flag
+            if (!isContentFullWidth) {
+                isContentFullWidth = true; // set flag
                 if (!App.IsPhone()) {
                     var $layoutTop = $('#Layout_top');
                     $('#Layout_content').css({ left:0, width:'100%' });
@@ -152,8 +112,8 @@ return function(options) {
                 onUnset: function(callback) { THIS.setContentFullWidthCB = callback; }
             };
         } else if (!isFullWidth) {
-            if (isAlreadyFullWidth) {
-                delete THIS.isAlreadyFullWidth; // clear flag
+            if (isContentFullWidth) {
+                isContentFullWidth = false; // clear flag
                 if (!App.IsPhone()) {
                     $('#Layout_content').css({ left:'', width:'' });
                     $('#Layout_leftSection').css({
@@ -173,6 +133,10 @@ return function(options) {
             }
         }
         return retCallback;
+    };
+
+    THIS.isContentFullWidth = function() {
+        return isContentFullWidth;
     };
 
     THIS.getContextMenu = function() {
@@ -198,5 +162,59 @@ return function(options) {
         onSearchCB = callback; // onSearch(text)
         return THIS;
     };
+
+    function _SetEvents() {
+        $('#Layout_logo3Lines').on('click.Layout', function() {
+            THIS.setLeftMenuVisibleOnPhone(true);
+        });
+
+        $('#Layout_arrowLeft').on('click.Layout', function() {
+            THIS.setContentFullWidth(false);
+        });
+
+        $('#Layout_txtSearch').on('keypress.Layout', function(ev) {
+            if (ev.which === 13) {
+                $('#Layout_btnSearch').trigger('click'); // submit search on Enter
+            }
+        });
+
+        $('#Layout_btnSearch').on('click.Layout', function() {
+            if (onSearchCB !== null) {
+                var searchTerm = App.IsPhone() ?
+                    window.prompt('Busca') : $('#Layout_txtSearch').val();
+                if (searchTerm !== null && searchTerm.length) {
+                    onSearchCB(searchTerm);
+                }
+            }
+        });
+
+        $('#Layout_logo,#Layout_menuArrowLeft').on('click.Layout', function() {
+            THIS.setLeftMenuVisibleOnPhone(false);
+        });
+
+        $('#Layout_menuDarkCover').on('click.Layout', function() {
+            THIS.setLeftMenuVisibleOnPhone(false);
+        });
+
+        $('#Layout_logoff').on('click.Layout', function(ev) { // logoff the whole application
+            $('#Layout_logoff').css('display', 'none');
+            $('#Layout_loggingOff').css('display', 'inline-block');
+            App.Post('logoff').done(function(data) {
+                location.href = '.';
+            });
+        });
+
+        $(document).ajaxComplete(function AjaxComplete() {
+            if (onKeepAliveCB !== null) {
+                if (AjaxComplete.timer !== undefined && AjaxComplete.timer !== null) {
+                    window.clearTimeout(AjaxComplete.timer);
+                }
+                AjaxComplete.timer = window.setTimeout(function() {
+                    AjaxComplete.timer = null;
+                    onKeepAliveCB(); // invoke user callback
+                }, userOpts.keepAliveTime); // X minutes after the last request, an update should be performed (keep-alive)
+            }
+        });
+    }
 };
 });

@@ -13,13 +13,14 @@ function($, App, DateFormat, ThreadMail, Contacts) {
 App.LoadCss('mail/WidgetHeadlines.css');
 return function(options) {
     var userOpts = $.extend({
-        $elem: null, // jQuery object for the target DIV
-        folderCache: []
+        $elem: null,    // jQuery object for the target DIV
+        folderCache: [] // central unique cache of all folders and messages
     }, options);
 
     var THIS          = this;
     var $targetDiv    = userOpts.$elem; // shorthand
     var curFolder     = null; // folder object currently loaded
+    var curSearch     = null; // if instead of a folder, we have a search result being shown
     var menu          = null; // context menu object
     var onClickCB     = null; // user callbacks
     var onCheckCB     = null;
@@ -33,6 +34,35 @@ return function(options) {
         if (msg !== null) $div.append(msg);
         $div.append([ ' ', $('#icons .throbber').clone() ]);
         return $div;
+    }
+
+    function _GetFolderIdsForSearch() {
+        var rejectedFolders = ['user', 'INBOX/Arquivo Remoto', 'INBOX/Trash'];
+        var folderIds = [];
+        (function getFolderIds(folders) {
+            for (var i = 0; i < folders.length; ++i) {
+                if (rejectedFolders.indexOf(folders[i].globalName) === -1) {
+                    folderIds.push(folders[i].id);
+                    getFolderIds(folders[i].subfolders);
+                }
+            }
+        })(userOpts.folderCache);
+        return folderIds;
+    }
+
+    function _GetFolderLocalNameByGlobalName(globalName) {
+        var ln = null;
+        (function getLN(folders) {
+            for (var i = 0; i < folders.length; ++i) {
+                if (folders[i].globalName === globalName) {
+                    ln = folders[i].localName;
+                    break;
+                } else {
+                    getLN(folders[i].subfolders);
+                }
+            }
+        })(userOpts.folderCache);
+        return ln;
     }
 
     function _FindHeadlineDiv(headline) {
@@ -129,13 +159,18 @@ return function(options) {
 
         var unreadClass = hasUnread ? 'Headlines_entryUnread' : 'Headlines_entryRead';
         var $elemHl = $('#icons ' + (hasHighlight ? '.icoHigh1' : '.icoHigh0')).clone();
-
         var $div = $('#Headlines_template .Headlines_entry').clone();
         $div.addClass(unreadClass);
         $div.find('.Headlines_sender').html(_BuildSendersText(thread, isSentFolder));
         $div.find('.Headlines_highlight').append($elemHl);
         $div.find('.Headlines_subject').text(thread[thread.length-1].subject != '' ?
             thread[thread.length-1].subject : '(sem assunto)');
+        if (curFolder.id === null) { // this is a search result
+            $div.find('.Headlines_subject').append(' ').append( $(document.createElement('span'))
+                .addClass('Headlines_folderName')
+                .text(_GetFolderLocalNameByGlobalName(msg.folder))
+            );
+        }
 
         var icons = [];
         if (hasReplied)    icons.push($('#icons .icoReplied').clone());
@@ -151,12 +186,39 @@ return function(options) {
         return $div;
     }
 
-    function _BuildAllThreadsDivs() {
+    function _BuildAllThreadsDivs(threads) {
         var divs = [];
         for (var i = 0; i < curFolder.threads.length; ++i) {
             divs.push(_BuildDiv(curFolder.threads[i], curFolder.globalName === 'INBOX/Sent'));
         }
         return divs;
+    }
+
+    function _AnimateFirstHeadlines($divs, $loading) {
+        var defer = $.Deferred();
+        window.setTimeout(function() {
+            $loading.animate({
+                'margin-top': ($targetDiv.height() - 20)+'px'
+            }, 200, function() {
+                $loading.remove();
+                $targetDiv.css('height', ''); // restore
+                var iLast = -1; // index of last visible DIV
+                var cyMax = $(window).height();
+                for (var i = 0; i < $divs.length; ++i) {
+                    $targetDiv.append($divs[i]);
+                    if ($divs[i].offset().top > cyMax) {
+                        iLast = i;
+                        break;
+                    }
+                }
+                $targetDiv.css('display', 'none').fadeIn(150, function() {
+                    $targetDiv.css('height', '')
+                        .append($divs.slice(iLast + 1)); // append remaning
+                    defer.resolve(); // finally resolve deferred
+                });
+            });
+        }, 50);
+        return defer.promise();
     }
 
     function _RedrawDiv($div) {
@@ -210,7 +272,9 @@ return function(options) {
             for (var i = 0; i < thread.length; ++i) {
                 if ((asRead && thread[i].unread) || (!asRead && !thread[i].unread)) {
                     thread[i].unread = !thread[i].unread; // update cache
-                    asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
+                    if (curFolder.id !== null) { // if not a search result
+                        asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
+                    }
                     relevantHeadlines.push(thread[i]);
                 }
             }
@@ -234,6 +298,9 @@ return function(options) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function() {
+                if (curFolder.id === null) { // if a search result
+                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                }
                 $checkedDivs.each(function(idx, elem) {
                     _RedrawDiv($(elem));
                 });
@@ -260,7 +327,7 @@ return function(options) {
             destFolder.totalMails += thread.length;
             for (var i = 0; i < thread.length; ++i) {
                 if (thread[i].unread) {
-                    --curFolder.unreadMails;
+                    if (curFolder.id !== null) --curFolder.unreadMails;
                     ++destFolder.unreadMails;
                 }
             }
@@ -275,6 +342,9 @@ return function(options) {
             window.alert('Erro ao mover email.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
         }).done(function() {
+            if (curFolder.id === null) { // if a search result
+                ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+            }
             $checkedDivs.slideUp(200).promise('fx').done(function() {
                 $checkedDivs.remove();
                 if (onMoveCB !== null) {
@@ -335,9 +405,11 @@ return function(options) {
                     .append('&nbsp; <i>Excluindo...</i>');
 
                 curFolder.totalMails -= thread.length; // update cache
-                for (var i = 0; i < thread.length; ++i) {
-                    if (thread[i].unread) {
-                        --curFolder.unreadMails;
+                if (curFolder.id !== null) { // if not a search result
+                    for (var i = 0; i < thread.length; ++i) {
+                        if (thread[i].unread && curFolder.id !== null) { // if not a search result
+                            --curFolder.unreadMails;
+                        }
                     }
                 }
             });
@@ -349,6 +421,9 @@ return function(options) {
                 window.alert('Erro ao apagar email.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function(status) {
+                if (curFolder.id === null) { // if a search result
+                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                }
                 $checkedDivs.slideUp(200).promise('fx').done(function() {
                     $checkedDivs.remove();
                     if (onMoveCB !== null) {
@@ -366,7 +441,7 @@ return function(options) {
         $targetDiv.empty();
 
         if (!curFolder.totalMails) { // no messages on this folder
-            defer.resolve();
+            return defer.resolve();
         } else {
             $targetDiv.css('height', '100%'); // important for showFancy()
             var $loading = _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
@@ -377,42 +452,55 @@ return function(options) {
                     $targetDiv.children('.Headlines_loading').remove();
                     defer.reject();
                 }).done(function(headlines) {
+                    curSearch = null; // we're not making a search, we're loading an actual folder
                     curFolder.messages.length = 0;
                     curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
                     curFolder.threads.length = 0;
                     curFolder.threads.push.apply(curFolder.threads,
                         ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
-                    showFancy(_BuildAllThreadsDivs());
-                });
-            } else {
-                showFancy(_BuildAllThreadsDivs());
-            }
-        }
-
-        function showFancy($divs) {
-            window.setTimeout(function() {
-                $loading.animate({
-                    'margin-top': ($targetDiv.height() - 20)+'px'
-                }, 200, function() {
-                    $loading.remove();
-                    $targetDiv.css('height', ''); // restore
-                    var iLast = -1; // index of last visible DIV
-                    var cyMax = $(window).height();
-                    for (var i = 0; i < $divs.length; ++i) {
-                        $targetDiv.append($divs[i]);
-                        if ($divs[i].offset().top > cyMax) {
-                            iLast = i;
-                            break;
-                        }
-                    }
-                    $targetDiv.css('display', 'none').fadeIn(150, function() {
-                        $targetDiv.css('height', '')
-                            .append($divs.slice(iLast + 1)); // append remaning
-                        defer.resolve(); // finally resolve deferred
+                    _AnimateFirstHeadlines(_BuildAllThreadsDivs(), $loading).done(function() {
+                        defer.resolve();
                     });
                 });
-            }, 50);
+            } else {
+                _AnimateFirstHeadlines(_BuildAllThreadsDivs(), $loading).done(function() {
+                    defer.resolve();
+                });
+            }
         }
+        return defer.promise();
+    };
+
+    THIS.searchMessages = function(text, howMany) {
+        var defer = $.Deferred();
+        $targetDiv.empty().css('height', '100%'); // important for showFancy()
+        var $loading = _CreateDivLoading('Buscando "'+text+'"...').appendTo($targetDiv);
+
+        App.Post('searchHeadlines', {
+            what: text,
+            folderIds: _GetFolderIdsForSearch().join(','),
+            start: 0,
+            limit: howMany
+        }).fail(function(resp) {
+            if (resp.responseText.indexOf('please refine') !== -1) {
+                $loading.remove();
+                window.alert('A busca por "'+text+'" retornou muitos resultados.\n'+
+                    'Pesquise por um termo mais específico.');
+            } else {
+                window.alert('Erro na busca por "'+text+'".\n'+resp.responseText);
+            }
+            defer.reject();
+        }).done(function(resFolder) {
+            curSearch = text; // cache the text being searched for eventual loadMore() calls
+            curFolder = resFolder; // virtual folder with search result
+            curFolder.localName = 'Resultados da busca';
+            curFolder.messages = ThreadMail.ParseTimestamps(curFolder.messages);
+            curFolder.threads.push.apply(curFolder.threads,
+                ThreadMail.MakeThreads(curFolder.messages, false));
+            _AnimateFirstHeadlines(_BuildAllThreadsDivs(), $loading).done(function() {
+                defer.resolve(curFolder); // return virtual search folder
+            });
+        });
         return defer.promise();
     };
 
@@ -421,11 +509,21 @@ return function(options) {
         var $divLoading = _CreateDivLoading('Carregando mensagens...')
         $divLoading.appendTo($targetDiv);
 
-        App.Post('getFolderHeadlines', { folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
-        .always(function() { $divLoading.remove(); })
+        ( (curSearch !== null) ? // actually a search result?
+            App.Post('searchHeadlines', {
+                what: curSearch,
+                folderIds: _GetFolderIdsForSearch().join(','),
+                start: curFolder.messages.length,
+                limit:howMany
+            }) : App.Post('getFolderHeadlines',
+                { folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
+        ).always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
         }).done(function(mails2) {
+            if (curSearch !== null) {
+                mails2 = mails2.messages; // search returns more data than we need
+            }
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
             curFolder.threads.length = 0;
             curFolder.threads.push.apply(curFolder.threads,

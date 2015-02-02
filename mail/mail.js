@@ -75,11 +75,11 @@ $(document).ready(function() {
         Cache.listHeadlines
             .onClick(HeadlineClicked)
             .onCheck(RebuildHeadlinesContextMenu)
-            .onMarkRead(function(folder) { SetMessagesPanelVisible(false); Cache.treeFolders.redraw(folder); UpdatePageTitle(); })
+            .onMarkRead(HeadlineMarkedRead)
             .onMove(ThreadMoved);
         Cache.listMessages
             .onView(function(folder, headline) { Cache.listHeadlines.redraw(headline); Cache.treeFolders.redraw(folder); })
-            .onMarkRead(MailMarkedRead)
+            .onMarkRead(MessageMarkedRead)
             .onMove(MailMoved);
         Cache.wndCompose
             //~ .onClose(function() { $('#composeFoldersSlot').show(); });
@@ -96,16 +96,22 @@ function UpdatePageTitle() {
     var folder = Cache.treeFolders.getCurrent();
     var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
     document.title = folder.localName+' '+counter+'- '+$('#mailAddress').val()+' - Expresso Lite';
-    Cache.layout.setTitle(folder.localName + (folder.unreadMails ? ' ('+folder.unreadMails+')' : ''));
+    Cache.layout.setTitle(Cache.layout.isContentFullWidth() ?
+        'voltar' :
+        folder.localName+(folder.unreadMails ? ' ('+folder.unreadMails+')' : '')
+    );
 }
 
 function UpdateHeadlineFooter() {
     var folder = Cache.treeFolders.getCurrent();
     if (!folder.messages.length) {
-        $('#loadedCount').text('A pasta '+folder.localName+' está vazia.');
+        $('#loadedCount').text(folder.id === null ?
+            'Nenhum email encontrado.' :
+            'A pasta '+folder.localName+' está vazia.');
     } else {
         var num = (folder.messages.length < folder.totalMails) ?
-            folder.messages.length+' de '+folder.totalMails : folder.messages.length;
+            folder.messages.length+' de '+folder.totalMails :
+            folder.messages.length;
         var s = folder.messages.length > 1 ? 's' : '';
         $('#loadedCount').text(num+' email'+s+' carregado'+s);
     }
@@ -140,7 +146,7 @@ function RebuildHeadlinesContextMenu() {
             });
         };
         MenuRenderFolderLevel(Cache.folders, 0);
-        Cache.layout.setContextMenuVisible(true);
+        Cache.layout.setContextMenuVisible(!Cache.layout.isContentFullWidth());
     }
 }
 
@@ -175,7 +181,20 @@ function SetMessagesPanelVisible(isVisible) {
 }
 
 function Search(text) {
-    console.log(text);
+    text = text.replace(/\//g, '').replace(/\\/g, ''); // remove dashes
+    SetMessagesPanelVisible(false);
+    $('#middleBody').scrollTop(0);
+    $('#headlinesFooter').css('display', 'none');
+    Cache.layout.setTitle('Buscando...');
+    Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).always(function() {
+        $('#headlinesFooter').css('display', '');
+        UpdatePageTitle();
+        UpdateHeadlineFooter();
+    }).fail(function() {
+        Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
+    }).done(function(virtFolder) {
+        Cache.treeFolders.setCurrent(virtFolder); // virtual search folder
+    });
 }
 
 function LoadFirstHeadlines(folder) {
@@ -234,10 +253,22 @@ function ThreadMoved(destFolder) {
     RebuildHeadlinesContextMenu();
 }
 
-function MailMarkedRead(folder, headline) {
+function HeadlineMarkedRead(folder) {
+    SetMessagesPanelVisible(false);
+    Cache.treeFolders.redraw(folder);
+    UpdatePageTitle();
+    if (folder.id === null) { // we're on a search result
+        $('#btnUpdateFolders').trigger('click');
+    }
+}
+
+function MessageMarkedRead(folder, headline) {
     Cache.listHeadlines.redraw(headline);
     Cache.treeFolders.redraw(folder);
     UpdatePageTitle();
+    if (folder.id === null) { // we're on a search result
+        $('#btnUpdateFolders').trigger('click');
+    }
 
     var curThread = Cache.listHeadlines.getCurrent();
     if (curThread.length === 1 && headline.unread) {
