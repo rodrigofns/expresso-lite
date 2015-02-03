@@ -408,7 +408,7 @@ class Tine
             'localName'     => $what,
             'hasSubfolders' => false,
             'subfolders'    => array(),
-            'totalMails'    => $res->totalCount,
+            'totalMails'    => count($res->headlines) ? $res->totalCount : 0,
             'unreadMails'   => 0,//$unreadCount,
             'recentMails'   => 0,
             'quotaLimit'    => 0,
@@ -480,7 +480,8 @@ class Tine
         );
     }
 
-    private function _extractFolderOfMessage($msgId) {
+    private function _extractFolderOfMessage($msgId)
+    {
         // [0] user ID;
         // [1] folder ID;
         // [2] sequential IMAP msg no.

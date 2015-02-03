@@ -181,19 +181,18 @@ function SetMessagesPanelVisible(isVisible) {
 }
 
 function Search(text) {
-    text = text.replace(/\//g, '').replace(/\\/g, ''); // remove dashes
+    text = text.replace(/\//g, '').replace(/\\/g, ''); // remove slashes
     SetMessagesPanelVisible(false);
     $('#middleBody').scrollTop(0);
     $('#headlinesFooter').css('display', 'none');
     Cache.layout.setTitle('Buscando...');
-    Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).always(function() {
+    Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).fail(function() {
+        Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
+    }).always(function(virtFolder) {
         $('#headlinesFooter').css('display', '');
+        Cache.treeFolders.setCurrent(virtFolder); // virtual folder with search result
         UpdatePageTitle();
         UpdateHeadlineFooter();
-    }).fail(function() {
-        Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
-    }).done(function(virtFolder) {
-        Cache.treeFolders.setCurrent(virtFolder); // virtual search folder
     });
 }
 
@@ -245,12 +244,17 @@ function HeadlineClicked(thread) {
 
 function ThreadMoved(destFolder) {
     SetMessagesPanelVisible(false);
-    if (destFolder !== null)
+    if (destFolder !== null) {
         Cache.treeFolders.redraw(destFolder);
-    Cache.treeFolders.redraw(Cache.treeFolders.getCurrent());
+    }
+    var curFolder = Cache.treeFolders.getCurrent();
+    Cache.treeFolders.redraw(curFolder);
     UpdateHeadlineFooter();
     UpdatePageTitle();
     RebuildHeadlinesContextMenu();
+    if (curFolder.id === null) { // we're on a search result
+        $('#btnUpdateFolders').trigger('click');
+    }
 }
 
 function HeadlineMarkedRead(folder) {
