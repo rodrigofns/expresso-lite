@@ -32,7 +32,7 @@ $(document).ready(function() {
     Cache.layout = new Layout({
         userMail: $('#mailAddress').val(),
         $menu: $('#leftColumn'),
-        $content: $('#bigBody'),
+        $content: $('#bigBody')
     });
     Cache.wndCompose = new WidgetCompose({ folderCache:Cache.folders });
     Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });

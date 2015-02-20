@@ -16,10 +16,10 @@
 
     #Layout_top > * { display:inline-block; position:absolute; }
 
-    #Layout_logo3Lines { cursor:pointer; padding-top:8px; }
+    #Layout_logo3Lines { cursor:pointer; margin-top:3px; }
     @media (min-width:768px) { #Layout_logo3Lines { display:none; } } /* desktop */
 
-    #Layout_arrowLeft { cursor:pointer; padding-top:8px; }
+    #Layout_arrowLeft { cursor:pointer; margin-top:2px; }
 
     #Layout_context { top:10px; cursor:pointer; }
     @media (min-width:768px) { #Layout_context { left:8px; } } /* desktop */
@@ -36,13 +36,13 @@
     @media (min-width:768px) { #Layout_btnSearch { right:74px; } } /* desktop */
     @media (max-width:767px) { #Layout_btnSearch { right:12px; } } /* phone */
 
+@media (max-width:767px) { #Layout_menuDarkCover { width:100%; height:100%;
+    display:inline-block; position:absolute; background-color:black; opacity:.4; } } /* phone */
+
 #Layout_leftSection { position:fixed; height:100%; padding:15px 12px; overflow-y:auto;
     background:linear-gradient(to bottom,#CCC,white 70px); }
 @media (max-width:767px) { #Layout_leftSection { display:none; width:300px; box-shadow:0 0 15px #666; } } /* phone */
 @media (min-width:768px) { #Layout_leftSection { width:280px; } } /* desktop */
-
-    @media (max-width:767px) { #Layout_menuDarkCover { width:100%; height:100%;
-        display:inline-block; position:absolute; background-color:black; opacity:.4; } } /* phone */
 
     #Layout_logo { width:120px; }
     @media (max-width:767px) { #Layout_logo { left:10px; cursor:pointer; } } /* phone */
@@ -51,10 +51,16 @@
     @media (max-width:767px) { #Layout_menuArrowLeft { position:absolute; right:22px; top:18px; opacity:.4; } } /* phone */
     @media (min-width:768px) { #Layout_menuArrowLeft { display:none; } } /* desktop */
 
-    #Layout_modules { padding:10px 0; }
-    #Layout_userMail { padding:10px 0; color:#777; }
-    #Layout_menu { padding:16px 0; border-top:1px solid #DCE8F0; }
-    #Layout_leftBottom { display:block; width:1px; height:12px; }
+    #Layout_userMail { padding-top:10px; padding-bottom:6px; color:#777; }
+
+    #Layout_modules { margin-top:8px; margin-bottom:18px; padding:4px 0; color:#444; /*box-shadow:0 3px 5px #BBB;*/
+        border-top:1px solid #DCE8F0; border-bottom:1px solid #DCE8F0; }
+    #Layout_modules li { list-style-type:none; padding:0; cursor:pointer; }
+    #Layout_modules li:hover { background-color:#F5F5F5; }
+    #Layout_modules li a { text-decoration:none; color:#444; }
+    #Layout_modules li span { position:relative; top:-10px; }
+
+    #Layout_menu { padding-bottom:26px; }
 
 #Layout_content { position:fixed; height:calc(100% - 60px); top:60px; }
 @media (max-width:767px) { #Layout_content { width:100%; } } /* phone */
@@ -62,3 +68,14 @@
 
 #Layout_loggingOff { display:none; font-style:italic; padding:10px 20px; }
 #Layout_throbber { display:inline-block; width:16px; height:16px; background:url(../img/chromiumthrobber.svg); }
+
+/* Sprite icons. */
+.Layout_icon32 { background-image:url('../img/layout-icons32.png'); display:inline-block; width:32px; height:32px; }
+.Layout_icon3Lines   { background-position:0 0; }
+.Layout_icon3Dots   { background-position:0 -32px; }
+.Layout_iconGoLeft   { background-position:0 -64px; }
+.Layout_iconSearch   { background-position:0 -96px; }
+.Layout_iconLogoff   { background-position:0 -128px; }
+.Layout_iconEmail    { background-position:0 -160px; }
+.Layout_iconAddress  { background-position:0 -192px; }
+.Layout_iconCalendar { background-position:0 -224px; }

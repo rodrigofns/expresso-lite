@@ -43,6 +43,7 @@ return function(options) {
             // Init some stuff.
             contextMenu = new ContextMenu({ $btn:$('#Layout_context') });
             THIS.setContextMenuVisible(false); // initially hidden
+            _SetCurrentModuleAsBold();
             defer.resolve();
         });
         return defer.promise();
@@ -163,6 +164,23 @@ return function(options) {
         return THIS;
     };
 
+    function _SetCurrentModuleAsBold() {
+        var curModule = location.href;
+        curModule = curModule.split('/');
+        curModule = curModule[curModule.length - 1] !== '' ?
+            curModule[curModule.length - 1] : curModule[curModule.length - 2];
+        $('#Layout_modules li').each(function(i, li) {
+            var module = $(li).find('a:first').attr('href');
+            if (module !== undefined) {
+                module = module.substr(module.indexOf('/') + 1);
+                if (module === curModule) {
+                    $(li).find('span').css('font-weight', 'bold');
+                    return false;
+                }
+            }
+        });
+    }
+
     function _SetEvents() {
         $('#Layout_logo3Lines').on('click.Layout', function() {
             THIS.setLeftMenuVisibleOnPhone(true);
@@ -197,11 +215,20 @@ return function(options) {
         });
 
         $('#Layout_logoff').on('click.Layout', function(ev) { // logoff the whole application
+            ev.stopImmediatePropagation();
             $('#Layout_logoff').css('display', 'none');
             $('#Layout_loggingOff').css('display', 'inline-block');
             App.Post('logoff').done(function(data) {
                 location.href = '.';
             });
+        });
+
+        $('#Layout_modules li,#Layout_modules a').on('click.Layout', function(ev) { // click on a module
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            var href = $(this).attr('href') !== undefined ?
+                $(this).attr('href') : $(this).find('a').attr('href');
+            location.href = href;
         });
 
         $(document).ajaxComplete(function AjaxComplete() {
