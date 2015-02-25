@@ -30,7 +30,7 @@
     @media (min-width:768px) { .rightBody_withMessages { left:400px; width:calc(100% - 400px); } } /* desktop */
 
 #headlinesArea { }
-#headlinesFooter { text-align:center; padding:12px 0; }
+#headlinesFooter { text-align:center; padding:12px 0 20px 0; }
 #loadedCount { color:#888; }
 
 #subject { position:absolute; width:100%; height:62px; }

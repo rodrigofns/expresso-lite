@@ -210,18 +210,6 @@ define([], function() {
         }
     };
 
-    ThreadMail.ClearCacheOfFolders = function(folders, excludeGlobalNames) {
-        for (var i = 0; i < folders.length; ++i) {
-            if ((excludeGlobalNames !== undefined) &&
-                (excludeGlobalNames.indexOf(folders[i].globalName) !== -1) ) {
-                continue;
-            }
-            folders[i].messages.length = 0; // force cache rebuild
-            folders[i].threads.length = 0;
-            ThreadMail.ClearCacheOfFolders(folders[i].subfolders, excludeGlobalNames); // recursive
-        }
-    };
-
     ThreadMail.FindFolderByGlobalName = function(name, folderCache) {
         for (var i = 0; i < folderCache.length; ++i) { // the global array with all top folders
             if (folderCache[i].globalName === name) {

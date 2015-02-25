@@ -17,37 +17,22 @@ return function(options) {
         folderCache: [] // central unique cache of all folders and messages
     }, options);
 
-    var THIS          = this;
-    var $targetDiv    = userOpts.$elem; // shorthand
-    var curFolder     = null; // folder object currently loaded
-    var curSearch     = null; // if instead of a folder, we have a search result being shown
-    var menu          = null; // context menu object
-    var onClickCB     = null; // user callbacks
-    var onCheckCB     = null;
-    var onMarkReadCB  = null;
-    var onMoveCB      = null;
-    var $prevClick    = null; // used in checkbox click event, modified by buildContextMenu()
-    var lastCheckWith = null; // 'leftClick' || 'rightClick', used in buildContextMenu()
+    var THIS            = this;
+    var $targetDiv      = userOpts.$elem; // shorthand
+    var curFolder       = null; // folder object currently loaded
+    var menu            = null; // context menu object
+    var onClickCB       = null; // user callbacks
+    var onCheckCB       = null;
+    var onMarkReadCB    = null;
+    var onMoveCB        = null;
+    var $prevClick      = null; // used in checkbox click event, modified by buildContextMenu()
+    var lastCheckWith   = null; // 'leftClick' || 'rightClick', used in buildContextMenu()
 
     function _CreateDivLoading(msg) {
         var $div = $('#Headlines_template .Headlines_loading').clone();
         if (msg !== null) $div.append(msg);
         $div.append([ ' ', $('#icons .throbber').clone() ]);
         return $div;
-    }
-
-    function _GetFolderIdsForSearch() {
-        var rejectedFolders = ['user', 'INBOX/Arquivo Remoto', 'INBOX/Trash'];
-        var folderIds = [];
-        (function getFolderIds(folders) {
-            for (var i = 0; i < folders.length; ++i) {
-                if (rejectedFolders.indexOf(folders[i].globalName) === -1) {
-                    folderIds.push(folders[i].id);
-                    getFolderIds(folders[i].subfolders);
-                }
-            }
-        })(userOpts.folderCache);
-        return folderIds;
     }
 
     function _GetFolderLocalNameByGlobalName(globalName) {
@@ -165,12 +150,6 @@ return function(options) {
         $div.find('.Headlines_highlight').append($elemHl);
         $div.find('.Headlines_subject').text(thread[thread.length-1].subject != '' ?
             thread[thread.length-1].subject : '(sem assunto)');
-        if (curFolder.id === null) { // this is a search result
-            $div.find('.Headlines_subject').append(' ').append( $(document.createElement('span'))
-                .addClass('Headlines_folderName')
-                .text(_GetFolderLocalNameByGlobalName(msg.folder))
-            );
-        }
 
         var icons = [];
         if (hasReplied)    icons.push($('#icons .icoReplied').clone());
@@ -298,8 +277,9 @@ return function(options) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function() {
-                if (curFolder.id === null) { // if a search result
-                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                if (curFolder.searchedFolder !== undefined) { // if a search result
+                    curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                    curFolder.searchedFolder.threads.length = 0;
                 }
                 $checkedDivs.each(function(idx, elem) {
                     _RedrawDiv($(elem));
@@ -342,8 +322,9 @@ return function(options) {
             window.alert('Erro ao mover email.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
         }).done(function() {
-            if (curFolder.id === null) { // if a search result
-                ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+            if (curFolder.searchedFolder !== undefined) { // if a search result
+                curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                curFolder.searchedFolder.threads.length = 0;
             }
             $checkedDivs.slideUp(200).promise('fx').done(function() {
                 $checkedDivs.remove();
@@ -421,8 +402,9 @@ return function(options) {
                 window.alert('Erro ao apagar email.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function(status) {
-                if (curFolder.id === null) { // if a search result
-                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                if (curFolder.searchedFolder !== undefined) { // if a search result
+                    curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                    curFolder.searchedFolder.threads.length = 0;
                 }
                 $checkedDivs.slideUp(200).promise('fx').done(function() {
                     $checkedDivs.remove();
@@ -443,16 +425,18 @@ return function(options) {
         if (!curFolder.totalMails) { // no messages on this folder
             return defer.resolve();
         } else {
-            $targetDiv.css('height', '100%'); // important for showFancy()
+            $targetDiv.css('height', '100%'); // important for _AnimateFirstHeadlines()
             var $loading = _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
             if (!curFolder.messages.length) { // not cached yet
-                App.Post('getFolderHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
-                .fail(function(resp) {
+                App.Post('getFolderHeadlines', {
+                    folderId: curFolder.id,
+                    start: 0,
+                    limit: howMany
+                }).fail(function(resp) {
                     window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
                     $targetDiv.children('.Headlines_loading').remove();
                     defer.reject();
                 }).done(function(headlines) {
-                    curSearch = null; // we're not making a search, we're loading an actual folder
                     curFolder.messages.length = 0;
                     curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
                     curFolder.threads.length = 0;
@@ -473,12 +457,15 @@ return function(options) {
 
     THIS.searchMessages = function(text, howMany) {
         var defer = $.Deferred();
-        $targetDiv.empty().css('height', '100%'); // important for showFancy()
+        $targetDiv.empty().css('height', '100%'); // important for _AnimateFirstHeadlines()
         var $loading = _CreateDivLoading('Buscando "'+text+'"...').appendTo($targetDiv);
+        var isSearchAfterSearch = (curFolder.searchedFolder !== undefined); // this is a search made while another search is still active
 
+        var theCurFolderId = isSearchAfterSearch ?
+            curFolder.searchedFolder.id : curFolder.id;
         App.Post('searchHeadlines', {
             what: text,
-            folderIds: _GetFolderIdsForSearch().join(','),
+            folderIds: theCurFolderId, // multiple folder IDs separated by commas
             start: 0,
             limit: howMany
         }).fail(function(resp) {
@@ -490,10 +477,12 @@ return function(options) {
                 window.alert('Erro na busca por "'+text+'".\n'+resp.responseText);
             }
             defer.reject();
-        }).done(function(resFolder) {
-            curSearch = text; // cache the text being searched for eventual loadMore() calls
-            curFolder = resFolder; // virtual folder with search result
-            curFolder.localName = 'Resultados da busca';
+        }).done(function(resFolder) { // returns a virtual folder with search result, ID/globalName are null
+            resFolder.searchedFolder = isSearchAfterSearch ? curFolder.searchedFolder : curFolder; // cache current folder being searched
+            resFolder.searchedText = text; // cache the text being searched for eventual loadMore() calls
+            resFolder.localName = 'Busca em '+(isSearchAfterSearch ? curFolder.searchedFolder : curFolder).localName; // will become page title
+
+            curFolder = resFolder; // virtual folder with search result is our current folder now
             curFolder.messages = ThreadMail.ParseTimestamps(curFolder.messages);
             curFolder.threads.push.apply(curFolder.threads,
                 ThreadMail.MakeThreads(curFolder.messages, false));
@@ -509,20 +498,27 @@ return function(options) {
         var $divLoading = _CreateDivLoading('Carregando mensagens...')
         $divLoading.appendTo($targetDiv);
 
-        ( (curSearch !== null) ? // actually a search result?
+        var thisIsASearch = (curFolder.searchedFolder !== undefined); // actually a search result?
+
+        var res = thisIsASearch ?
             App.Post('searchHeadlines', {
-                what: curSearch,
-                folderIds: _GetFolderIdsForSearch().join(','),
+                what: curFolder.searchedText,
+                folderIds: curFolder.searchedFolder.id, // multiple folder IDs separated by commas
                 start: curFolder.messages.length,
-                limit:howMany
-            }) : App.Post('getFolderHeadlines',
-                { folderId:curFolder.id, start:curFolder.messages.length, limit:howMany })
-        ).always(function() { $divLoading.remove(); })
+                limit: howMany
+            }) :
+            App.Post('getFolderHeadlines', {
+                folderId: curFolder.id,
+                start: curFolder.messages.length,
+                limit: howMany
+            });
+
+        res.always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
         }).done(function(mails2) {
-            if (curSearch !== null) {
-                mails2 = mails2.messages; // search returns more data than we need
+            if (thisIsASearch) {
+                mails2 = mails2.messages; // search returns more data than we need for loadMore()
             }
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
             curFolder.threads.length = 0;

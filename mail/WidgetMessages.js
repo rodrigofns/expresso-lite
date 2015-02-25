@@ -157,7 +157,8 @@ return function(options) {
                 if (curFolder.id !== null) { // if not a search result
                     asRead ? --curFolder.unreadMails : ++curFolder.unreadMails;
                 } else {
-                    ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                    curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                    curFolder.searchedFolder.threads.length = 0;
                 }
                 $elem.children('.Messages_top1,.Messages_top2')
                     .toggleClass('Messages_read', asRead).toggleClass('.Messages_unread', !asRead);
@@ -198,7 +199,8 @@ return function(options) {
                     }
                     ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
                     if (curFolder.id === null) { // if a search result
-                        ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                        curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                        curFolder.searchedFolder.threads.length = 0;
                     } else {
                         destFolder.messages.length = 0; // force cache rebuild
                         destFolder.threads.length = 0;
@@ -248,7 +250,8 @@ return function(options) {
                         }
                         ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
                         if (curFolder.id === null) { // if a search result
-                            ThreadMail.ClearCacheOfFolders(userOpts.folderCache);
+                            curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                            curFolder.searchedFolder.threads.length = 0;
                         }
                         if (onMoveCB !== null) {
                             onMoveCB(null, origThread);

@@ -67,7 +67,7 @@ $(document).ready(function() {
         // Setup events.
         Cache.layout
             .onKeepAlive(function() { $('#btnUpdateFolders').trigger('click'); })
-            .onSearch(Search);
+            .onSearch(Search); // when user performs a search
         Cache.treeFolders
             .onClick(LoadFirstHeadlines)
             .onTreeChanged(RebuildHeadlinesContextMenu)
@@ -82,7 +82,7 @@ $(document).ready(function() {
             .onMarkRead(MessageMarkedRead)
             .onMove(MailMoved);
         Cache.wndCompose
-            //~ .onClose(function() { $('#composeFoldersSlot').show(); });
+            .onClose(function() { })
             .onSend(MailSent)
             .onDraft(DraftSaved);
 
@@ -185,7 +185,12 @@ function Search(text) {
     SetMessagesPanelVisible(false);
     $('#middleBody').scrollTop(0);
     $('#headlinesFooter').css('display', 'none');
-    Cache.layout.setTitle('Buscando...');
+
+    var curFolder = Cache.treeFolders.getCurrent();
+    var fname = (curFolder.searchedFolder === undefined) ?
+        curFolder.localName : curFolder.searchedFolder.localName;
+    Cache.layout.setTitle('Buscando em '+fname+'...');
+
     Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).fail(function() {
         Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
     }).always(function(virtFolder) {
