@@ -8,7 +8,7 @@
  * @package   ExpressoLite\TineTunnel
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\TineTunnel;
 
@@ -251,6 +251,7 @@ class TineSession implements CookieHandler
     {
         try {
             $response = $this->jsonRpc('Tinebase.logout');
+            $this->jsonKey = null;
         } catch (Exception $e) {
             throw new TineException('Tinebase.logout: ' . $e->getMessage(), 0, $e);
         }
