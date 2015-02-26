@@ -428,8 +428,8 @@ return function(options) {
             $targetDiv.css('height', '100%'); // important for _AnimateFirstHeadlines()
             var $loading = _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
             if (!curFolder.messages.length) { // not cached yet
-                App.Post('getFolderHeadlines', {
-                    folderId: curFolder.id,
+                App.Post('searchHeadlines', {
+                    folderIds: curFolder.id,
                     start: 0,
                     limit: howMany
                 }).fail(function(resp) {
@@ -440,8 +440,12 @@ return function(options) {
                     curFolder.messages.length = 0;
                     curFolder.messages.push.apply(curFolder.messages, ThreadMail.ParseTimestamps(headlines));
                     curFolder.threads.length = 0;
-                    curFolder.threads.push.apply(curFolder.threads,
-                        ThreadMail.MakeThreads(headlines, curFolder.globalName === 'INBOX/Drafts')); // in thread: oldest first
+                    curFolder.threads.push.apply(
+                        curFolder.threads,
+                        (curFolder.globalName === 'INBOX/Drafts') ?
+                            ThreadMail.MakeThreadsWithSingleMessage(headlines) :
+                            ThreadMail.MakeThreads(headlines) // in thread: oldest first
+                    );
                     _AnimateFirstHeadlines(_BuildAllThreadsDivs(), $loading).done(function() {
                         defer.resolve();
                     });
@@ -485,7 +489,7 @@ return function(options) {
             curFolder = resFolder; // virtual folder with search result is our current folder now
             curFolder.messages = ThreadMail.ParseTimestamps(curFolder.messages);
             curFolder.threads.push.apply(curFolder.threads,
-                ThreadMail.MakeThreads(curFolder.messages, false));
+                ThreadMail.MakeThreadsWithSingleMessage(curFolder.messages));
             _AnimateFirstHeadlines(_BuildAllThreadsDivs(), $loading).done(function() {
                 defer.resolve(curFolder); // return virtual search folder
             });
@@ -500,20 +504,12 @@ return function(options) {
 
         var thisIsASearch = (curFolder.searchedFolder !== undefined); // actually a search result?
 
-        var res = thisIsASearch ?
-            App.Post('searchHeadlines', {
-                what: curFolder.searchedText,
-                folderIds: curFolder.searchedFolder.id, // multiple folder IDs separated by commas
-                start: curFolder.messages.length,
-                limit: howMany
-            }) :
-            App.Post('getFolderHeadlines', {
-                folderId: curFolder.id,
-                start: curFolder.messages.length,
-                limit: howMany
-            });
-
-        res.always(function() { $divLoading.remove(); })
+        App.Post('searchHeadlines', {
+            what: thisIsASearch ? curFolder.searchedText : '',
+            folderIds: thisIsASearch ? curFolder.searchedFolder.id : curFolder.id,
+            start: curFolder.messages.length,
+            limit: howMany
+        }).always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
         }).done(function(mails2) {
@@ -522,8 +518,12 @@ return function(options) {
             }
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(mails2)); // cache
             curFolder.threads.length = 0;
-            curFolder.threads.push.apply(curFolder.threads,
-                ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts')); // rebuild
+            curFolder.threads.push.apply( // rebuild
+                curFolder.threads,
+                (thisIsASearch || curFolder.globalName === 'INBOX/Drafts') ?
+                    ThreadMail.MakeThreadsWithSingleMessage(curFolder.messages) :
+                    ThreadMail.MakeThreads(curFolder.messages)
+            );
             $targetDiv.empty().append(_BuildAllThreadsDivs());
             defer.resolve();
         });
@@ -532,6 +532,10 @@ return function(options) {
     };
 
     THIS.loadNew = function(howMany, onDone) {
+        if (curFolder.searchedFolder !== undefined) { // actually a search result? do nothing
+            return THIS;
+        }
+
         var $divLoading = _CreateDivLoading('Carregando mensagens...');
         $targetDiv.prepend($divLoading);
 
@@ -541,14 +545,16 @@ return function(options) {
             headl0 = $current.data('thread')[0]; // 1st headline of thread being read
         }
 
-        App.Post('getFolderHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
+        App.Post('searchHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+curFolder.localName+'".\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
         }).done(function(headlines) {
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
-            curFolder.threads = ThreadMail.MakeThreads(curFolder.messages, curFolder.globalName === 'INBOX/Drafts'); // in thread: oldest first
+            curFolder.threads = (curFolder.globalName === 'INBOX/Drafts') ?
+                ThreadMail.MakeThreadsWithSingleMessage(curFolder.messages) :
+                ThreadMail.MakeThreads(curFolder.messages); // in thread: oldest first
             $targetDiv.empty().append(_BuildAllThreadsDivs());
             if (headl0 !== null) {
                 _FindHeadlineDiv(headl0).addClass('Headlines_entryCurrent');

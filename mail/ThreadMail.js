@@ -116,45 +116,48 @@ define([], function() {
         return addressees;
     };
 
-    ThreadMail.MakeThreads = function(headlines, isForDrafts) {
+    ThreadMail.MakeThreads = function(headlines) {
         var threads = [];
-        if (isForDrafts) {
-            for (var i = 0; i < headlines.length; ++i) {
-                threads.push([ headlines[i] ]); // drafts folder actually has no threads
-            }
-        } else {
-            for (var h = 0; h < headlines.length; ++h) {
-                headlines[h].subject2 = headlines[h].subject
-                    .replace(/(auto: )|(enc: )|(fw: )|(fwd: )|(re: )|(res: )/gi, 'FWD: '); // everything becomes "FWD:"
-            }
-            headlines.reverse(); // now sorted oldest first
+        for (var h = 0; h < headlines.length; ++h) {
+            headlines[h].subject2 = headlines[h].subject
+                .replace(/(auto: )|(enc: )|(fw: )|(fwd: )|(re: )|(res: )/gi, 'FWD: '); // everything becomes "FWD:"
+        }
+        headlines.reverse(); // now sorted oldest first
 
-            var threads = []; // each thread will be a flat array of headlines; if no thread, an array of 1 headline
-            HEADS: for (var h = 0; h < headlines.length; ++h) {
-                for (var t = 0; t < threads.length; ++t) {
-                    var canBeThreaded = headlines[h].subject2.indexOf('FWD: ') > -1;
-                    var hasSameSubject = headlines[h].subject2.replace(/^(FWD: )+/, '') ===
-                        threads[t][0].subject2.replace(/^(FWD: )+/, '');
-                    if (canBeThreaded && hasSameSubject) {
-                        threads[t].push(headlines[h]); // push into thread
-                        continue HEADS;
-                    }
-                }
-                threads.push([ headlines[h] ]); // new thread with 1 headline
-            }
-
+        var threads = []; // each thread will be a flat array of headlines; if no thread, an array of 1 headline
+        HEADS: for (var h = 0; h < headlines.length; ++h) {
             for (var t = 0; t < threads.length; ++t) {
-                for (var i = 0; i < threads[t].length; ++i) {
-                    delete threads[t][i].subject2; // normalized subject was added just for our internal processing
+                var canBeThreaded = headlines[h].subject2.indexOf('FWD: ') > -1;
+                var hasSameSubject = headlines[h].subject2.replace(/^(FWD: )+/, '') ===
+                    threads[t][0].subject2.replace(/^(FWD: )+/, '');
+                if (canBeThreaded && hasSameSubject) {
+                    threads[t].push(headlines[h]); // push into thread
+                    continue HEADS;
                 }
-                threads[t].reverse(); // thread now sorted newest first
             }
+            threads.push([ headlines[h] ]); // new thread with 1 headline
+        }
 
-            threads.sort(function(a, b) { // now all threads sorted newest first
-                return b[0].received.getTime() - a[0].received.getTime(); // compare timestamps
-            });
+        for (var t = 0; t < threads.length; ++t) {
+            for (var i = 0; i < threads[t].length; ++i) {
+                delete threads[t][i].subject2; // normalized subject was added just for our internal processing
+            }
+            threads[t].reverse(); // thread now sorted newest first
+        }
 
-            headlines.reverse(); // sorted newest first, as it came to us
+        threads.sort(function(a, b) { // now all threads sorted newest first
+            return b[0].received.getTime() - a[0].received.getTime(); // compare timestamps
+        });
+
+        headlines.reverse(); // sorted newest first, as it came to us
+        return threads;
+    };
+
+    ThreadMail.MakeThreadsWithSingleMessage = function(headlines) {
+        // Draft and search headlines are not grouped into threads, so return arrays with 1 message.
+        var threads = [];
+        for (var i = 0; i < headlines.length; ++i) {
+            threads.push([ headlines[i] ]);
         }
         return threads;
     };

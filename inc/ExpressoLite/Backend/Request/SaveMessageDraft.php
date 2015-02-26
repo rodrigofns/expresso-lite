@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\Backend\Request;
 
@@ -44,7 +44,7 @@ class SaveMessageDraft extends LiteRequest
             'recordData' => $recordData
         ));
 
-        $draftMsg = $this->processor->executeRequest('getFolderHeadlines', array(
+        $draftMsg = $this->processor->executeRequest('searchHeadlines', array(
             'folderId' => $draftFolderId,
             'start' => 0,
             'limit' => 1
@@ -64,7 +64,7 @@ class SaveMessageDraft extends LiteRequest
      * Converts a comma separated list of emails to an array
      *
      * @param string $emails Comma separated list of emails
-     * 
+     *
      * @return array Array of email strings
      */
     private function toArrayOfEmails($emails)
