@@ -26,7 +26,6 @@ require(['jquery', 'inc/App'], function($, App) {
         if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
         LoadServerStatus();
-        App.Post('setLocale'); // default to PT/BR
         $('#user').focus();
         $('#frmLogin').submit(DoLogin);
         $('#frmChangePwd').submit(DoChangePassword);
