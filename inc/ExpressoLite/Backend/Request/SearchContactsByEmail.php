@@ -8,7 +8,7 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\Backend\Request;
 
@@ -60,6 +60,7 @@ class SearchContactsByEmail extends LiteRequest
                 'created' => strtotime($contact->creation_time),
                 'email' => $contact->email,
                 'mugshot' => $this->getContactPicture($contact->id, strtotime($contact->creation_time), 90, 113),
+                //'mugshotUrl' => $this->assemblyMugshotUrl($contact->id, strtotime($contact->creation_time), 90, 113),
                 'name' => $contact->n_fn,
                 'phone' => $contact->tel_work,
                 'cpf' => sprintf('%011d', (int) $contact->account_id),
@@ -88,8 +89,7 @@ class SearchContactsByEmail extends LiteRequest
         $req = new Request();
         $req->setBinaryOutput(false); // do not directly output the binary stream to client
         $req->setCookieHandler($this->tineSession); //tineSession has the necessary cookies
-
-        $req->setUrl($this->tineSession->getTineUrl() . '?method=Tinebase.getImage&application=Addressbook' . "&location=&id={$contactId}&width={$cx}&height={$cy}&ratiomode=0&mtime={$creationTime}000");
+        $req->setUrl($this->assemblyMugshotUrl($contactId, $creationTime, $cx, $cy));
         $req->setHeaders(array(
             'Connection: keep-alive',
             'DNT: 1',
@@ -98,10 +98,32 @@ class SearchContactsByEmail extends LiteRequest
             'Cache-Control: no-cache'
         ));
         $mugshot = $req->send();
-        return ($mugshot !== null) ? $mugshot : ''; // dummy if binaryOutput(true)
 
+        return ($mugshot === null || substr($mugshot, 0, 14) === '<!DOCTYPE html') ?
+            '' : $mugshot; // dummy if binaryOutput(true)
+    }
 
-        return '';
+    /**
+     * Assemblies the URL to retrieve the mugshot of a given contact.
+     *
+     * @param $contactId    The ID of the contact.
+     * @param $creationTime Timestamp of contact creation date.
+     * @param $cx           Desired picture width, in pixels.
+     * @param $cy           Desired picture height, in pixels.
+     *
+     * @return Mugshot URL for the contact.
+     */
+    private function assemblyMugshotUrl($contactId, $creationTime, $cx, $cy)
+    {
+        return $this->tineSession->getTineUrl() .
+            '?method=Tinebase.getImage' .
+            '&application=Addressbook' .
+            '&location=' .
+            '&id='.$contactId .
+            '&width='.$cx .
+            '&height='.$cy .
+            '&ratiomode=0' .
+            '&mtime='.$creationTime.'000';
     }
 
     /**
