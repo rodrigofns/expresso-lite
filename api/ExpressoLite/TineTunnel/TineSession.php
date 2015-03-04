@@ -146,6 +146,7 @@ class TineSession implements CookieHandler
         $tineJsonRpc->setRpcMethod($method);
         $tineJsonRpc->setRpcParams($params);
         $tineJsonRpc->setJsonKey($this->jsonKey);
+        $tineJsonRpc->setAcceptErrors($acceptErrors);
         return $tineJsonRpc->send();
     }
 

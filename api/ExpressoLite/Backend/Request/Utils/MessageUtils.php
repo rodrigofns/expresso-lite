@@ -15,6 +15,7 @@
 namespace ExpressoLite\Backend\Request\Utils;
 
 use ExpressoLite\TineTunnel\TineSession;
+use ExpressoLite\TineTunnel\Request;
 
 class MessageUtils
 {
@@ -139,4 +140,38 @@ class MessageUtils
         ));
         return $response->result;
     }
+
+    /**
+     * Gets the binary content of a contact picture
+     *
+     * @param TineSession $tineSession The TineSession used to communicate with Tine.
+     * @param $contactId The id of the contact whose picture we want
+     * @param $creationTime The contact creation time (needed by Tine)
+     * @param int $cx The desired picture width
+     * @param int $cy The desired picture height
+     *
+     * @return The binary content of a contact picture
+     */
+    public static function getContactPicture(TineSession $tineSession, $contactId, $creationTime, $cx, $cy)
+    {
+        //we need to make a 'custom' request to get the contact picture, so
+        //we build a Request object manually instead of relying on tineSession
+        //to do it for us
+        $req = new Request();
+        $req->setBinaryOutput(false); // do not directly output the binary stream to client
+        $req->setCookieHandler($tineSession); //tineSession has the necessary cookies
+
+
+        $req->setUrl($tineSession->getTineUrl() . '?method=Tinebase.getImage&application=Addressbook' . "&location=&id={$contactId}&width={$cx}&height={$cy}&ratiomode=0&mtime={$creationTime}000");
+        $req->setHeaders(array(
+                'Connection: keep-alive',
+                'DNT: 1',
+                'User-Agent: ' . (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : TineJsonRpc::DEFAULT_USERAGENT),
+                'Pragma: no-cache',
+                'Cache-Control: no-cache'
+        ));
+        $mugshot = $req->send();
+        return ($mugshot !== null) ? $mugshot : '';
+    }
+
 }
