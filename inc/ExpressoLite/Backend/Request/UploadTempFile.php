@@ -23,7 +23,7 @@ class UploadTempFile extends LiteRequest
     public function execute()
     {
         $fileType = isset($_SERVER['HTTP_X_FILE_TYPE']) ?
-            isset($_SERVER['HTTP_X_FILE_TYPE']) : 'text/plain';
+            $_SERVER['HTTP_X_FILE_TYPE'] : 'text/plain';
 
         if (isset($_SERVER['HTTP_X_FILE_NAME']) && isset($_SERVER['HTTP_X_FILE_TYPE'])) {
             return $this->uploadTempFile(
