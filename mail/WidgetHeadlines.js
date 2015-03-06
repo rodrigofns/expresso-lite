@@ -468,7 +468,7 @@ return function(options) {
         var theCurFolderId = isSearchAfterSearch ?
             curFolder.searchedFolder.id : curFolder.id;
         App.Post('searchHeadlines', {
-            what: text,
+            what: $.trim(text),
             folderIds: theCurFolderId, // multiple folder IDs separated by commas
             start: 0,
             limit: howMany
