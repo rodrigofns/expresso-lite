@@ -181,24 +181,32 @@ function SetMessagesPanelVisible(isVisible) {
 }
 
 function Search(text) {
-    text = text.replace(/\//g, '').replace(/\\/g, ''); // remove slashes
     SetMessagesPanelVisible(false);
     $('#middleBody').scrollTop(0);
     $('#headlinesFooter').css('display', 'none');
 
-    var curFolder = Cache.treeFolders.getCurrent();
-    var fname = (curFolder.searchedFolder === undefined) ?
-        curFolder.localName : curFolder.searchedFolder.localName;
-    Cache.layout.setTitle('Buscando em '+fname+'...');
+    text = $.trim(text.replace(/\//g, '').replace(/\\/g, '')); // remove slashes, they break Tine
+    if (text === '') {
+        var curFolder = Cache.treeFolders.getCurrent();
+        if (curFolder.searchedFolder !== undefined) { // we currently have a search displayed?
+            curFolder = curFolder.searchedFolder;
+        }
+        Cache.treeFolders.setCurrent(curFolder); // nothing to search, simply show current folder
+    } else {
+        var curFolder = Cache.treeFolders.getCurrent();
+        var fname = (curFolder.searchedFolder === undefined) ?
+            curFolder.localName : curFolder.searchedFolder.localName;
+        Cache.layout.setTitle('Buscando em '+fname+'...');
 
-    Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).fail(function() {
-        Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
-    }).always(function(virtFolder) {
-        $('#headlinesFooter').css('display', '');
-        Cache.treeFolders.setCurrent(virtFolder); // virtual folder with search result
-        UpdatePageTitle();
-        UpdateHeadlineFooter();
-    });
+        Cache.listHeadlines.searchMessages(text, Cache.MAILBATCH).fail(function() {
+            Cache.treeFolders.setCurrent(Cache.treeFolders.getCurrent());
+        }).always(function(virtFolder) {
+            $('#headlinesFooter').css('display', '');
+            Cache.treeFolders.setCurrent(virtFolder); // virtual folder with search result
+            UpdatePageTitle();
+            UpdateHeadlineFooter();
+        });
+    }
 }
 
 function LoadFirstHeadlines(folder) {
