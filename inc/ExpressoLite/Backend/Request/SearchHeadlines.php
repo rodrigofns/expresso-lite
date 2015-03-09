@@ -73,7 +73,10 @@ class SearchHeadlines extends LiteRequest
                 'limit' => $limit
             )
         ));
-        return $response->result->results;
+        return (object) array(
+            'headlines'  => $response->result->results,
+            'totalCount' => $response->result->totalcount // for paging, if needed
+        );
     }
 
     /**
@@ -113,7 +116,7 @@ class SearchHeadlines extends LiteRequest
     private function convertTineMessagesToLiteHeadlines($tineMessages)
     {
         $headlines = array();
-        foreach ($tineMessages as $mail) {
+        foreach ($tineMessages->headlines as $mail) {
             $headlines[] = (object) array(
                 'id'      => $mail->id,
                 'subject' => ($mail->subject !== null) ? $mail->subject : '',
@@ -141,7 +144,7 @@ class SearchHeadlines extends LiteRequest
         }
         return (object) array(
             'headlines'  => $headlines,
-            'totalCount' => $jreq->result->totalcount // for paging, if needed
+            'totalCount' => $tineMessages->totalCount // for paging, if needed
         );
     }
 }
