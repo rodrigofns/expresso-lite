@@ -45,7 +45,7 @@ class SaveMessageDraft extends LiteRequest
         ));
 
         $draftMsg = $this->processor->executeRequest('searchHeadlines', array(
-            'folderId' => $draftFolderId,
+            'folderIds' => $draftFolderId,
             'start' => 0,
             'limit' => 1
         )); // newest draft
