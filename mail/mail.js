@@ -34,7 +34,11 @@ $(document).ready(function() {
         $menu: $('#leftColumn'),
         $content: $('#bigBody')
     });
-    Cache.wndCompose = new WidgetCompose({ folderCache:Cache.folders });
+    Cache.wndCompose = new WidgetCompose({
+        address: $('#mailAddress').val(),
+        signature: $('#mailSignature').val(),
+        folderCache: Cache.folders
+    });
     Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });
     Cache.listHeadlines = new WidgetHeadlines({ $elem:$('#headlinesArea'), folderCache:Cache.folders });
     Cache.listMessages = new WidgetMessages({ $elem:$('#messagesArea'), folderCache:Cache.folders, wndCompose:Cache.wndCompose });

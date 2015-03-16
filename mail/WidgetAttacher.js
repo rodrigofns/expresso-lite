@@ -13,11 +13,11 @@ function($, App, UploadFile, ThreadMail) {
 App.LoadCss('mail/WidgetAttacher.css');
 var WidgetAttacher = function(options) {
     var userOpts = $.extend({
-        elem: '' // jQuery selector for the target DIV
+        $elem: null // jQuery object for the target DIV
     }, options);
 
     var THIS = this;
-    var $targetDiv = $(userOpts.elem);
+    var $targetDiv = userOpts.$elem;
     var onContentChangeCB = null; // user callback
 
     function _BuildDisplayName(fileObj) {

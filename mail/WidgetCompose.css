@@ -5,16 +5,16 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 #Compose_template { display:none; }
 
-#Compose_panel { margin:6px; padding:5px; /*border-left:5px solid #4479BA;*/ }
-#Compose_toggs { margin-bottom:8px; -moz-user-select:none; -webkit-user-select:none; }
-#composePanel,#Compose_to,#Compose_cc,#Compose_bcc,#Compose_attacher,#icons,#info { display:none; }
-#Compose_subject,#Compose_to,#Compose_cc,#Compose_bcc,#Compose_body,#Compose_attacher
+.Compose_panel { margin:6px; padding:5px; /*border-left:5px solid #4479BA;*/ }
+.Compose_toggs { margin-bottom:8px; -moz-user-select:none; -webkit-user-select:none; }
+.Compose_to,.Compose_cc,.Compose_bcc,.Compose_attacher { display:none; }
+.Compose_subject,.Compose_to,.Compose_cc,.Compose_bcc,.Compose_body,.Compose_attacher
     { width:100%; margin-bottom:8px; padding:4px; }
-#Compose_body { margin-bottom:8px; border:1px solid #BBB; overflow:auto; }
-#Compose_send,#Compose_draft,#Compose_attachNew { margin-bottom:10px; }
-#Compose_attacher { max-height:154px; overflow-x:hidden; overflow-y:auto; }
+.Compose_body { margin-bottom:8px; border:1px solid #BBB; overflow:auto; }
+.Compose_send,.Compose_draft,.Compose_attachNew { margin-bottom:10px; }
+.Compose_attacher { max-height:154px; overflow-x:hidden; overflow-y:auto; }

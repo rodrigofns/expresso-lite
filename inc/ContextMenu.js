@@ -25,23 +25,34 @@ return function(options) {
     }
 
     function _HidePopup() {
+        var defer = $.Deferred();
         if (_IsShown()) {
-            $('.ContextMenu_darkCover').fadeOut(200, function() {
-                $('.ContextMenu_darkCover').remove(); // shown on phone only
-            });
             UrlStack.pop('#popup');
             $ul.css({ width:'', height:'' }); // revert to natural dimensions, if changed
             $ul.detach();
             $btn.removeClass('ContextMenu_hoverBtn');
+
+            if ($('.ContextMenu_darkCover').length) { // shown on phone only
+                $('.ContextMenu_darkCover').fadeOut(200, function() {
+                    $('.ContextMenu_darkCover').remove();
+                    defer.resolve();
+                });
+            } else {
+                defer.resolve();
+            }
+        } else {
+            defer.resolve();
         }
-        return THIS;
+        return defer.promise();
     }
 
     function _ApplyIndentation(text, nIndent) {
         var prefix = '';
-        if (nIndent !== undefined && nIndent !== null) // text indentation
-            for (var i = 0; i < nIndent; ++i)
+        if (nIndent !== undefined && nIndent !== null) { // text indentation
+            for (var i = 0; i < nIndent; ++i) {
                 prefix += '&nbsp; ';
+            }
+        }
         return prefix+text;
     }
 
@@ -145,11 +156,12 @@ return function(options) {
 
     $ul.on('click.ContextMenu', '.ContextMenu_liOption', function(ev) {
         ev.stopImmediatePropagation();
-        _HidePopup();
         var cb = $(this).data('callback');
-        if (cb !== null && cb !== undefined) {
-            cb(); // invoke user callback
-        }
+        _HidePopup().done(function() {
+            if (cb !== null && cb !== undefined) {
+                cb(); // invoke user callback
+            }
+        });
     });
 };
 });
