@@ -545,7 +545,7 @@ return function(options) {
             headl0 = $current.data('thread')[0]; // 1st headline of thread being read
         }
 
-        App.Post('searchHeadlines', { folderId:curFolder.id, start:0, limit:howMany })
+        App.Post('searchHeadlines', { folderIds:curFolder.id, start:0, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+curFolder.localName+'".\n' +
