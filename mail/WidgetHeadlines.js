@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/DateFormat', 'mail/ThreadMail', 'mail/Contacts'],
-function($, App, DateFormat, ThreadMail, Contacts) {
+define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/Contacts', 'mail/ThreadMail'],
+function($, App, DateFormat, Contacts, ThreadMail) {
 App.LoadCss('mail/WidgetHeadlines.css');
 return function(options) {
     var userOpts = $.extend({
@@ -87,10 +87,10 @@ return function(options) {
             var who = msg.unread ? names.unread : names.read;
             if (!isSentFolder) {
                 who.push( msg.from.name.indexOf('@') !== -1 ? // an actual email address
-                    Contacts.HumanizeLogin(msg.from.name, false) : msg.from.name );
+                    Contacts.humanizeLogin(msg.from.name, false) : msg.from.name );
             } else { // on Sent folder, show "to" field instead of "from"
                 for (var t = 0; t < msg.to.length; ++t) {
-                    who.push(Contacts.HumanizeLogin(msg.to[t], msg.to.length > 1));
+                    who.push(Contacts.humanizeLogin(msg.to[t], msg.to.length > 1));
                 }
             }
         }

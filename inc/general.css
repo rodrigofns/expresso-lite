@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 * { -moz-box-sizing:border-box; -webkit-box-sizing:border-box; box-sizing:border-box; }
@@ -31,22 +31,24 @@ a
 { color:#1B41D8 }
 
 input[type=text], input[type=password], textarea
-{ border:1px solid #BBB; background:white; resize:none; }
+{ border:1px solid #BBB; background-color:white; resize:none; }
 
 /*select, option
 { color:white; background-color:#4479BA; border:1px solid #4272B2; line-height:1; }*/
 
 button, input[type=button], input[type=submit]
-{ padding:5px 10px; background:#4479BA; color:white; border:1px solid #4272B2; border-radius:1px;
+{ padding:5px 10px; background-color:#4479BA; color:white; border:1px solid #4272B2; border-radius:1px;
     cursor:pointer; -moz-user-select:none; -webkit-user-select:none; }
+button:focus, input[type=button]:focus, input[type=submit]:focus
+{ background-color:#87A6D2; }
+
+button:hover, input[type=button]:hover, input[type=submit]:hover
+{ background-color:#87A6D2; }
+
+button:active, input[type=button]:active, input[type=submit]:active
+{ background-color:#ADC2E1; }
 
 blockquote
 { margin:2px 0 4px 4px; padding-left:5px; border-left:1px solid #BFD2E1; }
-
-button:hover, input[type=button]:hover, input[type=submit]:hover
-{ background:#87A6D2; }
-
-button:active, input[type=button]:active, input[type=submit]:active
-{ background:#ADC2E1; }
 
 /*input[type=text]:focus,input[type=password]:focus { box-shadow:0 0 4px #6EA2DE; }*/

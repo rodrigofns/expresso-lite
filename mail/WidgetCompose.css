@@ -10,11 +10,27 @@
 
 #Compose_template { display:none; }
 
-.Compose_panel { margin:6px; padding:5px; /*border-left:5px solid #4479BA;*/ }
-.Compose_toggs { margin-bottom:8px; -moz-user-select:none; -webkit-user-select:none; }
+.Compose_panel { }
+@media (max-width:767px) { .Compose_panel { padding:5px; height:100%; overflow-y:scroll; } } /* phone */
+@media (min-width:768px) { .Compose_panel { padding:9px; } } /* desktop */
+
+.Compose_toggs { -moz-user-select:none; -webkit-user-select:none; }
+@media (max-width:767px) { .Compose_toggs { margin:5px 2px 12px 2px; } } /* phone */
+@media (min-width:768px) { .Compose_toggs { margin-bottom:9px; } } /* desktop */
+
 .Compose_to,.Compose_cc,.Compose_bcc,.Compose_attacher { display:none; }
 .Compose_subject,.Compose_to,.Compose_cc,.Compose_bcc,.Compose_body,.Compose_attacher
-    { width:100%; margin-bottom:8px; padding:4px; }
+    { width:100%; margin-bottom:6px; padding:4px; }
+.Compose_to,.Compose_cc,.Compose_bcc
+    { border:1px solid #CCC; background-color:#F0F0F0; cursor:pointer; }
+.Compose_to:hover,.Compose_cc:hover,.Compose_bcc:hover { background-color:#F6F6F6; }
+.Compose_to > span:first-child,.Compose_cc > span:first-child,.Compose_bcc > span:first-child
+    { font-style:italic; color:#666; }
+
 .Compose_body { margin-bottom:8px; border:1px solid #BBB; overflow:auto; }
+@media (max-width:767px) { .Compose_body { height:300px; } } /* phone */
+
 .Compose_send,.Compose_draft,.Compose_attachNew { margin-bottom:10px; }
 .Compose_attacher { max-height:154px; overflow-x:hidden; overflow-y:auto; }
+.Compose_important { margin-bottom:12px; }
+label { white-space:nowrap; }

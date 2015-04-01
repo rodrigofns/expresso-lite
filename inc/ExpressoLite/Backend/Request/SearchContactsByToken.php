@@ -8,53 +8,35 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\Backend\Request;
 
 class SearchContactsByToken extends LiteRequest
 {
-
     /**
      * @see ExpressoLite\Backend\Request\LiteRequest::execute
      */
     public function execute()
     {
         $token = $this->param('token');
+        $start = $this->isParamSet('start') ? $this->param('start') : 0; // pagination
+        $limit = $this->isParamSet('limit') ? $this->param('limit') : 50;
+
         $response = $this->jsonRpc('Addressbook.searchContacts', (object) array(
             'filter' => array(
-                (object) array(
-                    'condition' => 'OR',
-                    'filters' => array(
-                        (object) array(
-                            'condition' => 'AND',
-                            'filters' => array(
-                                (object) array(
-                                    'field' => 'query',
-                                    'id' => 'ext-record-5',
-                                    'operator' => 'contains',
-                                    'value' => $token
-                                ),
-                                (object) array(
-                                    'field' => 'container_id',
-                                    'id' => 'ext-record-6',
-                                    'operator' => 'in',
-                                    'value' => array(
-                                        '48480'
-                                    )
-                                )
-                            ),
-                            'id' => 'ext-comp-1023',
-                            'label' => 'Contatos'
-                        )
-                    )
+                (object) array( // search on all catalogs
+                    'field' => 'query',
+                    'id' => 'quickFilter',
+                    'operator' => 'contains',
+                    'value' => $token
                 )
             ),
             'paging' => (object) array(
                 'dir' => 'ASC',
-                'limit' => 50,
+                'limit' => $limit,
                 'sort' => 'n_fileas',
-                'start' => 0
+                'start' => $start
             )
         ));
         $contacts = array();
@@ -64,9 +46,12 @@ class SearchContactsByToken extends LiteRequest
                 'email' => $contact->email,
                 'name' => $contact->n_fn,
                 'isDeleted' => $contact->is_deleted !== '',
-                'org' => $contact->org_name
+                'org' => $contact->org_unit
             );
         }
-        return $contacts;
+        return (object) array(
+            'contacts' => $contacts,
+            'totalCount' => $response->result->totalcount // useful for pagination
+        );
     }
 }

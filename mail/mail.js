@@ -13,9 +13,9 @@ require.config({
     paths: { jquery: 'inc/jquery.min' }
 });
 
-require(['jquery', 'inc/App', 'inc/UrlStack', 'inc/Layout', 'mail/Contacts', 'mail/ThreadMail',
-    'mail/WidgetCompose', 'mail/WidgetFolders', 'mail/WidgetHeadlines', 'mail/WidgetMessages'],
-function($, App, UrlStack, Layout, Contacts, ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
+require(['jquery', 'inc/App', 'inc/UrlStack', 'inc/Layout', 'inc/Contacts', 'mail/ThreadMail',
+    'mail/WidgetCompose', 'mail/WidgetFolders', 'mail/WidgetHeadlines', 'mail/WidgetMessages', 'inc/SearchContacts'],
+function($, App, UrlStack, Layout, Contacts, ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages, SearchContacts) {
 window.Cache = {
     MAILBATCH: 50, // overwritten with value from conf in document.ready
     folders: [], // all folder objects

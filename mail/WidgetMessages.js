@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/ContextMenu', 'mail/Contacts', 'mail/ThreadMail'],
+define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/ContextMenu', 'inc/Contacts', 'mail/ThreadMail'],
 function($, App, DateFormat, ContextMenu, Contacts, ThreadMail) {
 App.LoadCss('mail/WidgetMessages.css');
 return function(options) {

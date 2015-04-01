@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * A resizable and draggable modeless popup DIV, for desktop and phones. jQuery plugin.
+ * A resizable and draggable modal/modeless popup DIV, for desktop and phones.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -9,16 +9,18 @@
  */
 
 define(['jquery', 'inc/App', 'inc/UrlStack'], function($, App, UrlStack) {
-App.LoadCss('inc/ModelessDialog.css');
-var ModelessDialog = function(options) {
+App.LoadCss('inc/Dialog.css');
+var Dialog = function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
         caption: 'Modeless popup',
         width: 400,
         height: 400,
-        minWidth: 100,
+        minWidth: 200,
         minHeight: 100,
+        modal: true,
         resizable: true,
+        minimizable: true,
         marginMaximized: 8,
         marginLeftMaximized: 360
     }, options);
@@ -29,22 +31,23 @@ var ModelessDialog = function(options) {
     var onResizeCB    = null;
     var $targetDiv    = userOpts.$elem;
     var $tpl          = null;
+    var stackId       = 0; // in phones, popups can be stacked
     var cyTitle       = 0; // height of titlebar; never changes
     var prevMinPos    = { x:0, y:0, cx:0, cy:0 }; // position/size before minimize
     var prevMaxPos    = { x:0, y:0, cx:0, cy:0 }; // before maximize
 
     function _SetEvents() {
-        $tpl.find('.ModelessDialog_bar').on('mousedown', function(ev) {
+        $tpl.find('.Dialog_bar').on('mousedown', function(ev) {
             ev.stopImmediatePropagation();
 
-            if ($tpl.find('.ModelessDialog_content').is(':visible')) {
+            if ($tpl.find('.Dialog_content').is(':visible')) {
                 var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
                 var pop = { x:$tpl.offset().left, y:$tpl.offset().top,
                     cx:$tpl.outerWidth(), cy:$tpl.outerHeight() };
                 var offset = { x:ev.clientX - pop.x, y:ev.clientY - pop.y };
-                $('div').addClass('ModelessDialog_unselectable');
+                $('div').addClass('Dialog_unselectable');
 
-                $(document).on('mousemove.ModelessDialog', function(ev) {
+                $(document).on('mousemove.Dialog', function(ev) {
                     ev.stopImmediatePropagation();
                     var newPos = { x:ev.clientX - offset.x, y:ev.clientY - offset.y };
                     var destCss = { };
@@ -53,20 +56,20 @@ var ModelessDialog = function(options) {
                     $tpl.css(destCss);
                 });
 
-                $(document).on('mouseup.ModelessDialog', function(ev) {
-                    $('div').removeClass('ModelessDialog_unselectable');
-                    $(document).off('.ModelessDialog');
+                $(document).on('mouseup.Dialog', function(ev) {
+                    $('div').removeClass('Dialog_unselectable');
+                    $(document).off('.Dialog');
                 });
             } else {
                 THIS.toggleMinimize();
             }
         });
 
-        $tpl.find('.ModelessDialog_bar').on('dblclick', function(ev) {
+        $tpl.find('.Dialog_bar').on('dblclick', function(ev) {
             ev.stopImmediatePropagation();
             var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
             if (!App.IsPhone()) { // on phones doubleclick does nothing
-                if ($tpl.find('.ModelessDialog_content').is(':visible')) { // not minimized
+                if ($tpl.find('.Dialog_content').is(':visible')) { // not minimized
                     var isMaximized = ($tpl.offset().left === userOpts.marginLeftMaximized) &&
                         ($tpl.offset().top === userOpts.marginMaximized) &&
                         ($tpl.outerWidth() === wnd.cx - userOpts.marginLeftMaximized - userOpts.marginMaximized) &&
@@ -103,15 +106,15 @@ var ModelessDialog = function(options) {
             }
         });
 
-        $tpl.find('.ModelessDialog_resz').on('mousedown', function(ev) {
+        $tpl.find('.Dialog_resz').on('mousedown', function(ev) {
             ev.stopImmediatePropagation();
             var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
             var pop = { x:$tpl.offset().left, y:$tpl.offset().top,
                 cx:$tpl.outerWidth(), cy:$tpl.outerHeight() };
             var orig = { x:ev.clientX, y:ev.clientY };
-            $('div').addClass('ModelessDialog_unselectable');
+            $('div').addClass('Dialog_unselectable');
 
-            $(document).on('mousemove.ModelessDialog', function(ev) {
+            $(document).on('mousemove.Dialog', function(ev) {
                 ev.stopImmediatePropagation();
                 var newSz = { cx:pop.cx + ev.clientX - orig.x, cy:pop.cy + ev.clientY - orig.y };
                 var destCss = { };
@@ -127,18 +130,18 @@ var ModelessDialog = function(options) {
                 }
             });
 
-            $(document).on('mouseup.ModelessDialog', function(ev) {
-                $('div').removeClass('ModelessDialog_unselectable');
-                $(document).off('.ModelessDialog');
+            $(document).on('mouseup.Dialog', function(ev) {
+                $('div').removeClass('Dialog_unselectable');
+                $(document).off('.Dialog');
             });
         });
 
-        $tpl.find('.ModelessDialog_minCage input').on('click', function(ev) {
+        $tpl.find('.Dialog_minCage input').on('click', function(ev) {
             ev.stopImmediatePropagation();
             THIS.toggleMinimize();
         });
 
-        $tpl.find('.ModelessDialog_closeCage input').on('click', function(ev) {
+        $tpl.find('.Dialog_closeCage input').on('click', function(ev) {
             ev.stopImmediatePropagation();
             if (onUserCloseCB !== null) {
                 onUserCloseCB(); // invoke user callback, user must call close() himself
@@ -148,20 +151,21 @@ var ModelessDialog = function(options) {
 
     THIS.show = function() {
         var defer = $.Deferred();
-        $tpl = $('#ModelessDialog_template .ModelessDialog_box').clone();
-        $tpl.find('.ModelessDialog_title').html(userOpts.caption);
+        $tpl = $('#Dialog_template .Dialog_box').clone();
+        $tpl.find('.Dialog_title').html(userOpts.caption);
 
-        var wnd = { cx:$(window).outerWidth(), cy:$(window).outerHeight() };
         var szCss = App.IsPhone() ?
-            { width:wnd.cx+'px', height:wnd.cy+'px' } :
-            { width:userOpts.width+'px', height:userOpts.height+'px' };
+            { width:'100%', height:'100%' } : // on phones, go fullscreen
+            { width:userOpts.width+'px',
+                height:Math.max(userOpts.height, userOpts.minHeight)+'px' }; // on desktop, user chooses size
         $tpl.css(szCss).appendTo(document.body);
-        $tpl.find('.ModelessDialog_content').append($targetDiv);
+        $tpl.find('.Dialog_content').append($targetDiv);
 
         if (App.IsPhone()) {
-            $tpl.find('.ModelessDialog_minCage,.ModelessDialog_resz').hide();
-            UrlStack.push('#ModelessDialog', function() {
-                $tpl.find('.ModelessDialog_closeCage input:first').trigger('click');
+            $tpl.find('.Dialog_minCage,.Dialog_resz').hide();
+            ++stackId;
+            UrlStack.push('#Dialog'+stackId, function() {
+                $tpl.find('.Dialog_closeCage input:first').trigger('click');
             });
 
             $tpl.offset({ left:$(window).outerWidth() }) // slide from right
@@ -174,15 +178,24 @@ var ModelessDialog = function(options) {
                 top: Math.max(0, $(window).outerHeight() / 2 - $tpl.outerHeight() / 2)+'px'
             });
             if (!userOpts.resizable) {
-                $tpl.find('.ModelessDialog_resz').hide();
+                $tpl.find('.Dialog_resz').hide();
+            }
+            if (!userOpts.minimizable) {
+                $tpl.find('.Dialog_minCage').hide();
             }
 
             var yOff = $tpl.offset().top;
             $tpl.offset({ top:-$tpl.outerHeight() }) // slide from above
-                .animate({ top:yOff+'px' }, 200, function() { defer.resolve(); });
+                .animate({ top:yOff+'px' }, 200, function() {
+                    if (userOpts.modal) {
+                        $('#Dialog_template .Dialog_coverAllScreen')
+                            .clone().insertBefore($tpl);
+                    }
+                    defer.resolve();
+                });
         }
 
-        cyTitle = $tpl.find('.ModelessDialog_bar').outerHeight();
+        cyTitle = $tpl.find('.Dialog_bar').outerHeight();
         _SetEvents();
         return defer.promise();
     };
@@ -197,14 +210,18 @@ var ModelessDialog = function(options) {
 
     THIS.close = function() {
         var defer = $.Deferred();
+        if (userOpts.modal) {
+            $('.Dialog_coverAllScreen:last').remove();
+        }
         var animMove = App.IsPhone() || THIS.isMinimized() ?
-            { left: $(window).outerWidth()+'px' } :
-            { top: $(window).outerHeight()+'px' };
+            { left: $(window).outerWidth()+'px' } : // slide to right
+            { top: $(window).outerHeight()+'px' }; // slide to bottom
         $tpl.animate(animMove, 200, function() {
             $targetDiv.detach(); // element is up to user
             $tpl.remove();
             $tpl = null;
-            UrlStack.pop('#ModelessDialog');
+            UrlStack.pop('#Dialog'+stackId);
+            --stackId;
             if (onCloseCB !== null) {
                 onCloseCB(); // invoke user callback
             }
@@ -214,14 +231,14 @@ var ModelessDialog = function(options) {
     };
 
     THIS.isMinimized = function() {
-        return !$tpl.find('.ModelessDialog_content').is(':visible');
+        return !$tpl.find('.Dialog_content').is(':visible');
     };
 
     THIS.toggleMinimize = function() {
         var willMin = !THIS.isMinimized();
-        $tpl.find('.ModelessDialog_content,.ModelessDialog_resz').toggle();
-        $tpl.find('.ModelessDialog_closeCage').toggle(!willMin);
-        $tpl.find('.ModelessDialog_minCage input').val(willMin ? '¯' : '_');
+        $tpl.find('.Dialog_content,.Dialog_resz').toggle();
+        $tpl.find('.Dialog_closeCage').toggle(!willMin);
+        $tpl.find('.Dialog_minCage input').val(willMin ? '¯' : '_');
         if (willMin) {
             prevMinPos = { // keep current pos
                 x: $tpl.offset().left,
@@ -245,12 +262,12 @@ var ModelessDialog = function(options) {
     };
 
     THIS.setCaption = function(text) {
-        $tpl.find('.ModelessDialog_title').empty().append(text);
+        $tpl.find('.Dialog_title').empty().append(text);
         return THIS;
     };
 
     THIS.removeCloseButton = function() {
-        $tpl.find('.ModelessDialog_closeCage').remove();
+        $tpl.find('.Dialog_closeCage').remove();
         return THIS;
     };
 
@@ -270,12 +287,12 @@ var ModelessDialog = function(options) {
     };
 };
 
-ModelessDialog.Load = function() {
+Dialog.Load = function() {
     // Static method, since this class can be instantied ad-hoc.
-    return $('#ModelessDialog_template').length ?
-        $.Deferred().done() :
-        App.LoadTemplate('../inc/ModelessDialog.html');
+    return $('#Dialog_template').length ?
+        $.Deferred().resolve().promise() :
+        App.LoadTemplate('../inc/Dialog.html');
 };
 
-return ModelessDialog;
+return Dialog;
 });

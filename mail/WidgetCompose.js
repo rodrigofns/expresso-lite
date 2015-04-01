@@ -8,9 +8,9 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/ModelessDialog',
-    'mail/ThreadMail', 'mail/WidgetAttacher', 'mail/WidgetSearchAddr'],
-function($, App, DateFormat, ModelessDialog, ThreadMail, WidgetAttacher, WidgetSearchAddr) {
+define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/Dialog',
+    'inc/SearchContacts', 'mail/ThreadMail', 'mail/WidgetAttacher' ],
+function($, App, DateFormat, Dialog, SearchContacts, ThreadMail, WidgetAttacher) {
 App.LoadCss('mail/WidgetCompose.css');
 return function(options) {
     var userOpts = $.extend({
@@ -24,9 +24,8 @@ return function(options) {
     var onSendCB  = null;
     var onDraftCB = null;
     var $tpl      = null; // jQuery object with our HTML template
-    var popup     = null; // ModelessDialog object, created on show()
+    var popup     = null; // Dialog object, created on show()
     var attacher  = null; // WidgetAttacher object, created on show()
-    var autocomp  = null; // WidgetSearchAddr object, created on keydown
     var msg       = { fwd:null, re:null, draft:null }; // we have a forwarded/replied/draft message
     var isSending = false; // a "send" async request is running
 
@@ -51,6 +50,7 @@ return function(options) {
     }
 
     function _ResizeWriteField() {
+        if (App.IsPhone()) return; // phones will scroll dialog vertically
         var cy = popup.getContentArea().cy;
         var cyUsed = 0;
         $tpl.children(':visible:not(.Compose_body)').each(function(idx, elem) {
@@ -88,9 +88,9 @@ return function(options) {
                 .replace(/^[,\s]+|[,\s]+$/g, '');
         }
         var curAddr = {
-            to: removeSpacesAndTrimCommas($tpl.find('.Compose_to').val()),
-            cc: removeSpacesAndTrimCommas($tpl.find('.Compose_cc').val()),
-            bcc: removeSpacesAndTrimCommas($tpl.find('.Compose_bcc').val())
+            to: removeSpacesAndTrimCommas($tpl.find('.Compose_toAddrs').text()),
+            cc: removeSpacesAndTrimCommas($tpl.find('.Compose_ccAddrs').text()),
+            bcc: removeSpacesAndTrimCommas($tpl.find('.Compose_bccAddrs').text())
         };
         var changedDraftAddr = (msg.draft !== null && (
             curAddr.to !== removeSpacesAndTrimCommas(msg.draft.to.join(',')) ||
@@ -113,6 +113,9 @@ return function(options) {
             origAction = 'draft';
             origMsg = msg.draft;
         } else { // new message being written from scratch
+            if (attacher.getAll().length) {
+                return true; // an attachment has been added
+            }
             var subj = $.trim($tpl.find('.Compose_subject').val());
             if (subj !== '' || curAddr.to !== '' || curAddr.cc !== '' || curAddr.bcc !== '') {
                 return true;
@@ -138,21 +141,21 @@ return function(options) {
     function _JoinReplyAddresses(headline) {
         var ourMail = userOpts.address;
         var clonedTo = $.grep(headline.to, function(elem, i) {
-                return elem !== ourMail &&
-                    elem !== headline.from.email &&
+                return (elem !== ourMail) &&
+                    (elem !== headline.from.email) &&
                     _ValidateAddresses(elem).status;
             }),
             clonedCc = $.grep(headline.cc, function(elem, i) {
-                return elem !== ourMail &&
-                    elem !== headline.from.email &&
+                return (elem !== ourMail) &&
+                    (elem !== headline.from.email) &&
                     _ValidateAddresses(elem).status;
             });
         if (clonedTo.length && clonedCc.length) {
-            return clonedTo.join(', ')+', '+clonedCc.join(', ')+', ';
+            return clonedTo.join(', ')+', '+clonedCc.join(', ');
         } else if (clonedTo.length) {
-            return clonedTo.join(', ')+', ';
+            return clonedTo.join(', ');
         } else if (clonedCc.length) {
-            return clonedCc.join(', ')+', ';
+            return clonedCc.join(', ');
         } else {
             return '';
         }
@@ -162,9 +165,9 @@ return function(options) {
         var message = {
             subject: $.trim($tpl.find('.Compose_subject').val()),
             body: $tpl.find('.Compose_body').html(),
-            to: $tpl.find('.Compose_to').val().replace(/^[,\s]+|[,\s]+$/g, ''), // trim spaces and commas
-            cc: $tpl.find('.Compose_cc').val().replace(/^[,\s]+|[,\s]+$/g, ''),
-            bcc: $tpl.find('.Compose_bcc').val().replace(/^[,\s]+|[,\s]+$/g, ''),
+            to: $tpl.find('.Compose_toAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''), // trim spaces and commas
+            cc: $tpl.find('.Compose_ccAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''),
+            bcc: $tpl.find('.Compose_bccAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''),
             isImportant: '0', // 0|1 means false|true
             replyToId: null,
             forwardFromId: null,
@@ -246,64 +249,126 @@ return function(options) {
     function _FillNewFields(showOpts) {
         if (showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
             $tpl.find('.Compose_body').html(_PrepareBodyToQuote('new', null));
-            //$tpl.find('.Compose_subject').focus();
         } else if (showOpts.forward !== null) {
             msg.fwd = showOpts.forward; // keep forwarded headline
             $tpl.find('.Compose_subject').val('Fwd: '+msg.fwd.subject);
-            //$tpl.find('.Compose_body').html(_PrepareBodyToQuote('forward', msg.fwd)).focus();
             attacher.rebuildFromMsg(msg.fwd); // when forwarding, keep attachments
         } else if (showOpts.reply !== null) {
             msg.re = showOpts.reply; // keep replied headline
             $tpl.find('.Compose_subject').val('Re: '+msg.re.subject);
-            $tpl.find('.Compose_to').val(msg.re.from.email + ', ');
-            $tpl.find('.Compose_cc').val(_JoinReplyAddresses(msg.re).toLowerCase());
-            $tpl.find('.Compose_toggs a').trigger('click'); // empty ones will be hidden soon, ahead
-            //$tpl.find('.Compose_body').html(_PrepareBodyToQuote('reply', msg.re)).focus();
+            $tpl.find('.Compose_to').show();
+            $tpl.find('.Compose_toBtn').hide();
+            $tpl.find('.Compose_toAddrs').text(msg.re.from.email);
+
+            var replyAddrs = _JoinReplyAddresses(msg.re).toLowerCase();
+            if (replyAddrs.length) {
+                $tpl.find('.Compose_cc').show();
+                $tpl.find('.Compose_ccBtn').hide();
+                $tpl.find('.Compose_ccAddrs').text(replyAddrs);
+            }
         } else if (showOpts.draft !== null) {
             msg.draft = showOpts.draft; // keep draft headline
             $tpl.find('.Compose_subject').val(msg.draft.subject);
-            $tpl.find('.Compose_to').val(msg.draft.to.join(', ').toLowerCase().toLowerCase());
-            $tpl.find('.Compose_cc').val(msg.draft.cc.join(', ').toLowerCase());
-            $tpl.find('.Compose_bcc').val(msg.draft.bcc.join(', ').toLowerCase());
-            $tpl.find('.Compose_toggs a').trigger('click'); // empty ones will be hidden soon, ahead
-            //$tpl.find('.Compose_body').html(_PrepareBodyToQuote('draft', msg.draft)).focus();
+            if (msg.draft.to.length) {
+                $tpl.find('.Compose_to').show();
+                $tpl.find('.Compose_toBtn').hide();
+                $tpl.find('.Compose_toAddrs').text(msg.draft.to.join(', ').toLowerCase());
+            }
+            if (msg.draft.cc.length) {
+                $tpl.find('.Compose_cc').show();
+                $tpl.find('.Compose_ccBtn').hide();
+                $tpl.find('.Compose_ccAddrs').text(msg.draft.cc.join(', ').toLowerCase());
+            }
+            if (msg.draft.bcc.length) {
+                $tpl.find('.Compose_bcc').show();
+                $tpl.find('.Compose_bccBtn').hide();
+                $tpl.find('.Compose_bccAddrs').text(msg.draft.bcc.join(', ').toLowerCase());
+            }
             attacher.rebuildFromMsg(msg.draft); // keep attachments
         }
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').trigger('blur');
         _ResizeWriteField();
     }
 
     function _SetEvents() {
-        $tpl.find('.Compose_toggs a').on('click', function(ev) { // click To, Cc or Bcc link
-            var $lnk = $(this);
-            switch ($lnk.text()) {
-                case 'Para...': $tpl.find('.Compose_to').show().focus(); break;
-                case 'Cc...'  : $tpl.find('.Compose_cc').show().focus(); break;
-                case 'Bcc...' : $tpl.find('.Compose_bcc').show().focus();
+        popup.onUserClose(function() { // when user clicked X button
+            if (_UserWroteSomethingNew()) {
+                var question = (msg.draft === null) ?
+                    'Deseja descartar este email?' :
+                    'Deseja descartar as modificações?';
+                if (window.confirm(question)) {
+                    popup.close();
+                }
+            } else {
+                popup.close();
             }
-            $lnk.hide();
-            if (!$tpl.find('.Compose_toggs a:visible').length) {
-                $tpl.find('.Compose_toggs').hide();
-            }
+        });
+
+        popup.onClose(_PopupClosed); // when dialog is being dismissed
+
+        popup.onResize(_ResizeWriteField);
+
+        attacher.onContentChange(function() {
+            $tpl.find('.Compose_attacher').toggle(attacher.getAll().length > 0);
             _ResizeWriteField();
+        });
+
+        $tpl.find('.Compose_toBtn,.Compose_ccBtn,.Compose_bccBtn').on('click', function(ev) { // click To, Cc or Bcc link
+            var $lnk = $(this);
+            var prefix = $lnk.attr('class'); // like "Compose_toBtn"
+            prefix = '.'+prefix.substr(0, prefix.length - 3); // like ".Compose_to"
+
+            ( new SearchContacts({ caption:$lnk.text() }) ).onClose(function(emails) {
+                if (!emails.length) return;
+                $lnk.hide();
+                $tpl.find(prefix).show();
+                $tpl.find(prefix+'Addrs').text(emails.join(', '));
+                if (!$tpl.find('.Compose_toggs a:visible').length) {
+                    $tpl.find('.Compose_toggs').hide(); // if all three fields are shown, hide links container
+                }
+
+                var $subj = $tpl.find('.Compose_subject');
+                $subj.focus();
+                $subj[0].setSelectionRange($subj.val().length, $subj.val().length);
+                _ResizeWriteField();
+            });
             return false;
         });
 
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('blur', function(ev) { // field loses focus
-            var $txt = $(this); // textarea
-            if ($.trim($txt.val()) === '') { // when the field is empty and loses focus, hide it
-                $tpl.find('.Compose_toggs').show(); // "show" links container
-                $tpl.find('.'+$txt.attr('class')+'Btn').show();
-                $txt.hide();
-                _ResizeWriteField();
+        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('click', function(ev) { // emails field click
+            var $div = $(this);
+            var prefix = '.'+$div.attr('class'); // like ".Compose_to"
+            var capt = '';
+            switch (prefix) {
+                case '.Compose_to': capt = 'Para...'; break;
+                case '.Compose_cc': capt = 'Cc...'; break;
+                case '.Compose_bcc': capt = 'Bcc...';
             }
 
-            window.setTimeout(function() { // allow click event to be triggered
-                if (autocomp !== null) {
-                    autocomp.close();
-                    autocomp = null;
+            ( new SearchContacts({
+                caption: capt,
+                text: $tpl.find(prefix+'Addrs').text()
+            }) ).onClose(function(emails) {
+                if (!emails.length) {
+                    $tpl.find(prefix+'Addrs').text('');
+                    $div.hide();
+                    $tpl.find('.Compose_toggs').show(); // show links container
+                    $tpl.find(prefix+'Btn').show();
+                    _ResizeWriteField();
+                } else {
+                    $tpl.find(prefix+'Addrs').text(emails.join(', '));
                 }
-            }, 50);
+
+                var $subj = $tpl.find('.Compose_subject');
+                $subj.focus();
+                $subj[0].setSelectionRange($subj.val().length, $subj.val().length);
+                _ResizeWriteField();
+            });
+        });
+
+        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('keydown', function(ev) {
+            if (ev.which === 13) { // enter
+                $(this).trigger('click');
+            }
         });
 
         $tpl.find('.Compose_send').on('click', function() { // send email
@@ -372,71 +437,29 @@ return function(options) {
         });
 
         $tpl.find('.Compose_attachNew').on('click', function() {
-            $(this).blur();
             attacher.newAttachment();
-        });
-
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('keydown', function KeyHandle(ev) {
-            if ([0, 27, 13, 38, 40].indexOf(ev.which) !== -1) { // esc, enter, up, dn
-                ev.stopImmediatePropagation();
-                autocomp.processKey(ev.which);
-            } else {
-                if (KeyHandle.timer !== undefined && KeyHandle.timer !== null) {
-                    window.clearTimeout(KeyHandle.timer);
-                    KeyHandle.timer = null;
-                }
-                var $textarea = $(this);
-                KeyHandle.timer = window.setTimeout(function() { // so that keydown process completes
-                    autocomp = new WidgetSearchAddr({ $elem:$textarea });
-                    autocomp.onClick(function(token, ct) {
-                        var newtxt = $textarea.val();
-                        newtxt = newtxt.substr(0, newtxt.length - token.length) + ct.emails.join(', ');
-                        $textarea.val(newtxt+', ');
-                        $textarea[0].setSelectionRange(newtxt.length + 2, newtxt.length + 2);
-                        window.setTimeout(function() { $textarea.focus(); }, 10);
-                    });
-                }, 150);
-            }
-        });
-
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('keypress', function(ev) {
-            if (ev.keyCode === 13) { // enter; new line disabled
-                ev.stopImmediatePropagation();
-                return false;
-            }
+            var $subj = $tpl.find('.Compose_subject');
+            $subj.focus();
+            $subj[0].setSelectionRange($subj.val().length, $subj.val().length);
         });
     }
 
     function _CreateNewDialog(showOpts) {
         var defer = $.Deferred();
         $tpl = $('#Compose_template .Compose_panel').clone(); // create new HTML template object
-        _SetEvents();
 
-        popup = new ModelessDialog({ // create new modeless dialog object
+        popup = new Dialog({ // create new modeless dialog object
             $elem: $tpl,
             caption: 'Escrever email',
-            width: 550,
+            width: 620,
             height: $(window).outerHeight() - 120,
             minWidth: 300,
-            minHeight: 450
+            minHeight: 450,
+            modal: false
         });
-        popup.onUserClose(function() { // when user clicked X button
-            if (_UserWroteSomethingNew()) {
-                var question = (msg.draft === null) ?
-                    'Deseja descartar este email?' :
-                    'Deseja descartar as modificações?';
-                if (window.confirm(question)) {
-                    popup.close();
-                }
-            } else {
-                popup.close();
-            }
-        });
-        popup.onClose(_PopupClosed); // when dialog is being dismissed
-        popup.onResize(_ResizeWriteField);
         popup.show().done(function() {
             if (showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
-                $tpl.find('.Compose_subject').focus();
+                $tpl.find('.Compose_toBtn').focus();
             } else if (showOpts.forward !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('forward', msg.fwd)).focus();
             } else if (showOpts.reply !== null) {
@@ -448,11 +471,7 @@ return function(options) {
         });
 
         attacher = new WidgetAttacher({ $elem:$tpl.find('.Compose_attacher') });
-        attacher.onContentChange(function() {
-            $tpl.find('.Compose_attacher').toggle(attacher.getAll().length > 0);
-            _ResizeWriteField();
-        });
-
+        _SetEvents();
         _FillNewFields(showOpts);
         return defer.promise();
     }
@@ -460,12 +479,12 @@ return function(options) {
     THIS.load = function() {
         var defer = $.Deferred();
         ( $('#Compose_template').length ? // load once
-            $.Deferred().done() :
+            $.Deferred().resolve().promise() :
             App.LoadTemplate('WidgetCompose.html')
         ).done(function() {
             $.when(
-                ModelessDialog.Load(),
-                WidgetSearchAddr.Load(),
+                Dialog.Load(),
+                SearchContacts.Load(),
                 WidgetAttacher.Load()
             ).done(function() {
                 defer.resolve();

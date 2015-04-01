@@ -1,0 +1,28 @@
+<!--
+ * Expresso Lite
+ * SearchContacts widget template.
+ *
+ * @package   Lite
+ * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
+ * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+-->
+
+<section id="SearchContacts_template">
+    <section class="SearchContacts_box">
+        <textarea class="SearchContacts_field" placeholder="Endereços..."></textarea>
+        <div class="SearchContacts_results"></div>
+        <div class="SearchContacts_footer">
+            <span class="SearchContacts_throbber">Pesquisando no catálogo... <img  src="../img/chromiumthrobber.svg"/></span>
+            <input type="button" class="SearchContacts_searchBeyond"
+                value="Mais resultados..." title="Buscar no catálogo corporativo do Expresso"/>
+        </div>
+    </section>
+    <div class="SearchContacts_oneResult">
+        <div class="SearchContacts_name"></div>
+        <div>
+            <span class="SearchContacts_orgUnit"></span>
+            <span class="SearchContacts_mail"></span>
+        </div>
+    </div>
+</section>
