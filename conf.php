@@ -9,8 +9,8 @@
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
-define('BACKEND_URL', 'https://expressov3.serpro.gov.br/index.php');
-define('CLASSIC_URL', 'https://expressov3.serpro.gov.br');
+define('BACKEND_URL', 'https://expressobr.serpro.gov.br/index.php');
+define('CLASSIC_URL', 'https://expressobr.serpro.gov.br');
 define('ANDROID_URL', '');
 define('IOS_URL',     ''); // app download links
 

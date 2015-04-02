@@ -43,7 +43,7 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
     <div id="credent">
         <img id="logo" src="img/logo-lite-165.png"/>
         <form id="frmLogin">
-            <input type="text" id="user" placeholder="usuário" value="<?php echo $lastLogin;?>"/>
+            <input type="text" id="user" placeholder="usuário" value="<?php echo urldecode($lastLogin);?>"/>
             <input type="password" id="pwd" placeholder="senha"/>
             <input type="submit" id="btnLogin" value="login"/>
             <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>

@@ -18,7 +18,7 @@ require(['jquery', 'inc/App'], function($, App) {
         if (!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
             $('#frmLogin').html('Os browsers mínimos suportados são Firefox 24, Chrome 25 e Safari 7.<br/>' +
                 'Utilize o webmail padrão do Expresso em:<br/>' +
-                '<a href="http://expressov3.serpro.gov.br">http://expressov3.serpro.gov.br</a>');
+                '<a href="http://expressobr.serpro.gov.br">http://expressobr.serpro.gov.br</a>');
             return false;
         }
 
