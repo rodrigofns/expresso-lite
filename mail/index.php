@@ -15,6 +15,7 @@ $tineSession = ExpressoLite\Backend\TineSessionRepository::getTineSession();
 
 if(!$tineSession->isLoggedIn()) {
     header('location: ../');
+    die();
 }
 ?>
 <!DOCTYPE html>

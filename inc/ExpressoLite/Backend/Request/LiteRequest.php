@@ -15,6 +15,7 @@ use ExpressoLite\Backend\AjaxProcessor;
 use ExpressoLite\Backend\Exception\LiteException;
 use ExpressoLite\TineTunnel\TineSession;
 use ExpressoLite\Backend\LiteRequestProcessor;
+use ExpressoLite\Backend\TineSessionRepository;
 
 abstract class LiteRequest
 {
@@ -74,7 +75,7 @@ abstract class LiteRequest
      * situations in which calling a request without a session is allowed.
      *
      * @return true or false, indicating whether the request may be invoked
-     * without a TineSession     
+     * without a TineSession
      */
        public function allowAccessWithoutSession()
     {
@@ -124,7 +125,7 @@ abstract class LiteRequest
      *
      * @param string $paramName The name of the parameter we want to check
      *
-     * @return boolean true if the parameter was informed to this request, 
+     * @return boolean true if the parameter was informed to this request,
      *                 false otherwise
      */
     public function isParamSet($paramName)
@@ -170,12 +171,23 @@ abstract class LiteRequest
      * @param $object The objetct that has the desired field
      * @param string $field The name of the field we want to get the value of
      * @param $defaultValue The value to be returned when the field is not set
-     * 
+     *
      * @return The object attribute or the default value.
      */
     public function coalesce($object, $field, $defaultValue)
     {
         return isset($object->{$field}) ? $object->{$field} : $defaultValue;
+    }
+
+    /**
+     * Dumps the current tineSession associated to this request
+     * with a new one provided by TineSessionRepository
+     *
+     * @return TineSession The new TineSession
+     *
+     */
+    public function resetTineSession() {
+        $this->tineSession = TineSessionRepository::resetTineSession();
     }
 }
 

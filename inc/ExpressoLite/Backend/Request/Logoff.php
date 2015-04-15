@@ -18,10 +18,10 @@ class Logoff extends LiteRequest
      */
     public function execute()
     {
-        $this->tineSession->logout();
+        $response = $this->tineSession->logout();
 
-        return (object) array(
-            'success' => true
-        );
+        $this->resetTineSession();
+
+        return (object) $response;
     }
 }

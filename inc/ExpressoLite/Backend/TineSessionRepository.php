@@ -42,6 +42,17 @@ class TineSessionRepository
     }
 
     /**
+     * Dumps the current tineSession and creates a new one
+     *
+     * @return TineSession The new TineSession
+     *
+     */
+    public static function resetTineSession() {
+        $tineSession = self::createNewTineSession();
+        self::storeTineSession($tineSession);
+    }
+
+    /**
      * Creates and inits a new TineSession.
      *
      * @return a new TineSession
@@ -70,8 +81,7 @@ class TineSessionRepository
     public static function getTineSession()
     {
         if (! isset($_SESSION[self::TINE_SESSION])) {
-            $tineSession = self::createNewTineSession();
-            self::storeTineSession($tineSession);
+            self::resetTineSession();
         }
         return $_SESSION[self::TINE_SESSION];
     }

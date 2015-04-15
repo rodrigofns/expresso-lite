@@ -62,7 +62,7 @@ class JsonRpc extends Request
      * @return The RPC result
      *
      */
-    public function send()
+    public function send($method = self::POST)
     {
         if ($this->rpcMethod == null) {
             throw new RpcException('rpcMethod is not defined');
@@ -75,7 +75,7 @@ class JsonRpc extends Request
             'params' => $this->rpcParams
         )));
 
-        $rawResponse = parent::send(parent::POST);
+        $rawResponse = parent::send($method);
 
         return json_decode($rawResponse);
     }

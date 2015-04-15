@@ -14,8 +14,8 @@ namespace ExpressoLite\TineTunnel;
 
 use ExpressoLite\TineTunnel\CookieHandler;
 use ExpressoLite\TineTunnel\TineJsonRpc;
-use ExpressoLite\TineTunnel\Exception\TineException;
 use ExpressoLite\TineTunnel\Exception\PasswordExpiredException;
+use ExpressoLite\TineTunnel\Exception\TineTunnelException;
 
 class TineSession implements CookieHandler
 {
@@ -168,7 +168,7 @@ class TineSession implements CookieHandler
                 'securitycode' => ''
             ));
         } catch (Exception $e) {
-            throw new TineException('Tinebase.login: ' . $e->getMessage(), 0, $e);
+            throw new TineTunnelException('Tinebase.login: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -252,8 +252,14 @@ class TineSession implements CookieHandler
         try {
             $response = $this->jsonRpc('Tinebase.logout');
             $this->jsonKey = null;
-        } catch (Exception $e) {
-            throw new TineException('Tinebase.logout: ' . $e->getMessage(), 0, $e);
+        } catch (\Exception $e) {
+            $this->jsonKey = null;
+            // it is better to reset jsonKey to make this session to be considered
+            // as not logged in even if something wrong happens during logout.
+            // This way, the user will be able to login to a new session and
+            // won't be stuck with a bogus tineSession
+
+            throw new TineTunnelException('Tinebase.logout: ' . $e->getMessage(), 0, $e);
         }
     }
 

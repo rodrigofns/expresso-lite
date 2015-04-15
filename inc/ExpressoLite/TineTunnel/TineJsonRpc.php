@@ -113,7 +113,7 @@ class TineJsonRpc extends JsonRpc
      *
      * @return Response given by Tine
      */
-    public function send()
+    public function send($method = self::POST)
     {
         if ($this->tineUrl == null) {
             throw new RpcException('tineUrl is not defined');
@@ -140,7 +140,7 @@ class TineJsonRpc extends JsonRpc
         $response = parent::send();
 
         if (! $this->acceptErrors && isset($response->error)) {
-            throw new TineException('Tine error ' . $response->error->code . ': ' . $response->error->message);
+            throw new TineTunnelException('Tine error ' . $response->error->code . ': ' . $response->error->message);
         }
 
         return $response;

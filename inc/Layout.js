@@ -217,8 +217,15 @@ return function(options) {
             ev.stopImmediatePropagation();
             $('#Layout_logoff').css('display', 'none');
             $('#Layout_loggingOff').css('display', 'inline-block');
-            App.Post('logoff').done(function(data) {
+            App.Post('logoff')
+            .done(function(data) {
                 location.href = '.';
+            }).fail(function(error) {
+                console.error('Logout error: ' + error.responseText);
+                location.href = '.';
+                // server side processing will usually invalidate the current
+                // session even if it throws an error. So, it's reasonably
+                // safe to fail silently and go back to the login screen
             });
         });
 
