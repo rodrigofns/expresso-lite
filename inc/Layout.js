@@ -219,7 +219,7 @@ return function(options) {
             $('#Layout_loggingOff').css('display', 'inline-block');
             App.Post('logoff')
             .done(function(data) {
-                location.href = '.';
+                location.href = '..';
             }).fail(function(error) {
                 console.error('Logout error: ' + error.responseText);
                 location.href = '.';

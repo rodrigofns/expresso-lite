@@ -1,5 +1,5 @@
-<?php
-/*!
+<!DOCTYPE html>
+<!--
  * Expresso Lite
  * Entry index page for mail module.
  *
@@ -8,17 +8,7 @@
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
-
-require_once (dirname(__FILE__) .'/../inc/bootstrap.php');
-
-$tineSession = ExpressoLite\Backend\TineSessionRepository::getTineSession();
-
-if(!$tineSession->isLoggedIn()) {
-    header('location: ../');
-    die();
-}
-?>
-<!DOCTYPE html>
+-->
 <html>
 <head>
     <meta charset="UTF-8"/>
@@ -30,11 +20,6 @@ if(!$tineSession->isLoggedIn()) {
     <script src="../inc/require.min.js" data-main="mail.js"></script>
 </head>
 <body>
-    <section id="info"><!-- exposed server constants -->
-        <input type="hidden" id="mailBatch" value="<?=MAIL_BATCH?>"/>
-        <input type="hidden" id="mailAddress" value="<?=$tineSession->getAttribute('Expressomail.email') ?>"/>
-        <input type="hidden" id="mailSignature" value="<?=$tineSession->getAttribute('Expressomail.signature') ?>"/>
-    </section>
     <section id="icons"><!-- icon templates -->
         <img class="throbber" src="../img/chromiumthrobber.svg"/>
         <div class="icoReplied" title="Você respondeu este email"></div>

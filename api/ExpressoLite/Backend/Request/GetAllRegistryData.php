@@ -21,6 +21,13 @@ class GetAllRegistryData extends LiteRequest
     public function execute()
     {
         $response = $this->jsonRpc('Tinebase.getAllRegistryData');
+        $response->result->liteConfig = (object) array(
+            'classicUrl' => CLASSIC_URL,
+            'androidUrl' => ANDROID_URL,
+            'iosUrl' => IOS_URL,
+            'mailBatch' => MAIL_BATCH,
+            'packageString' => PACKAGE_STRING
+        );
         return $response->result;
     }
 

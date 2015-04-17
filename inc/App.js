@@ -30,9 +30,27 @@ return {
     Post: function(requestName, params) {
         // Usage: App.Post('searchFolders', { parentFolder:'1234' });
         // Returns a promise object.
-        return $.post(require.toUrl('.'), // follows require.config() baseUrl
-            $.extend({ r:requestName }, params));
-    },
+        var backendUrl = require.toUrl('.'); // follows require.config() baseUrl
+
+        var defer = $.Deferred();
+
+        $.post(
+            backendUrl + '/api/ajax.php',
+            $.extend({r:requestName}, params)
+        ).done(function (data) {
+            defer.resolve(data);
+        }).fail(function (data) {
+            if (data.status === 401) { //session timeout
+                document.location.href='../';
+                // as this will leave the current screen, we
+                // won't neither resolve or reject
+            } else {
+                defer.reject(data);
+            }
+        });
+
+        return defer.promise();
+     },
 
     LoadTemplate: function(htmlFileName) {
         // HTML file can be a relative path.
@@ -47,6 +65,33 @@ return {
 
     IsPhone: function() {
         return $(window).width() <= 1024; // should be consistent with all CSS media queries
+    },
+
+    SetUserInfo: function(entryIndex, entryValue) {
+        sessionStorage.setItem('user_info_'+entryIndex, entryValue);
+    },
+
+    GetUserInfo: function(entryIndex) {
+        return sessionStorage.getItem('user_info_'+entryIndex);
+    },
+
+    SetCookie: function (cookieName, cookieValue, expireDays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (expireDays * 24 * 60 * 60 * 1000));
+        var expires = 'expires='+d.toUTCString();
+        document.cookie = cookieName+'='+cookieValue+'; '+expires;
+    },
+
+    GetCookie: function (cookieName) {
+        var name = cookieName+'=';
+        var allCookies = document.cookie.split(';');
+        for(var i=0; i < allCookies.length; i++) {
+            var cookie = allCookies[i].replace(/^\s+/,''); //this trims spaces in the left of the string;
+            if (cookie.indexOf(name) === 0) {
+                return cookie.substring(name.length,cookie.length);
+            }
+        }
+        return null;
     }
 };
 });

@@ -20,6 +20,7 @@
 #btnLogin { margin:3px 0; }
 .throbber { display:none; margin:6px 0; }
 .throbber > span { font-style:italic; color:#666; -moz-user-select:none; -webkit-user-select:none; }
+#links {display: none;} /* initially invisible, is changed after filled */
 @media (max-width:1024px) { /* mobile */
     #credent { margin:10% auto; }
     #topgray,#thebg,#blue,#versionInfo { z-index:-1; }

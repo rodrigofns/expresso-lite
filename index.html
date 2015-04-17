@@ -1,31 +1,14 @@
-<?php
-/*!
+<!DOCTYPE html>
+<!--
  * Expresso Lite
  * Main index login page.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
-
-use ExpressoLite\Backend;
-require_once (dirname(__FILE__).'/inc/bootstrap.php');
-define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
-
-if(isset($_REQUEST['r'])) { // that's an AJAX request
-    $processor = new ExpressoLite\Backend\AjaxProcessor();
-    $processor->processHttpRequest($_REQUEST);
-    exit; // nothing is outputted here
-}
-
-if (Backend\TineSessionRepository::getTineSession()->isLoggedIn()) {
-    header('location: ./mail');
-}
-
-$lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] : '';
-?>
-<!DOCTYPE html>
+-->
 <html>
 <head>
     <meta charset="UTF-8"/>
@@ -43,7 +26,7 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
     <div id="credent">
         <img id="logo" src="img/logo-lite-165.png"/>
         <form id="frmLogin">
-            <input type="text" id="user" placeholder="usuário" value="<?php echo urldecode($lastLogin);?>"/>
+            <input type="text" id="user" placeholder="usuário"/>
             <input type="password" id="pwd" placeholder="senha"/>
             <input type="submit" id="btnLogin" value="login"/>
             <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
@@ -59,20 +42,17 @@ $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? $_COOKIE['TINE20LASTUSERID'] 
         </form>
     </section>
     <div id="links">
-        <?php if (ANDROID_URL != '') { ?>
-        <a href="<?php echo ANDROID_URL?>" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
+        <a id="androidHref" href="" title="Baixe na Google Play™"><img src="img/store-play.png"/><!-- Google Play é uma marca registrada da Google Inc. --></a>
         <!-- Google Play é uma marca registrada da Google Inc. -->
-        <?php } ?>
-        <?php if (IOS_URL != '') { ?>
-        <a href="<?php echo IOS_URL?>" title="Baixe na Apple Store™"><img src="img/store-apple.png"/></a>
+
+        <a id="iosHref" href="" title="Baixe na Apple Store™"><img src="img/store-apple.png"/><!-- Apple Store é uma marca registrada da Apple Inc. --></a>
         <!-- Apple Store é uma marca registrada da Apple Inc. -->
-        <?php } ?>
+        
         <br/>
-        <a href="<?php echo CLASSIC_URL;?>">Ir para a versão clássica do Expresso</a>
+        <a id="classicHref" href="">Ir para a versão clássica do Expresso</a>
     </div>
     <div id="versionInfo">
         Informações da Versão<br />
-        <?php echo EXPRESSOLITE_PACKAGE_STRING;?><br />
     </div>
 </body>
 </html>

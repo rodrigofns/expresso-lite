@@ -42,7 +42,7 @@ class AjaxProcessor {
             } catch ( Exception $e ) {
                 $msg = $e->getMessage ();
                 // TODO: log exception
-                $result = $this->createHttpError ( 500, "Error executing $methodName. Message: $msg" );
+                $result = $this->createHttpError ( 500, "Error executing $requestName. Message: $msg" );
             }
 
             $this->echoResult ( $result );

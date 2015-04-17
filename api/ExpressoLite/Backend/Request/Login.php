@@ -34,7 +34,11 @@ class Login extends LiteRequest
         }
 
         return (object) array(
-            'success' => $result
+            'success' => $result,
+            'userInfo' => (object) array (
+                'mailAddress' => $this->tineSession->getAttribute('Expressomail.email'),
+                'mailSignature' => $this->tineSession->getAttribute('Expressomail.signature')
+            )
         );
     }
 

@@ -452,7 +452,7 @@ return function(options) {
         var idx = $lnk.parent('span').index(); // child index; 0 is "<b>Anexo</b>", others are the link spans
         var headline = $lnk.closest('.Messages_unit').data('headline');
         var attach = headline.attachments[idx - 1];
-        window.open('../?' +
+        window.open('../api/ajax.php?' +
             'r=downloadAttachment&' +
             'fileName='+encodeURIComponent(attach.filename)+'&' +
             'messageId='+headline.id+'&' +

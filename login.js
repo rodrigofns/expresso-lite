@@ -23,6 +23,11 @@ require(['jquery', 'inc/App'], function($, App) {
         }
 
         // Initial stuff.
+        var user = App.GetCookie('user');
+        if (user !== null) {
+            $('#user').val(user);
+        }
+
         if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
         LoadServerStatus();
@@ -71,7 +76,18 @@ require(['jquery', 'inc/App'], function($, App) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+
                 'É possível que o Expresso esteja fora do ar.');
         }).done(function(data) {
-            $('#versionInfo').append(data.Tinebase.version.packageString).fadeIn(400);
+            $('#versionInfo').append(
+                    data.liteConfig.packageString+'<br/>'+
+                    data.Tinebase.version.packageString
+            ).fadeIn(400);
+            
+            ShowDownloadLinks({
+                android: data.liteConfig.androidUrl,
+                ios: data.liteConfig.iosUrl,
+                classic: data.liteConfig.classicUrl
+            });
+            
+            App.SetUserInfo('mailBatch', data.liteConfig.mailBatch);
         });
     }
 
@@ -88,22 +104,26 @@ require(['jquery', 'inc/App'], function($, App) {
             $('#user').focus();
         }
 
-        $.post('.', { r:'login', user:$('#user').val(), pwd:$('#pwd').val() })
+        App.Post('login', {user:$('#user').val(), pwd:$('#pwd').val() })
         .fail(function(resp) {
             window.alert('Não foi possível efetuar login.\n' +
                 'O usuário ou a senha estão incorretos.');
             RestoreLoginState();
-        }).done(function(data) {
-            if (data.expired) {
+        }).done(function(response) {
+            if (response.expired) {
                 RestoreLoginState();
                 window.alert('Sua senha expirou, é necessário trocá-la.');
                 var $frmLogin = $('#frmLogin').replaceWith($('#frmChangePwd')).appendTo('#templates');
                 $('#cpNewPwd').focus();
-            } else if (!data.success) {
+            } else if (!response.success) {
                 window.alert('Não foi possível efetuar login.\n' +
                     'O usuário ou a senha estão incorretos.');
                 RestoreLoginState();
             } else {
+            	for (var i in response.userInfo) {
+            	    App.SetUserInfo(i, response.userInfo[i]);
+            	}
+                App.SetCookie('user', $('#user').val(), 30); //store for 30 days
                 $('#credent,#links,#versionInfo').hide();
                 $('#thebg').fadeOut({ duration:400, queue:false });
                 $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
@@ -172,5 +192,25 @@ require(['jquery', 'inc/App'], function($, App) {
             return false;
         }
         return true;
+    }
+
+    function ShowDownloadLinks(urls) {
+        // urls should have the following format: {android: '', ios: '', classic: ''}
+        
+        if (urls.android === '' || urls.android === undefined) {
+            $('#androidHref').remove();
+        } else {
+            $('#androidHref').attr('href', urls.android);
+        }
+
+        if (urls.ios === '' || urls.ios === undefined) {
+            $('#iosHref').remove();
+        } else {
+            $('#iosHref').attr('href', urls.ios);
+        }
+
+        $('#classicHref').attr('href', urls.classic);
+
+        $('#links').show();
     }
 });

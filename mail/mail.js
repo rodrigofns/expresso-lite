@@ -17,7 +17,7 @@ require(['jquery', 'inc/App', 'inc/UrlStack', 'inc/Layout', 'inc/Contacts', 'mai
     'mail/WidgetCompose', 'mail/WidgetFolders', 'mail/WidgetHeadlines', 'mail/WidgetMessages', 'inc/SearchContacts'],
 function($, App, UrlStack, Layout, Contacts, ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages, SearchContacts) {
 window.Cache = {
-    MAILBATCH: 50, // overwritten with value from conf in document.ready
+    MAILBATCH: App.GetUserInfo('mailBatch'),
     folders: [], // all folder objects
     layout: null, // renders the main page layout
     treeFolders: null, // folder rendering widget
@@ -28,15 +28,14 @@ window.Cache = {
 
 $(document).ready(function() {
     // Initialize page objects.
-    Cache.MAILBATCH = $('#mailBatch').val();
     Cache.layout = new Layout({
-        userMail: $('#mailAddress').val(),
+        userMail: App.GetUserInfo('mailAddress'),
         $menu: $('#leftColumn'),
         $content: $('#bigBody')
     });
     Cache.wndCompose = new WidgetCompose({
-        address: $('#mailAddress').val(),
-        signature: $('#mailSignature').val(),
+        address: App.GetUserInfo('mailAddress'),
+        signature: App.GetUserInfo('mailSignature'),
         folderCache: Cache.folders
     });
     Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });
@@ -99,7 +98,7 @@ $(document).ready(function() {
 function UpdatePageTitle() {
     var folder = Cache.treeFolders.getCurrent();
     var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
-    document.title = folder.localName+' '+counter+'- '+$('#mailAddress').val()+' - Expresso Lite';
+    document.title = folder.localName+' '+counter+'- '+App.GetUserInfo('mailAddress')+' - Expresso Lite';
     Cache.layout.setTitle(Cache.layout.isContentFullWidth() ?
         'voltar' :
         folder.localName+(folder.unreadMails ? ' ('+folder.unreadMails+')' : '')
