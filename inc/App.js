@@ -9,6 +9,12 @@
  */
 
 define(['jquery'], function($) {
+
+$.ajaxSetup({
+    type: 'POST',
+    headers: { 'cache-control':'no-cache' } // iOS devices may cache POST requests
+});
+
 return {
     LoadCss: function(cssFiles) { // pass any number of files as arguments
         var head = document.getElementsByTagName('head')[0];
@@ -40,7 +46,7 @@ return {
     },
 
     IsPhone: function() {
-        return $(window).width() <= 767; // should be consistent with all CSS media queries
+        return $(window).width() <= 1024; // should be consistent with all CSS media queries
     }
 };
 });

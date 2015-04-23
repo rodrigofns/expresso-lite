@@ -24,10 +24,10 @@
     .rightBody_noMessages { display:none; }
 
     /* When messages are being read. */
-    @media (max-width:767px) { .middleBody_withMessages { display:none; } } /* phone */
-    @media (min-width:768px) { .middleBody_withMessages { width:400px; } } /* desktop */
-    @media (max-width:767px) { .rightBody_withMessages { width:100%; } } /* phone */
-    @media (min-width:768px) { .rightBody_withMessages { left:400px; width:calc(100% - 400px); } } /* desktop */
+    @media (max-width:1024px) { .middleBody_withMessages { display:none; } } /* mobile */
+    @media (min-width:1025px) { .middleBody_withMessages { width:400px; } } /* desktop */
+    @media (max-width:1024px) { .rightBody_withMessages { width:100%; } } /* mobile */
+    @media (min-width:1025px) { .rightBody_withMessages { left:400px; width:calc(100% - 400px); } } /* desktop */
 
 #headlinesArea { }
 #headlinesFooter { text-align:center; padding:12px 0 20px 0; }
@@ -51,10 +51,10 @@
 .icoHigh0     { background-position:0 -96px; }
 .icoHigh1     { background-position:0 -112px; }
 .icoCheck0,.icoCheck1 { background:no-repeat center; display:inline-block; }
-@media (max-width:767px) { /* phone */
+@media (max-width:1024px) { /* mobile */
     .icoCheck0,.icoCheck1 { background-size:80%; width:34px; height:32px; }
 }
-@media (min-width:768px) { /* desktop */
+@media (min-width:1025px) { /* desktop */
     .icoCheck0,.icoCheck1 { width:32px; height:32px; }
 }
 .icoCheck0 { background-image:url(../img/check0.png); }

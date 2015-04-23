@@ -141,7 +141,7 @@ var Dialog = function(options) {
             THIS.toggleMinimize();
         });
 
-        $tpl.find('.Dialog_closeCage input').on('click', function(ev) {
+        $tpl.find('.Dialog_backBtn input,.Dialog_closeCage input').on('click', function(ev) {
             ev.stopImmediatePropagation();
             if (onUserCloseCB !== null) {
                 onUserCloseCB(); // invoke user callback, user must call close() himself
@@ -162,7 +162,7 @@ var Dialog = function(options) {
         $tpl.find('.Dialog_content').append($targetDiv);
 
         if (App.IsPhone()) {
-            $tpl.find('.Dialog_minCage,.Dialog_resz').hide();
+            $tpl.find('.Dialog_minCage,.Dialog_closeCage,.Dialog_resz').hide();
             ++stackId;
             UrlStack.push('#Dialog'+stackId, function() {
                 $tpl.find('.Dialog_closeCage input:first').trigger('click');
@@ -177,6 +177,7 @@ var Dialog = function(options) {
                 left: ($(window).outerWidth() / 2 - $tpl.outerWidth() / 2)+'px', // center screen
                 top: Math.max(0, $(window).outerHeight() / 2 - $tpl.outerHeight() / 2)+'px'
             });
+            $tpl.find('.Dialog_backBtn').hide();
             if (!userOpts.resizable) {
                 $tpl.find('.Dialog_resz').hide();
             }

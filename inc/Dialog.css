@@ -12,6 +12,7 @@
 .Dialog_box { position:fixed; background:white; box-shadow:1px 1px 12px #666; }
 .Dialog_bar { overflow:hidden; padding:6px; border-bottom:1px solid #DDD; cursor:move;
     -moz-user-select:none; -webkit-user-select:none; user-select:none; background:#005483; }
+.Dialog_backBtn { display:inline-block; margin-right:10px; }
 .Dialog_title { font-weight:bold; color:#F0F0F0; display:inline-block; margin-top:3px; }
 .Dialog_minCage,.Dialog_closeCage { padding:0 1px; display:inline-block; float:right; }
 .Dialog_content { height:calc(100% - 43px); } /* _title has 43px */

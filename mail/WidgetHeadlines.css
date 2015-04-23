@@ -17,7 +17,7 @@
 .Headlines_entryChecked { background:#FFC; }
 .Headlines_sender { font-weight:normal; }
 .Headlines_folderName { font-size:80%; color:#87A6D2; }
-@media (max-width:767px) { /* phones */
+@media (max-width:1024px) { /* mobile */
     .Headlines_entry     { display:block; padding:2px 4px; position:relative; }
     .Headlines_check     { display:inline-block; float:left; }
     .Headlines_sender    { display:inline-block; width:88%; color:#777; }
@@ -26,7 +26,7 @@
     .Headlines_icons     { display:inline-block; float:right; }
     .Headlines_when      { display:inline-block; margin-left:32px; width:50%; font-size:80%; color:#888; }
 }
-@media (min-width:768px) { /* everyone else */
+@media (min-width:1025px) { /* desktop */
     .Headlines_entry     { display:table; width:100%; }
     .Headlines_entry > div { padding:6px; display:table-cell; vertical-align:middle; }
     .Headlines_check     { width:26px; padding:0 !important; }

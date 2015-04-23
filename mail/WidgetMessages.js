@@ -27,6 +27,25 @@ return function(options) {
     var onMarkReadCB = null;
     var onMoveCB     = null;
 
+    function _EnlargeMugshot($img, bEnlarge) {
+        var defer = $.Deferred();
+        var src = $img.attr('src');
+        if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
+            if (bEnlarge) {
+                $img.css('box-shadow', '3px 3px 3px #888')
+                    .animate({ width:'90px' }, { duration:70, queue:false, complete:function() {
+                        defer.resolve();
+                    } });
+            } else {
+                $img.animate({ width:'20px' }, { duration:70, queue:false, complete:function() {
+                    $img.css('box-shadow', '');
+                    defer.resolve();
+                } });
+            }
+        }
+        return defer.promise();
+    }
+
     function _FormatAttachments(attachs) {
         var ret = '';
         if (attachs !== undefined && attachs.length) {
@@ -446,20 +465,25 @@ return function(options) {
         $(this).next('.Messages_quote').slideToggle(200);
     });
 
-    $targetDiv.on('mouseenter', '.Messages_mugshot > img', function(ev) {
-        var $img = $(this);
-        var src = $img.attr('src');
-        if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
-            $img.css('box-shadow', '3px 3px 3px #888')
-                .animate({ width:'90px' }, { duration:70, queue:false });
+    $targetDiv.on('mouseenter', '.Messages_mugshot > img', function() {
+        if (!App.IsPhone()) {
+            _EnlargeMugshot($(this), true);
         }
-    }).on('mouseleave', '.Messages_mugshot > img', function(ev) {
-        var $img = $(this);
-        var src = $img.attr('src');
-        if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
-            $img.animate({ width:'20px' }, { duration:70, queue:false, complete:function() {
-                $img.css('box-shadow', '');
-            } });
+    }).on('mouseleave', '.Messages_mugshot > img', function() {
+        if (!App.IsPhone()) {
+            _EnlargeMugshot($(this), false);
+        }
+    });
+
+    $targetDiv.on('click', '.Messages_mugshot > img', function(ev) {
+        if (App.IsPhone()) {
+            ev.stopImmediatePropagation();
+            var $img = $(this);
+            _EnlargeMugshot($img, true).done(function() {
+                window.setTimeout(function() {
+                    _EnlargeMugshot($img, false);
+                }, 1250);
+            });
         }
     });
 };

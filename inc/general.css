@@ -18,11 +18,11 @@ input::-moz-focus-inner, button::-moz-focus-inner { border:0; padding:0; }
 html { height:100%; }
 body { height:100%; margin:0; }
 
-@media (max-width:767px) { /* phones */
+@media (max-width:1024px) { /* mobile */
     body, table, input[type=button], input[type=text], input[type=password], input[type=submit], select, button, textarea
     { font:11pt Arial,sans-serif; color:#1A1A1A; }
 }
-@media (min-width:768px) { /* everyone else */
+@media (min-width:1025px) { /* desktop */
     body, table, input[type=button], input[type=text], input[type=password], input[type=submit], select, button, textarea
     { font:10pt Arial,sans-serif; color:#1A1A1A; }
 }

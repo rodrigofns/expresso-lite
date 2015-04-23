@@ -20,12 +20,12 @@
 #btnLogin { margin:3px 0; }
 .throbber { display:none; margin:6px 0; }
 .throbber > span { font-style:italic; color:#666; -moz-user-select:none; -webkit-user-select:none; }
-@media (max-width:767px) { /* phones */
+@media (max-width:1024px) { /* mobile */
     #credent { margin:10% auto; }
     #topgray,#thebg,#blue,#versionInfo { z-index:-1; }
-    #links { position:absolute; top:75%; left:12px; width:90%; z-index:-1; font-size:90%; text-align:center; }
+    #links { position:absolute; top:75%; width:100%; z-index:-1; font-size:90%; text-align:center; }
 }
-@media (min-width:768px) { /* everyone else */
+@media (min-width:1025px) { /* desktop */
     #credent { position:absolute; right:20%; top:17%; }
     #links { position:absolute; bottom:20px; left:12px; font-size:90%; }
 }

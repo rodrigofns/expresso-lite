@@ -146,7 +146,8 @@ class Request
             CURLOPT_HTTPHEADER => $this->headers,
             CURLOPT_COOKIE => $this->getFormattedCookies(),
             CURLOPT_POSTFIELDS => $this->postFields,
-            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+            CURLOPT_FRESH_CONNECT => true
         ));
         $response = curl_exec($curl);
 

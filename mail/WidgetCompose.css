@@ -11,12 +11,12 @@
 #Compose_template { display:none; }
 
 .Compose_panel { }
-@media (max-width:767px) { .Compose_panel { padding:5px; height:100%; overflow-y:scroll; } } /* phone */
-@media (min-width:768px) { .Compose_panel { padding:9px; } } /* desktop */
+@media (max-width:1024px) { .Compose_panel { padding:5px; height:100%; overflow-y:scroll; } } /* mobile */
+@media (min-width:1025px) { .Compose_panel { padding:9px; } } /* desktop */
 
 .Compose_toggs { -moz-user-select:none; -webkit-user-select:none; }
-@media (max-width:767px) { .Compose_toggs { margin:5px 2px 12px 2px; } } /* phone */
-@media (min-width:768px) { .Compose_toggs { margin-bottom:9px; } } /* desktop */
+@media (max-width:1024px) { .Compose_toggs { margin:5px 2px 12px 2px; } } /* mobile */
+@media (min-width:1025px) { .Compose_toggs { margin-bottom:9px; } } /* desktop */
 
 .Compose_to,.Compose_cc,.Compose_bcc,.Compose_attacher { display:none; }
 .Compose_subject,.Compose_to,.Compose_cc,.Compose_bcc,.Compose_body,.Compose_attacher
@@ -28,7 +28,7 @@
     { font-style:italic; color:#666; }
 
 .Compose_body { margin-bottom:8px; border:1px solid #BBB; overflow:auto; }
-@media (max-width:767px) { .Compose_body { height:300px; } } /* phone */
+@media (max-width:1024px) { .Compose_body { height:300px; } } /* mobile */
 
 .Compose_send,.Compose_draft,.Compose_attachNew { margin-bottom:10px; }
 .Compose_attacher { max-height:154px; overflow-x:hidden; overflow-y:auto; }

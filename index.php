@@ -1,5 +1,4 @@
 <?php
-use ExpressoLite\Backend;
 /*!
  * Expresso Lite
  * Main index login page.
@@ -10,6 +9,7 @@ use ExpressoLite\Backend;
  * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
  */
 
+use ExpressoLite\Backend;
 require_once (dirname(__FILE__).'/inc/bootstrap.php');
 define('EXPRESSOLITE_PACKAGE_STRING', 'lite_development');
 
