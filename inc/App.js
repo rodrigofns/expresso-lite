@@ -9,11 +9,38 @@
  */
 
 define(['jquery'], function($) {
+    function _DisableRefreshOnPullDown() {
+        var lastTouchY = 0;
+        var preventPullToRefresh = false;
 
-$.ajaxSetup({
-    type: 'POST',
-    headers: { 'cache-control':'no-cache' } // iOS devices may cache POST requests
-});
+        $('body').on('touchstart', function(e) {
+            if (e.originalEvent.touches.length != 1) return;
+            lastTouchY = e.originalEvent.touches[0].clientY;
+            preventPullToRefresh = window.pageYOffset == 0;
+        });
+
+        $('body').on('touchmove', function(e) {
+            var touchY = e.originalEvent.touches[0].clientY;
+            var touchYDelta = touchY - lastTouchY;
+            lastTouchY = touchY;
+            if (preventPullToRefresh) {
+                preventPullToRefresh = false;
+                if (touchYDelta > 0) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        });
+    }
+
+    (function _Constructor() {
+        $.ajaxSetup({ // iOS devices may cache POST requests, so make no-cache explicit
+            type: 'POST',
+            headers: { 'cache-control':'no-cache' }
+        });
+
+        _DisableRefreshOnPullDown();
+    })();
 
 return {
     LoadCss: function(cssFiles) { // pass any number of files as arguments
