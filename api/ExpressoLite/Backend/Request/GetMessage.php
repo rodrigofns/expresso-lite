@@ -35,8 +35,19 @@ class GetMessage extends LiteRequest
         }
 
         return (object) array(
+            'id' => $response->result->id,
+            'received' => $response->result->received,
+            'subject' => $response->result->subject,
+            'from_name' => $response->result->from_name,
+            'from_email' => $response->result->from_email,
+            'to' => $response->result->to,
+            'cc' => $response->result->cc,
+            'bcc' => $response->result->bcc,
             'body' => $this->breakQuotedMessage($response->result->body),
-            'attachments' => $response->result->attachments
+            'importance' => $response->result->importance,
+            'has_attachment' => $response->result->has_attachment,
+            'attachments' => $response->result->attachments,
+            'folder_id' => $response->result->folder_id
         );
     }
 

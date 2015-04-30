@@ -54,7 +54,7 @@ class SearchFolders extends LiteRequest
         ));
 
         $enToPtTrans = array(
-            'INBOX' => 'Inbox',
+            'INBOX' => 'Caixa de entrada',
             'Drafts' => 'Rascunhos',
             'Sent' => 'Enviados',
             'Templates' => 'Modelos',

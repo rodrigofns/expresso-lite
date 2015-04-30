@@ -330,7 +330,7 @@ class TineSession implements CookieHandler
      */
     public function getAttribute($attrName)
     {
-        return $this->attributes[$attrName];
+        return isset($this->attributes[$attrName]) ? $this->attributes[$attrName] : null;
     }
 
     /**

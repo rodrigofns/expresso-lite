@@ -1,0 +1,84 @@
+/*!
+ * Expresso Lite
+ * CSS for Main.php template.
+ *
+ * @package   Lite
+ * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author    Diogo Santos <diogo.santos@serpro.gov.br>
+ * @author    Edgar Lucca <edgar.lucca@serpro.gov.br>
+ * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+ */
+
+body { background: #FDFDFD; }
+
+#header { margin: 0 0 30px 0; border-bottom: 1px solid #EFEFEF; text-align: center;}
+#signup-inner {
+    width: 280px;
+    margin: 0 auto;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background: #FFF;
+    padding: 40px;
+    border: 10px solid #F2F2F2;
+}
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+form { margin: 30px 0 0 0 }
+#send p {
+    margin-bottom: 20px
+}
+
+label{ font: 14px/24px Helvetica, Arial, sans-serif; }
+input { width: 90% }
+textarea { width: 95%; margin: 0 0 0 2px; }
+input, textarea { color: #666; }
+input {
+    margin-bottom: 10px;
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #C9C9C9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset, -5px -5px 0 0 #F5F5F6, 5px 5px 0 0 #F5F5F6, 5px 0 0 0 #F5F5F6, 0 5px 0 0 #F5F5F6, 5px -5px 0 0 #F5F5F6, -5px 5px 0 0 #F5F5F6;
+    color: #545658;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 2px 2px 2px 2px;
+}
+
+/********* BUTTON - STRUCTURE *********/
+#submit {
+    margin-top: 20px;
+    border: 1px solid #B7D6DF;
+    border-radius: 2px 2px 2px 2px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    color: #437182;
+    cursor: pointer;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    height: auto;
+    padding: 6px 10px;
+    text-shadow: 0 1px 0 #FFFFFF;
+    width: auto;
+}
+
+/********* BUTTON - BEHAVIOR *********/
+#submit:hover {
+    border: 1px solid #9FBAC0;
+    cursor: pointer;
+}
+a { color: #88BBC8; text-decoration: none; }
+a:hover { color: #F26525 }
+
+
+
+/********* HACKS *********/
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}

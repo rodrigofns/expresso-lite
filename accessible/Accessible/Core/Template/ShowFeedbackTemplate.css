@@ -1,0 +1,86 @@
+/*!
+ * Expresso Lite
+ * CSS for ShowFeedbackTemplate.php.
+ *
+ * @package   Lite
+ * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
+ * @author    Fatima Tonon <fatima.tonon@serpro.gov.br>
+ * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+ */
+
+body, table, input[type=button], input[type=text], input[type=password],
+    input[type=submit], select, button, textarea {
+    font: 11pt Arial, sans-serif;
+    color: #272F37;
+    background: #FFF;
+}
+
+a { font-size: 100%; color: #000; text-decoration: none; }
+
+#anchors { display: table; }
+
+#logomark {
+    background-image: url("../../../../img/expressobr_lite.png");
+    background-repeat: no-repeat;
+    background-position: top left;
+    width: 207px;
+    height: 90px;
+    float: left;
+}
+
+.anchors_title {
+    font-weight: 400;
+    font-size: 130%;
+    background-color: #003852;
+    color: #FFF;
+    padding: 7px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+#feedback_message_container { text-align: center; }
+
+#feedback_message {
+    display: inline-block;
+    background-image: url("../../../../img/72px_ok.png");
+    background-repeat: no-repeat;
+    background-position: center left;
+    width: 320px;
+    height: 30px;
+    padding: 35px 45px 35px 55px;
+    text-align: right;
+    font-size: 120%;
+    color: #2C353E;
+    border: 2px solid #2C353E;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+#feedback_message_alert {
+    background-image: url("../../../../img/72px_alert.png");
+    background-repeat: no-repeat;
+    background-position: center left;
+    width: 320px;
+    height: 30px;
+    padding: 35px 45px 35px 55px;
+    text-align: right;
+    font-size: 120%;
+    color: #2C353E;
+    border: 2px solid #2C353E;
+    font-weight: 600;
+    margin: 10px 250px;
+}
+
+#feedback_link a {
+    padding: 5px 10px;
+    text-align: center;
+    width: 40px;
+    background-color: #005076;
+    border: 1px solid #005076;
+    border-radius: 4px;
+    color: #FFF;
+}
+
+#feedback_link  a:hover { background-color: #FFDB79; color: #1B2026; }
+#feedback_link a:focus { background-color: #FF6536; color: #FFF; }
