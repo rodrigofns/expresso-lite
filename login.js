@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
 require.config({
@@ -70,23 +70,35 @@ require(['jquery', 'inc/App'], function($, App) {
     }
 
     function LoadServerStatus() {
-        $('#versionInfo').hide();
+        $('#externalLinks,#versionInfo').hide();
         App.Post('getAllRegistryData')
         .fail(function(resp) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+
                 'É possível que o Expresso esteja fora do ar.');
         }).done(function(data) {
+            $('#classicHref').attr('href', data.liteConfig.classicUrl);
             $('#versionInfo').append(
-                    data.liteConfig.packageString+'<br/>'+
-                    data.Tinebase.version.packageString
-            ).fadeIn(400);
-            
-            ShowDownloadLinks({
-                android: data.liteConfig.androidUrl,
-                ios: data.liteConfig.iosUrl,
-                classic: data.liteConfig.classicUrl
-            });
-            
+                data.liteConfig.packageString+'<br/>'+
+                data.Tinebase.version.packageString
+            );
+
+            // Android and iOS badges are shown only if the respective apps
+            // are currently available at Play & Apple store.
+            if (data.liteConfig.androidUrl === '' || data.liteConfig.androidUrl === undefined) {
+                $('#androidBadge').remove();
+            } else {
+                $('#androidBadge').attr('href', data.liteConfig.androidUrl);
+            }
+
+            if (data.liteConfig.iosUrl === '' || data.liteConfig.iosUrl === undefined) {
+                $('#iosBadge').remove();
+            } else {
+                $('#iosBadge').attr('href', data.liteConfig.iosUrl);
+            }
+
+            $('#externalLinks,#versionInfo').fadeIn(400);
+
+            // Store any other user information in application repository.
             App.SetUserInfo('mailBatch', data.liteConfig.mailBatch);
         });
     }
@@ -120,19 +132,19 @@ require(['jquery', 'inc/App'], function($, App) {
                     'O usuário ou a senha estão incorretos.');
                 RestoreLoginState();
             } else {
-            	for (var i in response.userInfo) {
-            	    App.SetUserInfo(i, response.userInfo[i]);
-            	}
-                App.SetCookie('user', $('#user').val(), 30); //store for 30 days
-                $('#credent,#links,#versionInfo').hide();
+                for (var i in response.userInfo) {
+                    App.SetUserInfo(i, response.userInfo[i]);
+                }
+                App.SetCookie('user', $('#user').val(), 30); // store for 30 days
+                $('#credent,#externalLinks,#versionInfo').hide();
                 $('#thebg').fadeOut({ duration:400, queue:false });
                 $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
                 $('#blue').animate({ top: '7.5%'}, {
                     duration: 500,
                     queue: false,
-                   complete: function() {
-                       location.href = './mail';
-                   }
+                    complete: function() {
+                        location.href = './mail'; // automatically redirect to email module
+                    }
                 });
             }
         });
@@ -192,25 +204,5 @@ require(['jquery', 'inc/App'], function($, App) {
             return false;
         }
         return true;
-    }
-
-    function ShowDownloadLinks(urls) {
-        // urls should have the following format: {android: '', ios: '', classic: ''}
-        
-        if (urls.android === '' || urls.android === undefined) {
-            $('#androidHref').remove();
-        } else {
-            $('#androidHref').attr('href', urls.android);
-        }
-
-        if (urls.ios === '' || urls.ios === undefined) {
-            $('#iosHref').remove();
-        } else {
-            $('#iosHref').attr('href', urls.ios);
-        }
-
-        $('#classicHref').attr('href', urls.classic);
-
-        $('#links').show();
     }
 });
