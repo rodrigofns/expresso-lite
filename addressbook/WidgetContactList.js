@@ -162,6 +162,10 @@ function($, App, WidgetLetterIndex) {
             $pagingFooter
                 .detach() // remove it...
                 .appendTo($mainSection) // ... and then re-append it at the end
+                .on('click', function () {
+                    $mainSection.find('#WidgetContactList_footer').hide();
+                    loadMoreContacts();
+                })
                 .show();
         }
 
@@ -304,12 +308,6 @@ function($, App, WidgetLetterIndex) {
                     .detach();
 
                 $pagingFooter = $('#WidgetContactList_footer').hide();
-
-                $pagingFooter.find('#WidgetContactList_loadMoreButton')
-                .on('click', function () {
-                    $mainSection.find('#WidgetContactList_footer').hide();
-                    loadMoreContacts();
-                });
 
                 $throbber = $('#WidgetContactList_throbber');
 
