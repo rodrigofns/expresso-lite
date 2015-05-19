@@ -70,7 +70,6 @@ require(['jquery', 'inc/App'], function($, App) {
     }
 
     function LoadServerStatus() {
-        $('#externalLinks,#versionInfo').hide();
         App.Post('getAllRegistryData')
         .fail(function(resp) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+

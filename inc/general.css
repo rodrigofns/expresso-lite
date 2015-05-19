@@ -52,3 +52,5 @@ blockquote
 { margin:2px 0 4px 4px; padding-left:5px; border-left:1px solid #BFD2E1; }
 
 /*input[type=text]:focus,input[type=password]:focus { box-shadow:0 0 4px #6EA2DE; }*/
+
+.hidden { display: none; }
