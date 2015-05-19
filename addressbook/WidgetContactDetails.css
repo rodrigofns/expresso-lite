@@ -91,6 +91,11 @@
     display: block;
 }
 
+a.phoneNumber:hover, a.phoneNumber:visited, a.phoneNumber:link, a.phoneNumber:active {
+    text-decoration: none;
+    color: #1a1a1a;
+}
+
 .WidgetContactDetails_phonesDiv * {
     display: inline-block;
     padding-right: 20px;

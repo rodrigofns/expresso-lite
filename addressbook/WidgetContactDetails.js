@@ -78,11 +78,21 @@ function($, App,Contacts) {
             $otherFieldsDiv.fadeIn(200);
         }
 
+        function createTelLink(number) {
+            if (!number) {
+                return '';
+            } else if (App.IsPhone()) {
+                return number ? '<a class="phoneNumber" href="tel:' + number + '">' + number + '</a>' : '';
+            } else {
+                return number;
+            }
+        }
+
         function showContactDetailsFormTopInfo(contact) {
             $mainDiv.find('.WidgetContactDetails_name').html(contact.name);
             $mainDiv.find('.WidgetContactDetails_email').html(contact.email);
-            $mainDiv.find('.WidgetContactDetails_phone').html(contact.phone);
-            $mainDiv.find('.WidgetContactDetails_mobile').html(contact.mobile);
+            $mainDiv.find('.WidgetContactDetails_phone').html(createTelLink(contact.phone));
+            $mainDiv.find('.WidgetContactDetails_mobile').html(createTelLink(contact.mobile));
 
             $mainDiv.find('#WidgetContactDetails_mugshot').css('visibility', 'hidden');
             $mainDiv.find('#WidgetContactDetails_mugshotThrobber').show();
