@@ -30,11 +30,13 @@ class DownloadAttachment extends LiteRequest
         $partId = $this->param('partId');
 
         $mimeType = $this->getMimeType($fileName);
-
         if ($mimeType != null) {
-            header('Content-Type: ' . $mimeTypes[$ext]); // will be opened in browser
+            //WITHOUT 'attachment' in header, will be opened in browser
+            header("Content-Disposition: filename=\"$fileName\"");
+            header('Content-Type: ' . $mimeType);
         } else {
-            header("Content-Disposition: attachment; filename=\"$fileName\""); // will be downloaded
+            //WITH 'attachment' in header, will be downloaded
+            header("Content-Disposition: attachment; filename=\"$fileName\"");
             header('Content-Type: application/octet-stream');
             header('Content-Transfer-Encoding: binary');
         }
