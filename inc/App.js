@@ -10,27 +10,34 @@
 
 define(['jquery'], function($) {
     function _DisableRefreshOnPullDown() {
-        var lastTouchY = 0;
-        var preventPullToRefresh = false;
+        var isFirefoxAndroid =
+            navigator.userAgent.indexOf('Mozilla') !== -1 &&
+            navigator.userAgent.indexOf('Android') !== -1 &&
+            navigator.userAgent.indexOf('Firefox') !== -1;
 
-        $('body').on('touchstart', function(e) {
-            if (e.originalEvent.touches.length != 1) return;
-            lastTouchY = e.originalEvent.touches[0].clientY;
-            preventPullToRefresh = window.pageYOffset == 0;
-        });
+        if (!isFirefoxAndroid) {
+            var lastTouchY = 0;
+            var preventPullToRefresh = false;
 
-        $('body').on('touchmove', function(e) {
-            var touchY = e.originalEvent.touches[0].clientY;
-            var touchYDelta = touchY - lastTouchY;
-            lastTouchY = touchY;
-            if (preventPullToRefresh) {
-                preventPullToRefresh = false;
-                if (touchYDelta > 0) {
-                    e.preventDefault();
-                    return;
+            $('body').on('touchstart', function(e) {
+                if (e.originalEvent.touches.length != 1) return;
+                lastTouchY = e.originalEvent.touches[0].clientY;
+                preventPullToRefresh = window.pageYOffset == 0;
+            });
+
+            $('body').on('touchmove', function(e) {
+                var touchY = e.originalEvent.touches[0].clientY;
+                var touchYDelta = touchY - lastTouchY;
+                lastTouchY = touchY;
+                if (preventPullToRefresh) {
+                    preventPullToRefresh = false;
+                    if (touchYDelta > 0) {
+                        e.preventDefault();
+                        return;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     (function _Constructor() {
