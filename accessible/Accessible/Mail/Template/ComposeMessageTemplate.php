@@ -50,7 +50,7 @@
         </div>
         <div class="Dialog_field">
             <label for="addrCc">Destinatário em cópia:</label><br />
-            <input type="email" multiple="multiple" name="addrCc" />
+            <input type="email" multiple="multiple" name="addrCc" value="<?= $VIEW->cc ?>" />
         </div>
         <div class="Dialog_field">
             <label for="addrBcc">Destinatário em cópia oculta:</label><br />
