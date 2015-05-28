@@ -60,7 +60,14 @@
     <?php ENDIF; ?>
 
     <?php IF ($VIEW->message->has_attachment) : ?>
-        <div><span class="fieldName">Observação:</span> Esta mensagem possui anexo.</div>
+        <div class="menu">
+            <span class="fieldName">Anexos:</span>
+            <ul id="attachments">
+            <?php FOREACH ($VIEW->message->attachments as $ATTACH) : ?>
+                <li><a href="<?= $ATTACH->lnkDownload ?>"><?= $ATTACH->filename ?></a></li>
+            <? ENDFOREACH; ?>
+            </ul>
+        </div>
     <?php ENDIF; ?>
 </div>
 

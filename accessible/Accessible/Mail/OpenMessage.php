@@ -37,6 +37,8 @@ class OpenMessage extends Handler
             $message->subject = '(sem assunto)';
         }
 
+        $this->createAttachmentsLinks($message->attachments, $params->messageId);
+
         $this->showTemplate('OpenMessageTemplate', (object) array(
             'folderName' => $params->folderName,
             'message' => $message,
@@ -72,5 +74,22 @@ class OpenMessage extends Handler
                 'forward' => 'yes'
             ))
         ));
+    }
+
+    /**
+     * In-place update of attachments array by adding the download links.
+     *
+     * @param array  $attachments Attachments array from message object.
+     * @param string $msgId       ID of current message.
+     */
+    private function createAttachmentsLinks(array $attachments, $msgId)
+    {
+        foreach ($attachments as $attach) {
+            $attach->lnkDownload = '../api/ajax.php?' .
+                'r=downloadAttachment&' .
+                'fileName=' . urlencode($attach->filename) . '&' .
+                'messageId=' . $msgId . '&' .
+                'partId=' . $attach->partId;
+        }
     }
 }
