@@ -132,6 +132,10 @@ class ComposeMessage extends Handler
      */
     private function prepareQuotedMessage($params, $msg = null)
     {
+        if (is_null($msg)) {
+            return '';
+        }
+
         $formatedDate = date('d/m/Y H:i', strtotime($msg->received));
         if (isset($params->reply) && $msg !== null) {
             return '<br />Em ' . $formatedDate . ', ' .
