@@ -13,6 +13,7 @@ namespace Accessible\Mail;
 
 use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
+use ExpressoLite\Backend\TineSessionRepository;
 use Accessible\Dispatcher;
 
 class DeleteMessage extends Handler
@@ -28,13 +29,22 @@ class DeleteMessage extends Handler
 
     public function execute($params)
     {
+        $folders = TineSessionRepository::getTineSession()->getAttribute('folders');
+        $isTrashFolder = FALSE;
+        foreach ($folders as $fol) {
+            if ($fol->id === $params->folderId) {
+                $isTrashFolder = $fol->globalName === self::TRASH_FOLDER;
+                break;
+            }
+        }
+
         $liteRequestProcessor = new LiteRequestProcessor();
         $message = $liteRequestProcessor->executeRequest('DeleteMessages', (object) array(
             'messages' => $params->messageId,
-            'forever' => $params->isTrashFolder
+            'forever' => $isTrashFolder ? '1' : '0'
         ));
 
-        $outMsg = ($params->isTrashFolder && $params->globalName === self::TRASH_FOLDER) ?
+        $outMsg = ($isTrashFolder) ?
             'Mensagem apagada com sucesso.' :
             'Mensagem movida para lixeira.';
 

@@ -56,7 +56,6 @@ class Main extends Handler
             'start' => $start,
             'limit' => $limit,
             'requestLimit' => self::REQUEST_LIMIT,
-            'forever' => ($curFolder->globalName === self::TRASH_FOLDER) ? 1 : 0,
             'lnkRefreshFolder' => $this->makeUrl('Mail.Main', array(
                 'folderId' => $curFolder->id,
                 'page' => $params->page
@@ -162,8 +161,6 @@ class Main extends Handler
                 'messageId' => $headl->id,
                 'folderId' => $curFolder->id,
                 'folderName' => $curFolder->localName,
-                'globalName' => $curFolder->globalName,
-                'isTrashFolder' => ($curFolder->globalName === self::TRASH_FOLDER) ? 1 : 0,
                 'page' => $curPage
             ));
 
@@ -171,8 +168,6 @@ class Main extends Handler
                 'messageId' => $headl->id,
                 'folderId' => $curFolder->id,
                 'folderName' => $curFolder->localName,
-                'globalName' => $curFolder->globalName,
-                'isTrashFolder' => ($curFolder->globalName === self::TRASH_FOLDER) ? 1 : 0
             ));
 
             $headl->lnkMarkMessage = $this->makeUrl('Mail.MarkMessage', array(
