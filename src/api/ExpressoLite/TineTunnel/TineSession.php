@@ -278,11 +278,6 @@ class TineSession implements CookieHandler
     public function storeCookie($cookie)
     {
         $this->cookies[$cookie->name] = $cookie;
-
-        if (strcmp($cookie->name, 'PHPSESSID') !== 0 && ! defined('TEST_ENVIRONMENT')) {
-            setcookie($cookie->name, $cookie->value, $cookie->expires);
-        }
-        // TODO: remove this if above after refactoring is complete
     }
 
     /**

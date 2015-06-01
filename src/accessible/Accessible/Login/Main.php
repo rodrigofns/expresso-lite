@@ -21,7 +21,7 @@ class Main extends Handler
      */
     public function execute($params)
     {
-        $lastLogin = isset($_COOKIE['TINE20LASTUSERID']) ? urldecode($_COOKIE['TINE20LASTUSERID']) : '';
+        $lastLogin = isset($_COOKIE['user']) ? urldecode($_COOKIE['user']) : '';
         $this->showTemplate('MainTemplate', (object) array(
             'lastLogin' => $lastLogin
         ));
