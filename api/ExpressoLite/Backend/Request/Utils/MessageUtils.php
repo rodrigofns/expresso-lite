@@ -10,7 +10,7 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\Backend\Request\Utils;
 
@@ -174,4 +174,31 @@ class MessageUtils
         return ($mugshot !== null) ? $mugshot : '';
     }
 
+    /**
+     * Uploads raw data to Tine as a temp file that may be used as a message attachment.
+     *
+     * @param  TineSession $tineSession     The TineSession used to communicate with Tine.
+     * @param  string      $rawData         The file raw content
+     * @param  string      $fileDisplayName The file name
+     * @param  string      $mimeType        The file's mimetype
+     *
+     * @return string The temp file information.
+     */
+    public static function uploadTempFile(TineSession $tineSession, $rawData, $fileDisplayName, $mimeType)
+    {
+        $req = new Request();
+        $req->setUrl($tineSession->getTineUrl() . '?method=Tinebase.uploadTempFile&eid='.sha1(mt_rand().microtime()));
+        $req->setCookieHandler($tineSession); //tineSession has the necessary cookies
+        $req->setPostFields($rawData);
+        $req->setHeaders(array(
+            'DNT: 1',
+            'User-Agent: ' . $_SERVER['HTTP_USER_AGENT'],
+            'X-File-Name: ' . $fileDisplayName,
+            'X-File-Size: 0',
+            'X-File-Type: ' . $mimeType,
+            'X-Requested-With: XMLHttpRequest',
+            'X-Tine20-Request-Type: HTTP'
+        ));
+        return $req->send(REQUEST::POST);
+    }
 }

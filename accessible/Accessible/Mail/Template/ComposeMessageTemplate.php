@@ -33,7 +33,7 @@
 <br/>
 
 <h2 class="anchors-title"><?= $VIEW->actionText ?> mensagem</h2>
-<form action="<?= $VIEW->lnkSendMessageAction ?>" method="post">
+<form action="<?= $VIEW->lnkSendMessageAction ?>" method="post" enctype="multipart/form-data">
     <fieldset class="Dialog_email">
         <input type="hidden" name="folderId" value="<?= $VIEW->folderId ?>" />
         <input type="hidden" name="folderName" value="<?= $VIEW->folderName ?>" />
@@ -68,6 +68,16 @@
             <span class="quoted_area">Mensagem citada:</span>
             <div class="message_text" name="quotedBody"><?= $VIEW->quotedBody ?></div>
         <?php ENDIF; ?>
+
+        <div class="Dialog_field">
+            <label for="attach0">Anexar 1º arquivo:</label>
+            <input type="file" name="attach0" id="attach0" />
+            <label for="attach1">Anexar 2º arquivo:</label>
+            <input type="file" name="attach1" id="attach1" />
+            <label for="attach2">Anexar 3º arquivo:</label>
+            <input type="file" name="attach2" id="attach2" />
+        </div>
+
         <div class="compose_footer">
             <div>
                 <label for="important">Esta mensagem é importante</label>

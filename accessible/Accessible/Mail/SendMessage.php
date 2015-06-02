@@ -15,6 +15,7 @@ use Accessible\Dispatcher;
 use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
+use ExpressoLite\Backend\Request\Utils\MessageUtils;
 
 class SendMessage extends Handler
 {
@@ -23,9 +24,18 @@ class SendMessage extends Handler
      */
     public function execute($params)
     {
-        $lrp = new LiteRequestProcessor();
+        // Treat uploaded files, if any.
+        $upFiles = array();
+        foreach ($_FILES as $upf) {
+            $processed = $this->uploadFile($upf);
+            if ($processed !== null) {
+                $upFiles[] = $processed;
+            }
+        }
 
         // Retrieve original message, if replying or forwarding.
+        $lrp = new LiteRequestProcessor();
+
         if (!empty($params->replyToId) || !empty($params->forwardFromId)) {
             $msg = $lrp->executeRequest('GetMessage', (object) array(
                 'id' => !empty($params->replyToId) ?
@@ -34,14 +44,15 @@ class SendMessage extends Handler
         } else {
             $msg = null; // compose new mail, not reply/forward
         }
+
         $lrp->executeRequest('SaveMessage', (object) array(
             'subject' => $params->subject,
-            'body' => $this->prepareQuotedMessage($params, $msg),
+            'body' => $this->prepareMessageBody($params, $msg),
             'to' => $params->addrTo,
             'cc' => $params->addrCc,
             'bcc' => $params->addrBcc,
             'isImportant' => isset($params->important) ? '1' : '0',
-            'attachs' => '',
+            'attachs' => empty($upFiles) ? '' : json_encode($upFiles),
             'replyToId' => $params->replyToId,
             'forwardFromId' => $params->forwardFromId,
             'origDraftId' => ''
@@ -67,29 +78,52 @@ class SendMessage extends Handler
      * @param  stdClass $msg    Message object, if replied or forwarded.
      * @return string           Formatted body text.
      */
-    private function prepareQuotedMessage($params, $msg = null)
+    private function prepareMessageBody($params, $msg = null)
     {
-        $formattedDate = date('d/m/Y H:i', strtotime($msg->received));
-        if (!empty($params->replyToId) && $msg !== null) {
-            $out = '<br />Em ' . $formattedDate . ', ' .
-                $msg->from_name . ' escreveu:' .
-                '<blockquote>' . $msg->body->message . '<br />' .
-                ($msg->body->quoted !== null ? $msg->body->quoted : '') .
-                '</blockquote>';
-        } else if (!empty($params->forwardFromId) && $msg !== null) {
-            $out = '<br />-----Mensagem original-----<br />' .
-                '<b>Assunto:</b> ' . $msg->subject . '<br />' .
-                '<b>Remetente:</b> "' . $msg->from_name . '" &lt;' . $msg->from_email . '&gt;<br />' .
-                '<b>Para:</b> ' . implode(', ', $msg->to) . '<br />' .
-                (!empty($msg->cc) ? '<b>Cc:</b> ' . implode(', ', $msg->cc) . '<br />' : '') .
-                '<b>Data:</b> ' . $formattedDate . '<br /><br />' .
-                $msg->body->message . '<br />' .
-                ($msg->body->quoted !== null ? $msg->body->quoted : '');
-        } else {
-            $out = '';
+        $out = '';
+
+        if ($msg !== null) {
+            $formattedDate = date('d/m/Y H:i', strtotime($msg->received));
+            if (!empty($params->replyToId) && $msg !== null) {
+                $out = '<br />Em ' . $formattedDate . ', ' .
+                    $msg->from_name . ' escreveu:' .
+                    '<blockquote>' . $msg->body->message . '<br />' .
+                    ($msg->body->quoted !== null ? $msg->body->quoted : '') .
+                    '</blockquote>';
+            } else if (!empty($params->forwardFromId) && $msg !== null) {
+                $out = '<br />-----Mensagem original-----<br />' .
+                    '<b>Assunto:</b> ' . $msg->subject . '<br />' .
+                    '<b>Remetente:</b> "' . $msg->from_name . '" &lt;' . $msg->from_email . '&gt;<br />' .
+                    '<b>Para:</b> ' . implode(', ', $msg->to) . '<br />' .
+                    (!empty($msg->cc) ? '<b>Cc:</b> ' . implode(', ', $msg->cc) . '<br />' : '') .
+                    '<b>Data:</b> ' . $formattedDate . '<br /><br />' .
+                    $msg->body->message . '<br />' .
+                    ($msg->body->quoted !== null ? $msg->body->quoted : '');
+            }
         }
+
         return nl2br($params->messageBody) . '<br /><br />' .
             TineSessionRepository::getTineSession()->getAttribute('Expressomail.signature') .
             '<br />' . $out;
+    }
+
+    /**
+     * Pushes uploaded file into Tine shadows.
+     *
+     * @param  array $upFileObj Associative array of uploaded $_FILE entry.
+     * @return stdClass         Ordinary Tine upload status.
+     */
+    private function uploadFile(array $upFileObj)
+    {
+        if (empty($upFileObj['tmp_name']) || $upFileObj['error'] !== 0) {
+            return null; // this file upload slot was not used
+        }
+
+        return json_decode(MessageUtils::uploadTempFile(
+            TineSessionRepository::getTineSession(),
+            file_get_contents($upFileObj['tmp_name']),
+            $upFileObj['name'],
+            $upFileObj['type']
+        ));
     }
 }
