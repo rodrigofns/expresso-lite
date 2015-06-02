@@ -12,6 +12,8 @@
  */
 namespace ExpressoLite\Backend\Request;
 
+use ExpressoLite\TineTunnel\Exception\CaptchaRequiredException;
+
 class Login extends LiteRequest
 {
 
@@ -25,11 +27,20 @@ class Login extends LiteRequest
         }
 
         try {
-            $result = $this->tineSession->login($this->param('user'), $this->param('pwd'));
+            $result = $this->tineSession->login(
+                $this->param('user'),
+                $this->param('pwd'),
+                $this->isParamSet('captcha') ? $this->param('captcha') : null
+            );
         } catch (PasswordExpiredException $pe) {
             return (object) array(
                 'success' => false,
                 'expired' => true
+            );
+        } catch (CaptchaRequiredException $cre) {
+            return (object) array(
+                    'success' => false,
+                    'captcha' => $cre->getCaptcha()
             );
         }
 

@@ -115,8 +115,11 @@ require(['jquery', 'inc/App'], function($, App) {
             $('#user').focus();
         }
 
-        App.Post('login', {user:$('#user').val(), pwd:$('#pwd').val() })
-        .fail(function(resp) {
+        App.Post('login', {
+            user:$('#user').val(),
+            pwd:$('#pwd').val(),
+            captcha: $('#captcha').val()
+        }).fail(function(resp) {
             window.alert('Não foi possível efetuar login.\n' +
                 'O usuário ou a senha estão incorretos.');
             RestoreLoginState();
@@ -126,6 +129,14 @@ require(['jquery', 'inc/App'], function($, App) {
                 window.alert('Sua senha expirou, é necessário trocá-la.');
                 var $frmLogin = $('#frmLogin').replaceWith($('#frmChangePwd')).appendTo('#templates');
                 $('#cpNewPwd').focus();
+            } else if (response.captcha) {
+                window.alert('Número máximo de tentativas excedido.\n' +
+                             'Informe também o CAPTCHA para efetuar o login');
+                if (!$('#captchaDiv').is(':visible')) {
+                    $('#captchaDiv').insertAfter('#pwd');
+                }
+                $('#captchaImg').attr('src', 'data:image/png;base64,' + response.captcha);
+                RestoreLoginState();
             } else if (!response.success) {
                 window.alert('Não foi possível efetuar login.\n' +
                     'O usuário ou a senha estão incorretos.');

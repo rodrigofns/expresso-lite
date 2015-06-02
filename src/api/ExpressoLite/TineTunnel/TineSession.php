@@ -16,6 +16,7 @@ use ExpressoLite\TineTunnel\CookieHandler;
 use ExpressoLite\TineTunnel\TineJsonRpc;
 use ExpressoLite\TineTunnel\Exception\PasswordExpiredException;
 use ExpressoLite\TineTunnel\Exception\TineTunnelException;
+use ExpressoLite\TineTunnel\Exception\CaptchaRequiredException;
 
 class TineSession implements CookieHandler
 {
@@ -160,13 +161,13 @@ class TineSession implements CookieHandler
      * @return The result of the login attempt as returned by Tine
      *
      */
-    private function getLoginInfo($user, $password)
+    private function getLoginInfo($user, $password, $captcha = null)
     {
         try {
             return $this->jsonRpc('Tinebase.login', (object) array(
                 'username' => $user,
                 'password' => $password,
-                'securitycode' => ''
+                'securitycode' => $captcha === null ? '' : $captcha
             ));
         } catch (Exception $e) {
             throw new TineTunnelException('Tinebase.login: ' . $e->getMessage(), 0, $e);
@@ -196,12 +197,16 @@ class TineSession implements CookieHandler
      * @return True if the login was successful, false otherwise
      *
      */
-    public function login($user, $password)
+    public function login($user, $password, $captcha = null)
     {
-        $loginInfo = $this->getLoginInfo($user, $password);
+        $loginInfo = $this->getLoginInfo($user, $password, $captcha);
 
-        if ($loginInfo->result->success === false && strpos($loginInfo->result->errorMessage, 'Your password has expired. You must change it.') === 0) {
-            throw new PasswordExpiredException();
+        if ($loginInfo->result->success === false) {
+            if (strpos($loginInfo->result->errorMessage, 'Your password has expired. You must change it.') === 0) {
+                throw new PasswordExpiredException();
+            } else if (isset($loginInfo->result->c1)) {
+                throw new CaptchaRequiredException($loginInfo->result->c1);
+            }
         }
 
         if ($loginInfo->result->success) {
