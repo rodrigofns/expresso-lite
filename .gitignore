@@ -1,0 +1,8 @@
+.buildpath
+.externalToolBuilders
+.project
+.pydevproject
+.cache
+.settings
+.DS_Store
+nbproject
