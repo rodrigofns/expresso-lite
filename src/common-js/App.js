@@ -77,7 +77,7 @@ return {
 
         function returnToLoginScreen() {
             var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-            var destHref = currHref.replace(/\b(\/mail|\/addressbook)\b/gi, '') //removes /mail or /addressbook from the address
+            var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar)\b/gi, '') //removes /module from the URL address
             document.location.href = destHref;
         }
 

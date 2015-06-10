@@ -251,6 +251,7 @@ class TineSession implements CookieHandler
         $this->setAttribute('Expressomail.organization', $registryData->result->Expressomail->accounts->results[0]->organization);
         $this->setAttribute('Expressomail.signature', $registryData->result->Expressomail->accounts->results[0]->signature);
         $this->setAttribute('Tinebase.accountId', $registryData->result->Tinebase->currentAccount->accountId);
+        $this->setAttribute('Calendar.defaultEventColor', $registryData->result->Calendar->defaultContainer->color);
     }
 
     /**
