@@ -22,7 +22,19 @@ require(['jquery', 'inc/App'], function($, App) {
             return false;
         }
 
-        // Initial stuff.
+        App.Post('checkSessionStatus')
+        .done(function (response) {
+            if (response.status !== 'active') {
+                // no active session, do normal initialization
+                Init();
+            } else {
+                // there is an active session, go to mail module
+                document.location.href = './mail';
+            }
+        });
+    });
+
+    function Init() {
         var user = App.GetCookie('user');
         if (user !== null) {
             $('#user').val(user);
@@ -30,11 +42,13 @@ require(['jquery', 'inc/App'], function($, App) {
 
         if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
+
+        $('body').show();
         LoadServerStatus();
         $('#user').focus();
         $('#frmLogin').submit(DoLogin);
         $('#frmChangePwd').submit(DoChangePassword);
-    });
+    }
 
     function ValidateBrowser(minBrowsers) {
         var ua = navigator.userAgent;
