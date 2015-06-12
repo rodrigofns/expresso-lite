@@ -16,6 +16,7 @@ use Accessible\Handler;
 use Accessible\Dispatcher;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
+use Accessible\Core\ShowFeedback;
 
 class Logoff extends Handler
 {
@@ -30,6 +31,7 @@ class Logoff extends Handler
         }
 
         Dispatcher::processRequest('Core.ShowFeedback', (object) array(
+            'typeMsg' => ShowFeedback::MSG_SUCCESS,
             'message' => 'Saída realizada com sucesso.',
             'destinationText' => 'Acessar a página de login',
             'destinationUrl' => (object) array(

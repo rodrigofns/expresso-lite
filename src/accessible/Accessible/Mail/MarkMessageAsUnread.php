@@ -14,6 +14,7 @@ namespace Accessible\Mail;
 use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use Accessible\Dispatcher;
+use Accessible\Core\ShowFeedback;
 
 class MarkMessageAsUnread extends Handler
 {
@@ -29,6 +30,7 @@ class MarkMessageAsUnread extends Handler
         ));
 
         Dispatcher::processRequest('Core.ShowFeedback', (object) array(
+            'typeMsg' => ShowFeedback::MSG_SUCCESS,
             'message' => 'Mensagem marcada como não lida com sucesso.',
             'destinationText' => 'Voltar para ' . $params->folderName,
             'destinationUrl' => (object) array(

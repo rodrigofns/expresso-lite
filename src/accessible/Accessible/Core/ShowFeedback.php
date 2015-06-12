@@ -19,11 +19,27 @@ use ExpressoLite\Backend\LiteRequestProcessor;
 class ShowFeedback extends Handler
 {
     /**
+     * @var MSG_SUCCESS.
+     */
+    const MSG_SUCCESS = 'feedbackMessageSuccess';
+
+    /**
+     * @var MSG_ERROR.
+     */
+    const MSG_ERROR = 'feedbackMessageError';
+
+    /**
+     * @var MSG_ALERT.
+     */
+    const MSG_ALERT = 'feedbackMessageAlert';
+
+    /**
      * @see Accessible\Handler::execute
      */
     public function execute($params)
     {
         $this->showTemplate('ShowFeedbackTemplate', (object) array(
+            'typeMsg' => isset($params->typeMsg) ? $params->typeMsg : ShowFeedback::MSG_SUCCESS,
             'message' =>  $params->message,
             'destinationText' => $params->destinationText,
             'destinationUrl' => $this->makeUrl($params->destinationUrl->action,

@@ -24,9 +24,9 @@
 </div>
 
 <h2 class="anchors_title">Mensagens</h2>
-<div id="feedback_message_container">
-    <div id="feedback_message" name="feedback_message"> <?= $VIEW->message ?></div>
-    <div id="feedback_link" name="feedback_link">
+<div id="feedbackMessageContainer">
+    <div class="feedbackMessage <?= $VIEW->typeMsg ?>"> <?= $VIEW->message ?></div>
+    <div id="feedbackLink" name="feedbackLink">
         <a href="<?= $VIEW->destinationUrl ?>" accesskey="v"><?= $VIEW->destinationText ?> [v]</a>
     </div>
 </div>

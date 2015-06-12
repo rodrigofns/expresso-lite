@@ -15,6 +15,7 @@ namespace Accessible\Login;
 use Accessible\Handler;
 use Accessible\Dispatcher;
 use ExpressoLite\Backend\LiteRequestProcessor;
+use Accessible\Core\ShowFeedback;
 
 class Login extends Handler
 {
@@ -35,6 +36,7 @@ class Login extends Handler
             Dispatcher::processRequest('Mail.Main', $params);
         } else {
             Dispatcher::processRequest('Core.ShowFeedback', (object) array(
+                'typeMsg' => ShowFeedback::MSG_ERROR,
                 'message' => 'Login falhou! Usuário ou senha inválidos.',
                 'destinationText' => 'Voltar para página de login',
                 'destinationUrl' => (object) array(

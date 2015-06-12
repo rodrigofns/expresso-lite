@@ -15,6 +15,7 @@ use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
 use Accessible\Dispatcher;
+use Accessible\Core\ShowFeedback;
 
 class DeleteMessage extends Handler
 {
@@ -49,6 +50,7 @@ class DeleteMessage extends Handler
             'Mensagem movida para lixeira.';
 
         Dispatcher::processRequest('Core.ShowFeedback', (object) array (
+            'typeMsg' => ShowFeedback::MSG_SUCCESS,
             'message' => $outMsg,
             'destinationText' => 'Voltar para ' . $params->folderName,
             'destinationUrl' => (object) array(

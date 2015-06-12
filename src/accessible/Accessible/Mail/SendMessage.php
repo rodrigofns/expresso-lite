@@ -16,6 +16,7 @@ use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
 use ExpressoLite\Backend\Request\Utils\MessageUtils;
+use Accessible\Core\ShowFeedback;
 
 class SendMessage extends Handler
 {
@@ -59,6 +60,7 @@ class SendMessage extends Handler
         ));
 
         Dispatcher::processRequest('Core.ShowFeedback', (object) array(
+            'typeMsg' => ShowFeedback::MSG_SUCCESS,
             'message' => 'Mensagem enviada com sucesso.',
             'destinationText' => 'Voltar para ' . $params->folderName,
             'destinationUrl' => (object) array(
