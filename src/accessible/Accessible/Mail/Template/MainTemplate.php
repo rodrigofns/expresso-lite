@@ -58,8 +58,7 @@
         <thead>
             <tr>
                 <th id="id">Número</th>
-                <th id="sender">Remetente</th>
-                <th id="subject">Assunto</th>
+                <th id="senderSubject">Remetente / Assunto</th>
                 <th id="date">Data</th>
                 <th id="observations">Observações</th>
                 <th id="actions">Ação</th>
@@ -74,11 +73,12 @@
                 <td headers="id" class="align_center">
                     <span><?= $SEQ ?></span>
                 </td>
-                <td headers="sender" class="align_left">
-                    <span><?= $HEADLINE->from->name ?></span>
-                </td>
-                <td headers="subject">
-                    <a href="<?= $HEADLINE->lnkOpen ?>" title="Abrir mensagem <?= $SEQ ?>"><?= $HEADLINE->subject ?></a>
+                <td headers="senderSubject" class="align_left">
+                    <a href="<?= $HEADLINE->lnkOpen ?>" title="Abrir mensagem <?= $SEQ ?>">
+                        De: <span> <?= $HEADLINE->from->name ?></span> 
+                        <br />
+                        <span ><?= $HEADLINE->subject ?></span>
+                    </a>
                 </td>
                 <td headers="date" class="align_center">
                     <span><?= gmdate('d/m/Y \\à\\s H:i', $HEADLINE->received) ?></span>
