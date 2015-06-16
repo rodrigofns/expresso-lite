@@ -13,7 +13,8 @@ namespace ExpressoLite\TineTunnel\Exception;
 
 use ExpressoLite\TineTunnel\Exception\TineTunnelException;
 
-class RpcException extends ExpressoLite\TineTunnelException
+class RpcException extends TineTunnelException
 {
 
 }
+
