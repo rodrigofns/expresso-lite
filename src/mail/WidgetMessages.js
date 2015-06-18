@@ -76,6 +76,7 @@ return function(options) {
         var menu = new ContextMenu({ $btn:$divUnit.find('.Messages_dropdown') });
         menu.addOption('Marcar como não lida', function() { _MarkRead($divUnit, false); })
             .addOption('Responder', function() { _NewMail($divUnit, 're'); })
+            .addOption('Responder a todos', function() { _NewMail($divUnit, 'reAll'); })
             .addOption('Encaminhar', function() { _NewMail($divUnit, 'fwd'); })
             .addOption('Apagar', function() { _DeleteMessage($divUnit); })
             .addHeader('Mover para...');
@@ -143,6 +144,7 @@ return function(options) {
 
             if (action === 'fwd') opts.forward = $div.data('headline');
             else if (action === 're') opts.reply = $div.data('headline');
+            else if (action === 'reAll') opts.replyToAll = $div.data('headline');
 
             userOpts.wndCompose.show(opts);
         }

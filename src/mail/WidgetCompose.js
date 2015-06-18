@@ -26,7 +26,7 @@ return function(options) {
     var $tpl      = null; // jQuery object with our HTML template
     var popup     = null; // Dialog object, created on show()
     var attacher  = null; // WidgetAttacher object, created on show()
-    var msg       = { fwd:null, re:null, draft:null }; // we have a forwarded/replied/draft message
+    var msg       = { fwd:null, re:null, reAll:null, draft:null }; // we have a forwarded/replied/draft message
     var isSending = false; // a "send" async request is running
 
     function _DeleteOldDraftIfAny(draftMsgObj, onDone) {
@@ -63,7 +63,7 @@ return function(options) {
         var out = '';
         if (action === 'draft') {
             return headline.body.message;
-        } else if (action === 'reply') { // prepare mail content to be replied
+        } else if (action === 'reply' || action === 'replyToAll') { // prepare mail content to be replied
             out = '<br/>Em '+DateFormat.Medium(headline.received)+', ' +
                 headline.from.name+' escreveu:' +
                 '<blockquote>'+headline.body.message+'<br/>' +
@@ -109,6 +109,9 @@ return function(options) {
         } else if (msg.re !== null) {
             origAction = 'reply';
             origMsg = msg.re;
+        } else if (msg.reAll !== null) {
+            origAction = 'replyToAll';
+            origMsg = msg.reAll;
         } else if (msg.draft !== null) {
             origAction = 'draft';
             origMsg = msg.draft;
@@ -181,6 +184,8 @@ return function(options) {
 
         if (msg.re !== null) { // is this message a reply to other one?
             message.replyToId = msg.re.id;
+        } else if (msg.reAll !== null) {
+            message.replyToId = msg.reAll.id;
         } else if (msg.fwd !== null) { // is this message a forwarding of other one?
             message.forwardFromId = msg.fwd.id;
         }
@@ -236,6 +241,7 @@ return function(options) {
     function _PopupClosed() {
         msg.fwd = null; // cleanup
         msg.re = null;
+        msg.reAll = null;
         msg.draft = null;
         popup = null;
         attacher.removeAll();
@@ -247,7 +253,12 @@ return function(options) {
     }
 
     function _FillNewFields(showOpts) {
-        if (showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
+        var isNewMessage = showOpts.forward === null &&
+            showOpts.reply === null &&
+            showOpts.replyToAll === null &&
+            showOpts.draft === null;
+
+        if (isNewMessage) {
             $tpl.find('.Compose_body').html(_PrepareBodyToQuote('new', null));
         } else if (showOpts.forward !== null) {
             msg.fwd = showOpts.forward; // keep forwarded headline
@@ -259,8 +270,14 @@ return function(options) {
             $tpl.find('.Compose_to').show();
             $tpl.find('.Compose_toBtn').hide();
             $tpl.find('.Compose_toAddrs').text(msg.re.from.email);
+        } else if (showOpts.replyToAll !== null) {
+            msg.reAll = showOpts.replyToAll; // keep replied headline
+            $tpl.find('.Compose_subject').val('Re: '+msg.reAll.subject);
+            $tpl.find('.Compose_to').show();
+            $tpl.find('.Compose_toBtn').hide();
+            $tpl.find('.Compose_toAddrs').text(msg.reAll.from.email);
 
-            var replyAddrs = _JoinReplyAddresses(msg.re).toLowerCase();
+            var replyAddrs = _JoinReplyAddresses(msg.reAll).toLowerCase();
             if (replyAddrs.length) {
                 $tpl.find('.Compose_cc').show();
                 $tpl.find('.Compose_ccBtn').hide();
@@ -382,9 +399,9 @@ return function(options) {
                     .append($('#Compose_template .Compose_throbber').clone()) );
                 popup.toggleMinimize();
 
-                var reMsg = msg.re, // cache to send to callback, since they'll soon be nulled by a close()
+                var reMsg = (msg.re === null) ? msg.reAll : msg.re, // re and reAll are returned as the same object
                     fwdMsg = msg.fwd,
-                    draftMsg = msg.draft;
+                    draftMsg = msg.draft; // cache to send to callback, since they'll soon be nulled by a close()
 
                 App.Post('saveMessage', message)
                 .fail(function(resp) {
@@ -458,12 +475,19 @@ return function(options) {
             modal: false
         });
         popup.show().done(function() {
-            if (showOpts.forward === null && showOpts.reply === null && showOpts.draft === null) {
+            var isNewMessage = showOpts.forward === null &&
+                showOpts.reply === null &&
+                showOpts.replyToAll === null &&
+                showOpts.draft === null;
+
+            if (isNewMessage) {
                 $tpl.find('.Compose_toBtn').focus();
             } else if (showOpts.forward !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('forward', msg.fwd)).focus();
             } else if (showOpts.reply !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('reply', msg.re)).focus();
+            } else if (showOpts.replyToAll !== null) {
+                $tpl.find('.Compose_body').html(_PrepareBodyToQuote('replyToAll', msg.reAll)).focus();
             } else if (showOpts.draft !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('draft', msg.draft)).focus();
             }
@@ -496,8 +520,9 @@ return function(options) {
     THIS.show = function(showOptions) {
         var showOpts = $.extend({
             forward: null, // headline object; this email is a forwarding
-            reply: null, // this email is a replying
-            draft: null // this email is a draft editing
+            reply: null, // a replying
+            replyToAll: null, // a reply-to-all
+            draft: null // a draft editing
         }, showOptions);
 
         if (isSending) { // "send" asynchronous request is running right now
