@@ -41,7 +41,7 @@
 
     <div><span class="fieldName">Remetente:</span> <?= $VIEW->message->from_name ?> (<?= $VIEW->message->from_email ?>)</div>
 
-    <div><span class="fieldName">Data:</span> <?= $VIEW->message->received ?></div>
+    <div><span class="fieldName">Data:</span> <?= $VIEW->formattedDate ?></div>
 
     <?php IF (!EMPTY($VIEW->message->to[0])) : ?>
         <div><span class="fieldName">Destinatário:</span> <?= implode(', ', $VIEW->message->to) ?></div>

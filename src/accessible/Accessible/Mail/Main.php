@@ -18,6 +18,7 @@ namespace Accessible\Mail;
 use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
+use Accessible\Core\DateUtils;
 
 class Main extends Handler
 {
@@ -152,6 +153,7 @@ class Main extends Handler
         ));
 
         foreach ($headlines as &$headl) {
+            $headl->received = DateUtils::getFormattedDate($headl->received);
             $headl->subject = trim($headl->subject);
             if ($headl->subject === '') {
                 $headl->subject = '(sem assunto)';

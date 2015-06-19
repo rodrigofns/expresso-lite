@@ -15,6 +15,7 @@ namespace Accessible\Mail;
 use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
+use Accessible\Core\DateUtils;
 
 class OpenMessage extends Handler
 {
@@ -38,10 +39,10 @@ class OpenMessage extends Handler
         }
 
         $this->createAttachmentsLinks($message->attachments, $params->messageId);
-
         $this->showTemplate('OpenMessageTemplate', (object) array(
             'folderName' => $params->folderName,
             'message' => $message,
+            'formattedDate' => DateUtils::getFormattedDate(strtotime($message->received), true),
             'page' => $params->page,
             'lnkBack' => $this->makeUrl('Mail.Main', array(
                 'folderId' => $params->folderId,

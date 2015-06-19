@@ -81,7 +81,7 @@
                     </a>
                 </td>
                 <td headers="date" class="align_center">
-                    <span><?= gmdate('d/m/Y \\à\\s H:i', $HEADLINE->received) ?></span>
+                    <span><?= $HEADLINE->received ?></span>
                 </td>
                 <td headers="observations" class="align_left">
                     <?php IF ($HEADLINE->hasAttachment) : ?>
