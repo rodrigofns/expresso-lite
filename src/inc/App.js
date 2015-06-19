@@ -102,11 +102,11 @@ return {
     },
 
     SetUserInfo: function(entryIndex, entryValue) {
-        sessionStorage.setItem('user_info_'+entryIndex, entryValue);
+        localStorage.setItem('user_info_'+entryIndex, entryValue);
     },
 
     GetUserInfo: function(entryIndex) {
-        return sessionStorage.getItem('user_info_'+entryIndex);
+        return localStorage.getItem('user_info_'+entryIndex);
     },
 
     SetCookie: function (cookieName, cookieValue, expireDays) {

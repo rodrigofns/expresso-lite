@@ -110,9 +110,6 @@ require(['jquery', 'inc/App'], function($, App) {
             }
 
             $('#externalLinks,#versionInfo').fadeIn(400);
-
-            // Store any other user information in application repository.
-            App.SetUserInfo('mailBatch', data.liteConfig.mailBatch);
         });
     }
 

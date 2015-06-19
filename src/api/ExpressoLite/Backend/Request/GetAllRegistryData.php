@@ -25,7 +25,6 @@ class GetAllRegistryData extends LiteRequest
             'classicUrl' => CLASSIC_URL,
             'androidUrl' => ANDROID_URL,
             'iosUrl' => IOS_URL,
-            'mailBatch' => MAIL_BATCH,
             'packageString' => PACKAGE_STRING
         );
         return $response->result;
