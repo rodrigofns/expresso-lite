@@ -23,7 +23,7 @@ class ComposeMessage extends Handler
     public function execute($params)
     {
         // Retrieve original message, if replying or forwarding.
-        if (isset($params->reply) || isset($params->forward)) {
+        if (isset($params->reply) || isset($params->replyAll) || isset($params->forward)) {
             $lrp = new LiteRequestProcessor();
             $msg = $lrp->executeRequest('GetMessage', (object) array(
                 'id' => $params->messageId
@@ -38,13 +38,13 @@ class ComposeMessage extends Handler
             'page' => isset($params->page) ? $params->page : '1',
             'actionText' => $this->actionText($params),
             'subject' => $this->formatSubject($params, $msg),
-            'to' => isset($params->reply) ? $msg->from_email : '',
-            'cc' => $this->formatCcAddresses($params, $msg),
-            'replyToId' => isset($params->reply) ? $params->messageId : '',
+            'to' => (isset($params->reply) || isset($params->replyAll)) ? $msg->from_email : '',
+            'cc' => isset($params->replyAll) ? $this->formatCcAddresses($params, $msg) : '',
+            'replyToId' => (isset($params->reply) || isset($params->replyAll)) ? $params->messageId : '',
             'forwardFromId' => isset($params->forward) ? $params->messageId : '',
             'signature' => TineSessionRepository::getTineSession()->getAttribute('Expressomail.signature'),
             'quotedBody' => $this->prepareQuotedMessage($params, $msg),
-            'lnkBackText' => (isset($params->reply) || isset($params->forward)) ?
+            'lnkBackText' => (isset($params->reply) || isset($params->replyAll) || isset($params->forward)) ?
                 'mensagem de origem' : $params->folderName,
             'lnkBackUrl' => $this->returnLink($params),
             'lnkSendMessageAction' => $this->makeUrl('Mail.SendMessage')
@@ -61,6 +61,8 @@ class ComposeMessage extends Handler
     {
         if (isset($params->reply)) {
             return 'Responder';
+        } else if (isset($params->replyAll)) {
+            return 'Responder a todos';
         } else if (isset($params->forward)) {
             return 'Encaminhar';
         }
@@ -76,7 +78,7 @@ class ComposeMessage extends Handler
      */
     private function formatSubject($params, $msg = null)
     {
-        if (isset($params->reply) && $msg !== null) {
+        if ((isset($params->reply) || isset($params->replyAll)) && $msg !== null) {
             return 'Re: ' . $msg->subject;
         } else if (isset($params->forward) && $msg !== null) {
             return 'Fwd: ' . $msg->subject;
@@ -92,7 +94,7 @@ class ComposeMessage extends Handler
      */
     private function returnLink($params)
     {
-        if (isset($params->reply) || isset($params->forward)) {
+        if (isset($params->reply) || isset($params->replyAll) || isset($params->forward)) {
             return $this->makeUrl('Mail.OpenMessage', array(
                 'messageId' => $params->messageId,
                 'folderId' => $params->folderId,
@@ -113,12 +115,18 @@ class ComposeMessage extends Handler
      *
      * @param  stdClass $params Request parameters.
      * @param  stdClass $msg    Message object, if replied or forwarded.
-     * @return string           The return URL.
+     * @return string           The return Cc addresses formatted.
      */
     private function formatCcAddresses($params, $msg = null)
     {
-        if (isset($params->reply) && $msg !== null) {
-            return implode(', ', $msg->cc);
+        $userEmail = TineSessionRepository::getTineSession()->getAttribute('Expressomail.email');
+
+        if (($key = array_search($userEmail, $msg->to)) !== false) {
+            unset($msg->to[$key]);
+        }
+
+        if (isset($params->replyAll) && $msg !== null) {
+            return implode(', ', array_merge($msg->to, $msg->cc));
         }
         return '';
     }
@@ -137,7 +145,7 @@ class ComposeMessage extends Handler
         }
 
         $formatedDate = date('d/m/Y H:i', strtotime($msg->received));
-        if (isset($params->reply) && $msg !== null) {
+        if ((isset($params->reply) || isset($params->replyAll)) && $msg !== null) {
             return '<br />Em ' . $formatedDate . ', ' .
                 $msg->from_name . ' escreveu:' .
                 '<blockquote>' . $msg->body->message . '<br />' .

@@ -65,6 +65,13 @@ class OpenMessage extends Handler
                 'messageId' => $params->messageId,
                 'reply' => 'yes'
             )),
+            'lnkReplyAll' => $this->makeUrl('Mail.ComposeMessage', array(
+                'folderId' => $params->folderId,
+                'folderName' => $params->folderName,
+                'page' => $params->page,
+                'messageId' => $params->messageId,
+                'replyAll' => 'yes'
+            )),
             'lnkForward' => $this->makeUrl('Mail.ComposeMessage', array(
                 'folderId' => $params->folderId,
                 'folderName' => $params->folderName,

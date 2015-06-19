@@ -92,6 +92,7 @@
 <h2 class="anchors-title">Ações</h2>
     <ul>
         <li><a href="<?= $VIEW->lnkReply ?>">Responder</a></li>
+        <li><a href="<?= $VIEW->lnkReplyAll ?>">Responder a todos</a></li>
         <li><a href="<?= $VIEW->lnkForward ?>">Encaminhar</a></li>
         <li><a href="<?= $VIEW->lnkMark ?>">Marcar como não lida</a></li>
         <li><a href="<?= $VIEW->lnkDelete ?>">Apagar</a></li>
