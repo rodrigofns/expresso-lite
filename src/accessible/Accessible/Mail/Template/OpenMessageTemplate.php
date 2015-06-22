@@ -64,7 +64,11 @@
             <span class="fieldName">Anexos:</span>
             <ul id="attachments">
             <?php FOREACH ($VIEW->message->attachments as $ATTACH) : ?>
-                <li><a href="<?= $ATTACH->lnkDownload ?>"><?= $ATTACH->filename ?></a></li>
+                <li>
+                    <a title="<?= $ATTACH->filename ?>" href="<?= $ATTACH->lnkDownload ?>">
+                        Abrir anexo <span class="attachName"><?= $ATTACH->filename ?></span>
+                    </a>
+                </li>
             <? ENDFOREACH; ?>
             </ul>
         </div>
