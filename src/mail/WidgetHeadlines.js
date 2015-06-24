@@ -352,7 +352,7 @@ return function(options) {
             }
         });
         var msgIds = $.map(headlines, function(elem) { return elem.id; });
-        $checkedDivs.find('div[class^=icoHigh]').replaceWith(_CreateDivLoading(null));
+        $checkedDivs.find('div[class^=icoHigh]').replaceWith(_CreateDivLoading(null).css('margin', '0'));
         for (var i = 0; i < headlines.length; ++i) {
             headlines[i].flagged = willStar; // update cache
         }
@@ -364,6 +364,8 @@ return function(options) {
         }).fail(function(resp) {
             window.alert('Erro ao alterar o flag de destaque das mensagens.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+        }).done(function() {
+            THIS.clearChecked();
         });
         return THIS;
     };
