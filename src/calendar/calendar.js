@@ -31,7 +31,7 @@ window.Cache = {
     viewEvents: null // WidgetEvents object
 };
 
-$(document).ready(function() {
+App.Ready(function() {
     // Initialize page objects.
     Cache.layout = new Layout({
         userMail: App.GetUserInfo('mailAddress'),

@@ -16,7 +16,7 @@ require(['jquery',
     'common-js/App'
 ],
 function($, App) {
-    $(document).ready(function() {
+    App.Ready(function() {
         var isBrowserValid = ValidateBrowser([
             { name:'Firefox', version:24 },
             { name:'Chrome', version:25 },
@@ -29,12 +29,15 @@ function($, App) {
         }
 
         App.Post('checkSessionStatus')
-        .done(function (response) {
+        .done(function(response) {
             if (response.status !== 'active') {
                 Init(); // no active session, do normal initialization
             } else {
-                document.location.href = './mail'; // there is an active session, go to mail module
+                App.GoToFolder('./mail'); // there is an active session, go to mail module
             }
+        }).fail(function(error) {
+            window.alert('Ocorreu um erro ao realizar a conexão com o Expresso.\n'+
+                'É possível que o sistema esteja fora do ar.');
         });
     });
 
@@ -250,7 +253,7 @@ function($, App) {
                     duration: animTime,
                     queue: false,
                     complete: function() {
-                        location.href = './mail';
+                        App.GoToFolder('./mail');
                     }
                 });
         } else {
@@ -261,7 +264,7 @@ function($, App) {
                 duration: animTime,
                 queue: false,
                 complete: function() {
-                    location.href = './mail';
+                    App.GoToFolder('./mail');
                 }
             });
         }

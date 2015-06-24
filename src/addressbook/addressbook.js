@@ -28,7 +28,7 @@ window.Cache = {
     widgetContactDetails: null
 };
 
-$(document).ready(function() {
+App.Ready(function() {
     function showDetailView() {
         if (!Cache.layout.isRightPanelVisible()) {
             Cache.layout.setRightPanelVisible(true);
@@ -107,6 +107,6 @@ $(document).ready(function() {
             Cache.widgetContactList.changeToCorporateCatalog();
         });
     })();
-}); // $(document).ready
+}); // App.Ready
 
 }); // require

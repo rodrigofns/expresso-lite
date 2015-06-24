@@ -180,7 +180,7 @@ return function(options) {
             $('#Layout_loggingOff').css('display', 'inline-block');
             App.Post('logoff')
             .done(function(data) {
-                location.href = '..';
+                App.ReturnToLoginScreen();
             }).fail(function(error) {
                 console.error('Logout error: ' + error.responseText);
                 location.href = '.';
@@ -195,7 +195,7 @@ return function(options) {
             ev.stopImmediatePropagation();
             var href = $(this).attr('href') !== undefined ?
                 $(this).attr('href') : $(this).find('a').attr('href');
-            location.href = href;
+            App.GoToFolder(href);
         });
 
         $(document).ajaxComplete(function AjaxComplete() {

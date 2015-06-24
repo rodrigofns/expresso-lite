@@ -8,9 +8,12 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery'], function($) {
-
+define(['jquery',
+    'common-js/Cordova'
+],
+function($, Cordova) {
     var isUnloadingPage = false;
+    var App = {};
 
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
@@ -51,13 +54,12 @@ define(['jquery'], function($) {
 
         _DisableRefreshOnPullDown();
 
-        $(window).bind('beforeunload', function () {
+        $(window).on('beforeunload', function() {
             isUnloadingPage = true;
         });
     })();
 
-return {
-    LoadCss: function(cssFiles) { // pass any number of files as arguments
+    App.LoadCss = function(cssFiles) { // pass any number of files as arguments
         var head = document.getElementsByTagName('head')[0];
         for (var i = 0; i < arguments.length; ++i) {
             var link = document.createElement('link');
@@ -66,18 +68,20 @@ return {
             link.href = require.toUrl(arguments[i]); // follows require.config() baseUrl
             document.getElementsByTagName('head')[0].appendChild(link);
         }
-    },
+    };
 
-    Post: function(requestName, params) {
+    App.Post = function(requestName, params) {
         // Usage: App.Post('searchFolders', { parentFolder:'1234' });
         // Returns a promise object.
-        var backendUrl = require.toUrl('.'); // follows require.config() baseUrl
+        var backendUrl = Cordova.isEnabled() ?
+                Cordova.getLiteBackendUrl() :
+                require.toUrl('.'); // follows require.config() baseUrl
 
         var defer = $.Deferred();
 
         function returnToLoginScreen() {
             var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-            var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar)\b/gi, '') //removes /module from the URL address
+            var destHref = currHref.replace(/\b(\/mail|\/addressbook)\b/gi, '') //removes /mail or /addressbook from the address
             document.location.href = destHref;
         }
 
@@ -95,12 +99,12 @@ return {
                 isUnloadingPage = true; //this avoids duplicated session expired alerts
 
                 window.alert('Sua sessão expirou, é necessário realizar o login novamente.');
-                returnToLoginScreen();
+                App.ReturnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
             } else if (data.status === 500 && data.responseText == 'UserMismatchException') {
                 window.alert('Ocorreu um problema durante a execução desta operação. É necessário realizar o login novamente.');
-                returnToLoginScreen();
+                App.ReturnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
             } else {
@@ -109,9 +113,9 @@ return {
         });
 
         return defer.promise();
-     },
+     };
 
-    LoadTemplate: function(htmlFileName) {
+    App.LoadTemplate = function(htmlFileName) {
         // HTML file can be a relative path.
         // Pure HTML files are cached by the browser.
         var defer = $.Deferred();
@@ -120,28 +124,28 @@ return {
             defer.resolve();
         });
         return defer.promise();
-    },
+    };
 
-    IsPhone: function() {
+    App.IsPhone = function() {
         return $(window).width() <= 1024; // should be consistent with all CSS media queries
-    },
+    };
 
-    SetUserInfo: function(entryIndex, entryValue) {
+    App.SetUserInfo = function(entryIndex, entryValue) {
         localStorage.setItem('user_info_'+entryIndex, entryValue);
-    },
+    };
 
-    GetUserInfo: function(entryIndex) {
+    App.GetUserInfo = function(entryIndex) {
         return localStorage.getItem('user_info_'+entryIndex);
-    },
+    };
 
-    SetCookie: function (cookieName, cookieValue, expireDays) {
+    App.SetCookie = function(cookieName, cookieValue, expireDays) {
         var d = new Date();
         d.setTime(d.getTime() + (expireDays * 24 * 60 * 60 * 1000));
         var expires = 'expires='+d.toUTCString();
         document.cookie = cookieName+'='+cookieValue+'; '+expires;
-    },
+    };
 
-    GetCookie: function (cookieName) {
+    App.GetCookie = function(cookieName) {
         var name = cookieName+'=';
         var allCookies = document.cookie.split(';');
         for(var i=0; i < allCookies.length; i++) {
@@ -151,6 +155,39 @@ return {
             }
         }
         return null;
-    }
-};
+    };
+
+    App.ReturnToLoginScreen = function() {
+        var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
+        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar)\b/gi, ''); //removes /module from the URL address
+
+        if (destHref.slice(-1) != '/') { //checks last char
+            destHref += '/';
+        }
+
+        if (Cordova.isEnabled()) {
+            destHref += 'index.html';
+        }
+
+        document.location.href = destHref;
+    };
+
+    App.Ready = function(callback) {
+        if (Cordova.isEnabled()) {
+            $(document).ready(function() {
+                document.addEventListener('deviceready', function() {
+                    Cordova.RegisterCordovaListeners();
+                    callback();
+                }, false);
+            });
+        } else {
+            $(document).ready(callback);
+        }
+    };
+
+    App.GoToFolder = function(folderName) {
+        document.location.href = folderName + (Cordova.isEnabled() ? '/index.html' : '/');
+    };
+
+    return App;
 });
