@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Mail/Template/OpenMessageTemplate.css" />
-    <title>Leitura de mensagem - Expresso Lite Accessível</title>
+    <title>Leitura de mensagem - ExpressoBr Acessível</title>
 </head>
 <body>
 

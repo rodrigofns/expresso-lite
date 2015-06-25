@@ -98,7 +98,7 @@ $(document).ready(function() {
 function UpdatePageTitle() {
     var folder = Cache.treeFolders.getCurrent();
     var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
-    document.title = folder.localName+' '+counter+'- '+App.GetUserInfo('mailAddress')+' - Expresso Lite';
+    document.title = folder.localName+' '+counter+'- '+App.GetUserInfo('mailAddress')+' - ExpressoBr';
     Cache.layout.setTitle(Cache.layout.isContentFullWidth() ?
         'voltar' :
         folder.localName+(folder.unreadMails ? ' ('+folder.unreadMails+')' : '')

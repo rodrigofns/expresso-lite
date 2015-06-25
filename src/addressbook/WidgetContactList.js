@@ -249,7 +249,7 @@ function($, App, WidgetLetterIndex) {
         }
 
         function showTitle(catalogLabel) {
-            document.title = catalogLabel + ' - '+App.GetUserInfo('mailAddress')+' - Expresso Lite';
+            document.title = catalogLabel + ' - '+App.GetUserInfo('mailAddress')+' - ExpressoBr';
             Cache.layout.setTitle(catalogLabel);
         }
 

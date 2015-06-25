@@ -14,8 +14,8 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Mail/Template/ComposeMessageTemplate.css" />
-    <title><?= $VIEW->actionText ?> mensagem - Expresso Lite Acessível</title>
-    <title>Seleção de pasta - Expresso Lite Accessível</title>
+    <title><?= $VIEW->actionText ?> mensagem - ExpressoBr Acessível</title>
+    <title>Seleção de pasta - ExpressoBr Acessível</title>
 </head>
 <body>
 

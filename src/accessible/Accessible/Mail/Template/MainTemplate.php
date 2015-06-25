@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Mail/Template/MainTemplate.css" />
-    <title><?= $VIEW->curFolder->localName ?> - Expresso Lite Accessível</title>
+    <title><?= $VIEW->curFolder->localName ?> - ExpressoBr Acessível</title>
 </head>
 <body>
 
@@ -40,7 +40,7 @@
         <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="a">Atualizar lista de emails da pasta <?= $VIEW->curFolder->localName ?> [a]</span></a></li>
         <li><a href="<?= $VIEW->lnkChangeFolder ?>" accesskey="p">Selecionar outra pasta [p]</a></li>
         <li><a href="<?= $VIEW->lnkComposeMessage ?>" accesskey="n">Escrever novo email [n]</span></a></li>
-        <li><a href="<?= $VIEW->lnkLogoff ?>" title="Sair do expresso lite accessível" accesskey="s">Sair do sistema [s]</a></li>
+        <li><a href="<?= $VIEW->lnkLogoff ?>" title="Sair do expressobr acessível" accesskey="s">Sair do sistema [s]</a></li>
     </ul>
 </div>
 
@@ -75,7 +75,7 @@
                 </td>
                 <td headers="senderSubject" class="align_left">
                     <a href="<?= $HEADLINE->lnkOpen ?>" title="Abrir mensagem <?= $SEQ ?>">
-                        De: <span> <?= $HEADLINE->from->name ?></span> 
+                        De: <span> <?= $HEADLINE->from->name ?></span>
                         <br />
                         <span ><?= $HEADLINE->subject ?></span>
                     </a>

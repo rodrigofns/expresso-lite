@@ -7,7 +7,6 @@
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
- */
 -->
 <html>
 <head>
@@ -16,7 +15,7 @@
     <link rel="icon" type="image/png" href="img/favicon.png"/>
     <link type="text/css" rel="stylesheet" href="inc/general.css"/>
     <link type="text/css" rel="stylesheet" href="login.css"/>
-    <title>Expresso Lite</title>
+    <title>ExpressoBr</title>
     <script src="inc/require.min.js" data-main="login.js"></script>
 </head>
 <body class="hidden">
@@ -25,15 +24,15 @@
     </div>
     <div id="topgray"></div>
     <div id="thebg"></div>
-    <div id="blue"></div>
     <div id="credent">
-        <img id="logo" src="img/logo-lite-165.png"/>
+        <img id="logo-top" src="img/logo-expressobr-top.png"/>
         <form id="frmLogin">
-            <input type="text" id="user" placeholder="usuário"/>
-            <input type="password" id="pwd" placeholder="senha"/>
-            <input type="submit" id="btnLogin" value="login"/>
+            <div><input type="text" id="user" placeholder="usuário"/></div>
+            <div><input type="password" id="pwd" placeholder="senha"/></div>
+            <div><input type="submit" id="btnLogin" value="login"/></div>
             <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
         </form>
+        <img id="logo-bottom" src="img/logo-expressobr-bottom.png"/>
     </div>
     <section id="templates">
         <form id="frmChangePwd">

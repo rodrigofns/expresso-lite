@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Core/Template/ShowFeedbackTemplate.css" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
-    <title>Aviso - Expresso Lite Accessível</title>
+    <title>Aviso - ExpressoBr Acessível</title>
 </head>
 <body>
 

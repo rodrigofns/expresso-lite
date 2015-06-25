@@ -157,16 +157,7 @@ require(['jquery', 'inc/App'], function($, App) {
                     App.SetUserInfo(i, response.userInfo[i]);
                 }
                 App.SetCookie('user', $('#user').val(), 30); // store for 30 days
-                $('#credent,#externalLinks,#versionInfo').hide();
-                $('#thebg').fadeOut({ duration:400, queue:false });
-                $('#topgray').animate({ height:'7.5%' }, { duration:500, queue:false });
-                $('#blue').animate({ top: '7.5%'}, {
-                    duration: 500,
-                    queue: false,
-                    complete: function() {
-                        location.href = './mail'; // automatically redirect to email module
-                    }
-                });
+                location.href = './mail'; // automatically redirect to email module
             }
         });
         return false;

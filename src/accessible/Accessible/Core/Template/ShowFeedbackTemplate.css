@@ -20,11 +20,11 @@ a { font-size: 100%; color: #000; text-decoration: none; }
 #anchors { display: table; }
 
 #logomark {
-    background-image: url("../../../../img/expressobr_lite.png");
+    background-image: url("../../../../img/logo-expressobr-top.png");
     background-repeat: no-repeat;
     background-position: top left;
-    width: 207px;
-    height: 90px;
+    width: 248px;
+    height: 97px;
     float: left;
 }
 

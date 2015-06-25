@@ -17,11 +17,11 @@ blockquote { margin:2px 0 4px 15px; padding-left:5px; border-left:1px solid #BFD
 
 #anchors { display: table;}
 #logomark {
-    background-image: url("../../../../img/expressobr_lite.png");
+    background-image: url("../../../../img/logo-expressobr-top.png");
     background-repeat: no-repeat;
     background-position: top left;
-    width: 207px;
-    height: 85px;
+    width: 248px;
+    height: 97px;
     float:left;
 }
 #anchors_area { position: absolute; right: 46px; padding: 0x; }

@@ -15,13 +15,13 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Login/Template/MainTemplate.css" />
-    <title>Expresso Lite Accessível - Email - Página de Login</title>
+    <title>Login - ExpressoBr Acessível</title>
 </head>
 <body>
 
 <div id="signup-inner" name="signup-inner">
     <div class="clearfix" id="header">
-        <img id="logo" name="logo" src="../img/expressobr_lite_200.png" alt="Logotipo do Expresso Lite Acessível" />
+        <img id="logo" name="logo" src="../img/logo-expressobr-top.png" alt="Logotipo do ExpressoBr Acessível" />
     </div>
 
     <form id="frmLogin" name="frmLogin" method="post" action=".">
