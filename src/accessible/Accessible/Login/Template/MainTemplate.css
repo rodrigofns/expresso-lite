@@ -69,10 +69,6 @@ input {
     border: 1px solid #9FBAC0;
     cursor: pointer;
 }
-a { color: #88BBC8; text-decoration: none; }
-a:hover { color: #F26525 }
-
-
 
 /********* HACKS *********/
 .clearfix:after {
@@ -82,3 +78,17 @@ a:hover { color: #F26525 }
     clear: both;
     visibility: hidden;
 }
+
+#expressoBrAccess {
+    height: 24px;
+    left: 16px;
+    line-height: 24px;
+    text-align: center;
+    bottom: 100px;
+    font-size: 90%;
+}
+
+#expressoBrAccess a { text-decoration: none; color: #006594; }
+
+#expressoBrAccess a:hover { text-decoration: underline; }
+
