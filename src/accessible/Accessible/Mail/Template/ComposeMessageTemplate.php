@@ -42,46 +42,52 @@
         <input type="hidden" name="forwardFromId" value="<?= $VIEW->forwardFromId ?>" />
         <div class="Dialog_field">
             <label for="subject">Assunto:</label><br />
-            <input type="text" name="subject" required="required" value="<?= $VIEW->subject ?>" />
+            <input type="text" name="subject" id="subject" required="required" value="<?= $VIEW->subject ?>" />
         </div>
         <div class="Dialog_field">
             <label for="addrTo">Destinatário:</label><br />
-            <input type="email" multiple="multiple" name="addrTo" required="required" value="<?= $VIEW->to ?>"/>
+            <input type="email" multiple="multiple" name="addrTo" id="addrTo" required="required" value="<?= $VIEW->to ?>"/>
         </div>
         <div class="Dialog_field">
             <label for="addrCc">Destinatário em cópia:</label><br />
-            <input type="email" multiple="multiple" name="addrCc" value="<?= $VIEW->cc ?>" />
+            <input type="email" multiple="multiple" name="addrCc" id="addrCc" value="<?= $VIEW->cc ?>" />
         </div>
         <div class="Dialog_field">
             <label for="addrBcc">Destinatário em cópia oculta:</label><br />
-            <input type="email" multiple="multiple" name="addrBcc" />
+            <input type="email" multiple="multiple" name="addrBcc" id="addrBcc" />
         </div >
         <div class="Dialog_message">
             <label for="messageBody">Mensagem:</label><br />
-            <textarea name="messageBody" required="required"></textarea>
+            <textarea name="messageBody" id="messageBody" required="required"></textarea>
             <?php IF ($VIEW->signature !== '') : ?>
             <div class="compose_sign"><?= $VIEW->signature ?></div>
             <?php ENDIF; ?>
         </div>
 
         <?php IF ($VIEW->quotedBody !== '') : ?>
-            <span class="quoted_area">Mensagem citada:</span>
-            <div class="message_text" name="quotedBody"><?= $VIEW->quotedBody ?></div>
+            <label class="quoted_area" for="quotedBody">Mensagem citada:</label>
+            <div class="message_text" name="quotedBody" id="quotedBody"><?= $VIEW->quotedBody ?></div>
         <?php ENDIF; ?>
 
         <div class="Dialog_field">
-            <label for="attach0">Anexar 1º arquivo:</label>
-            <input type="file" name="attach0" id="attach0" />
-            <label for="attach1">Anexar 2º arquivo:</label>
-            <input type="file" name="attach1" id="attach1" />
-            <label for="attach2">Anexar 3º arquivo:</label>
-            <input type="file" name="attach2" id="attach2" />
+            <p class="Attach">
+                <label for="attach0">Anexar 1º arquivo:</label>&nbsp;
+                <input type="file" name="attach0" id="attach0" />
+            </p>
+            <p class="Attach">
+                <label for="attach1">Anexar 2º arquivo:</label>&nbsp;
+                <input type="file" name="attach1" id="attach1" />
+            </p>
+            <p class="Attach">
+                <label for="attach2">Anexar 3º arquivo:</label>&nbsp;
+                <input type="file" name="attach2" id="attach2" />
+            </p>
         </div>
 
         <div class="compose_footer">
             <div>
                 <label for="important">Esta mensagem é importante</label>
-                <input type="checkbox" name="important" title="Marcar essa mensagem como importante" />
+                <input type="checkbox" name="important" id="important" title="Marcar essa mensagem como importante" />
             </div>
             <br/>
             <div >
