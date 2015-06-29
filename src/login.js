@@ -14,22 +14,23 @@ require.config({
 
 require(['jquery', 'inc/App'], function($, App) {
     $(document).ready(function() {
-        // Browser validation.
-        if (!ValidateBrowser([ {name:'Firefox',version:17}, {name:'Chrome',version:25}, {name:'Safari',version:7} ])) {
-            $('#frmLogin').html('Os browsers mínimos suportados são Firefox 24, Chrome 25 e Safari 7.<br/>' +
-                'Utilize o webmail padrão do Expresso em:<br/>' +
-                '<a href="http://expressobr.serpro.gov.br">http://expressobr.serpro.gov.br</a>');
-            return false;
+        var isBrowserValid = ValidateBrowser([
+            { name:'Firefox', version:24 },
+            { name:'Chrome', version:25 },
+            { name:'Safari', version:7 }
+        ]);
+        if (!isBrowserValid) {
+            $('body,#unsupportedMsg').show();
+            $('#frmLogin').hide();
+            return false; // won't load anything else
         }
 
         App.Post('checkSessionStatus')
         .done(function (response) {
             if (response.status !== 'active') {
-                // no active session, do normal initialization
-                Init();
+                Init(); // no active session, do normal initialization
             } else {
-                // there is an active session, go to mail module
-                document.location.href = './mail';
+                document.location.href = './mail'; // there is an active session, go to mail module
             }
         });
     });
@@ -44,7 +45,7 @@ require(['jquery', 'inc/App'], function($, App) {
             history.pushState('', '', location.pathname);
 
         $('body').show();
-        LoadServerStatus();
+        LoadServerStatus(); // async
         $('#user').focus();
         $('#frmLogin').submit(DoLogin);
         $('#frmChangePwd').submit(DoChangePassword);
@@ -114,6 +115,19 @@ require(['jquery', 'inc/App'], function($, App) {
     }
 
     function DoLogin() {
+        function ValidateLogin() {
+            if ($('#user').val() == '') {
+                window.alert('Por favor, digite seu nome de usuário.');
+                $('#user').focus();
+                return false;
+            } else if ($('#pwd').val() == '') {
+                window.alert('Por favor, digite sua senha.');
+                $('#pwd').focus();
+                return false;
+            }
+            return true;
+        }
+
         if (!ValidateLogin()) return false;
         $('#btnLogin').hide();
         $('#frmLogin input').prop('disabled', true);
@@ -173,6 +187,15 @@ require(['jquery', 'inc/App'], function($, App) {
             $('#frmChangePwd input').prop('disabled', true);
             $('#frmChangePwd .throbber').show().children('span').text('Trocando senha...');
 
+            function UglyTineFormatMsg(errorMessage) {
+                // Ugly formatting function copied straight from Tine source.
+                var title  = errorMessage.substr(0, (errorMessage.indexOf(':') + 1));
+                var errorFull = errorMessage.substr((errorMessage.indexOf(':') + 1));
+                var errorTitle = errorFull.substr(0, (errorFull.indexOf(':') + 1));
+                var errors = errorFull.substr((errorFull.indexOf(':') + 1));
+                return errorTitle+'\n\n'+errors.replace(/, /g, '\n').replace(/^\s/, '');
+            }
+
             function RestoreChangePasswordState() {
                 $('#btnNewPwd').show();
                 $('#frmChangePwd input').prop('disabled', false);
@@ -194,27 +217,5 @@ require(['jquery', 'inc/App'], function($, App) {
             });
         }
         return false;
-    }
-
-    function UglyTineFormatMsg(errorMessage) {
-        // Ugly formatting function copied straight from Tine source.
-        var title  = errorMessage.substr(0, (errorMessage.indexOf(':') + 1));
-        var errorFull = errorMessage.substr((errorMessage.indexOf(':') + 1));
-        var errorTitle = errorFull.substr(0, (errorFull.indexOf(':') + 1));
-        var errors = errorFull.substr((errorFull.indexOf(':') + 1));
-        return errorTitle+'\n\n'+errors.replace(/, /g, '\n').replace(/^\s/, '');
-    }
-
-    function ValidateLogin() {
-        if ($('#user').val() == '') {
-            window.alert('Por favor, digite seu nome de usuário.');
-            $('#user').focus();
-            return false;
-        } else if ($('#pwd').val() == '') {
-            window.alert('Por favor, digite sua senha.');
-            $('#pwd').focus();
-            return false;
-        }
-        return true;
     }
 });
