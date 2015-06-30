@@ -129,7 +129,7 @@ class TineJsonRpc extends JsonRpc
         $this->setHeaders(array(
             'Content-Type: application/json; charset=UTF-8',
             'Connection: Keep-Alive',
-            'User-Agent: ' . $this->getUserAgent(),
+            'User-Agent: ' . self::DEFAULT_USERAGENT,
             'DNT: 1',
             'X-Requested-With: XMLHttpRequest',
             'X-Tine20-JsonKey: ' . $this->jsonKey,
@@ -144,20 +144,5 @@ class TineJsonRpc extends JsonRpc
         }
 
         return $response;
-    }
-
-    /**
-     * Returns the user agent to be set in the request headers. It will
-     * be the same used by the client. If no user agent information can
-     * be found (as in test environment calls), it uses a default value
-     *
-     * @return The user agent to be set in the request headers
-     */
-    private function getUserAgent() {
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            return $_SERVER['HTTP_USER_AGENT'];
-        } else {
-            return self::DEFAULT_USERAGENT;
-        }
     }
 }
