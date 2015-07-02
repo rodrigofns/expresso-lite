@@ -16,6 +16,7 @@ use ExpressoLite\Backend\Exception\LiteException;
 use ExpressoLite\TineTunnel\TineSession;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
+use ExpressoLite\Backend\Exception\UserMismatchException;
 
 abstract class LiteRequest
 {
@@ -62,8 +63,29 @@ abstract class LiteRequest
         $this->processor = $processsor;
         $this->tineSession = $tineSession;
 
-        if (! $this->tineSession->isLoggedIn() && ! $this->allowAccessWithoutSession()) {
+    }
+
+    /**
+     * Checks if user defined in the back-end is the same in the front-end, throwing
+     * exceptions and logging the errors.
+     */
+    public function checkSessionValidity()
+    {
+        if ($this->allowAccessWithoutSession()) {
+            return;
+        }
+
+        if (!$this->tineSession->isLoggedIn()) {
             throw new NoTineSessionException('This request cannot be processed without a previously estabilished tine session');
+        }
+
+        $clientUser = isset($_COOKIE['user']) ? $_COOKIE['user'] : null;
+        $tineSessionUser = $this->tineSession->getAttribute('Expressomail.email');
+
+        if ($clientUser != $tineSessionUser) {
+            $this->resetTineSession();
+            error_log('POSSIBLE SESSION HIJACKING! Client user: ' . $clientUser . '; TineSession user: '. $tineSessionUser);
+            throw new UserMismatchException('Ocorreu um problema com a sua sessão');
         }
     }
 

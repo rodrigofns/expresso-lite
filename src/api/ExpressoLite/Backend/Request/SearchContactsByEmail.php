@@ -13,6 +13,7 @@
 namespace ExpressoLite\Backend\Request;
 
 use ExpressoLite\TineTunnel\Request;
+use ExpressoLite\TineTunnel\TineJsonRpc;
 
 class SearchContactsByEmail extends LiteRequest
 {
@@ -93,7 +94,7 @@ class SearchContactsByEmail extends LiteRequest
         $req->setHeaders(array(
             'Connection: keep-alive',
             'DNT: 1',
-            'User-Agent: ' . $_SERVER['HTTP_USER_AGENT'],
+            'User-Agent: ' . TineJsonRpc::DEFAULT_USERAGENT,
             'Pragma: no-cache',
             'Cache-Control: no-cache'
         ));

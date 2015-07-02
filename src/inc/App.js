@@ -75,6 +75,7 @@ return {
             defer.resolve(data);
         }).fail(function (data) {
             if (data.status === 401) { //session timeout
+                window.alert('Sua sessão expirou, é necessário realizar o login novamente');
                 document.location.href='../';
                 // as this will leave the current screen, we
                 // won't neither resolve or reject

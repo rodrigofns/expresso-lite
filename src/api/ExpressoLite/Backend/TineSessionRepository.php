@@ -50,6 +50,7 @@ class TineSessionRepository
     public static function resetTineSession() {
         $tineSession = self::createNewTineSession();
         self::storeTineSession($tineSession);
+        return $tineSession;
     }
 
     /**

@@ -33,15 +33,6 @@ class Login extends Handler
         ));
 
         if ($response->success === true) {
-            setrawcookie( // setrawcookie deals better with @ in the cookie value
-                'user', $user,
-                time()+60*60*24*30, // expires = actual time + 30 days
-                str_replace('accessible/', '', $_SERVER['REQUEST_URI']) // cookie path
-                //we remove 'accessible/' suffix from current path.
-                //This way, the cookie is set for the parent path and
-                //will also work for non-acessible modules
-            );
-
             Dispatcher::processRequest('Mail.Main', $params);
         } else {
             Dispatcher::processRequest('Core.ShowFeedback', (object) array(

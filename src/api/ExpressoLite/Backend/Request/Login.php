@@ -27,6 +27,7 @@ class Login extends LiteRequest
         }
 
         try {
+            $this->resetTineSession();
             $result = $this->tineSession->login(
                 $this->param('user'),
                 $this->param('pwd'),
@@ -41,6 +42,19 @@ class Login extends LiteRequest
             return (object) array(
                     'success' => false,
                     'captcha' => $cre->getCaptcha()
+            );
+        }
+
+        if ($result) {
+            $cookiePath = str_replace('accessible/', '', $_SERVER['REQUEST_URI']);
+            //we remove 'accessible/' suffix from current path.
+            //This way, the cookie will always be set to all modules,
+            //even if it was started by the accessible module
+
+            setrawcookie( // setrawcookie deals better with @ in the cookie value
+                'user', $this->param('user'),
+                time()+60*60*24*30, // expires = actual time + 30 days
+                $cookiePath
             );
         }
 

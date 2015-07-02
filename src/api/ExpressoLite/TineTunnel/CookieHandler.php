@@ -28,4 +28,11 @@ interface CookieHandler
      *
      */
     public function getCookies();
+
+    /**
+     * Deletes an specific cookie
+     *
+     * @param string $cookieName Name of the cookie to be deleted.
+     */
+    public function deleteCookie($cookieName);
 }

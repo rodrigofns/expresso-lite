@@ -14,6 +14,7 @@
  */
 namespace ExpressoLite\Backend\Request\Utils;
 
+use ExpressoLite\TineTunnel\TineJsonRpc;
 use ExpressoLite\TineTunnel\TineSession;
 use ExpressoLite\TineTunnel\Request;
 
@@ -166,7 +167,7 @@ class MessageUtils
         $req->setHeaders(array(
                 'Connection: keep-alive',
                 'DNT: 1',
-                'User-Agent: ' . (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : TineJsonRpc::DEFAULT_USERAGENT),
+                'User-Agent: ' . TineJsonRpc::DEFAULT_USERAGENT,
                 'Pragma: no-cache',
                 'Cache-Control: no-cache'
         ));
@@ -192,7 +193,7 @@ class MessageUtils
         $req->setPostFields($rawData);
         $req->setHeaders(array(
             'DNT: 1',
-            'User-Agent: ' . $_SERVER['HTTP_USER_AGENT'],
+            'User-Agent: ' . TineJsonRpc::DEFAULT_USERAGENT,
             'X-File-Name: ' . $fileDisplayName,
             'X-File-Size: 0',
             'X-File-Type: ' . $mimeType,

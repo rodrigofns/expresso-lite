@@ -13,6 +13,7 @@
  */
 namespace ExpressoLite\Backend\Request;
 
+use ExpressoLite\TineTunnel\TineJsonRpc;
 use ExpressoLite\TineTunnel\Request;
 
 class DownloadAttachment extends LiteRequest
@@ -50,7 +51,7 @@ class DownloadAttachment extends LiteRequest
         $req->setHeaders(array(
             'Connection: keep-alive',
             'DNT: 1',
-            'User-Agent: ' . $_SERVER['HTTP_USER_AGENT'],
+            'User-Agent: ' . TineJsonRpc::DEFAULT_USERAGENT,
             'Pragma: no-cache',
             'Cache-Control: no-cache'
         ));

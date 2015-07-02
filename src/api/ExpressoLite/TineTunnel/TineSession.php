@@ -281,6 +281,16 @@ class TineSession implements CookieHandler
     }
 
     /**
+     * Deletes a cookie from the cookie store
+     *
+     * @param string $cookieName Name of the cookie to be deleted.
+     */
+    public function deleteCookie($cookieName)
+    {
+        unset($this->cookies[$cookieName]);
+    }
+
+    /**
      * Returns an array with all the stored cookies
      *
      * @return $cookie Array with all the stored cookies

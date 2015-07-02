@@ -18,9 +18,21 @@ class Logoff extends LiteRequest
      */
     public function execute()
     {
-        $response = $this->tineSession->logout();
+        try {
+            $response = $this->tineSession->logout();
+        } catch (\Exception $e) {
+            error_log('Error during logoff: ' . $e->getMessage());
+            $response = array(
+                'status' => 'error',
+                'message' => $e->getMessage()
+            );
+        }
 
         $this->resetTineSession();
+        session_destroy();
+        //resetting tine session and detroying the session may be
+        //redundant, but its an extra precaution to avoid reuse
+        //of invalidated sessions
 
         return (object) $response;
     }

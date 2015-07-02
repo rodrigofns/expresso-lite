@@ -189,7 +189,9 @@ class Request
         $cookies = $this->cookieHandler->getCookies();
         $vals = array();
         foreach ($cookies as $cookie) {
-            if (strcmp($cookie->name, 'PHPSESSID') !== 0) {
+            if ($this->cookieShouldBeDeleted($cookie)) {
+                $this->cookieHandler->deleteCookie($cookie->name);
+            } else {
                 $vals[] = ($cookie->name . '=' . $cookie->value);
             }
         }
@@ -283,6 +285,7 @@ class Request
         $cookieParts = explode(';', substr($line, strlen('Set-Cookie: ')));
 
         foreach ($cookieParts as $cookiePart) {
+            $isExpired = false;
             $cookiePart = trim($cookiePart);
             $pair = explode('=', $cookiePart);
             switch ($pair[0]) {
@@ -296,8 +299,10 @@ class Request
                     $cookie->secure = true;
                     break;
                 case 'expires':
-                    $dtt = DateTime::createFromFormat('D, d-M-Y H:i:s T', $pair[1]);
-                    $cookie->expires = $dtt->getTimestamp();
+                    $expiresValue = $pair[1];
+                    if ($expiresValue != 0) {
+                        $cookie->expires = DateTime::createFromFormat('D, d-M-Y H:i:s T', $expiresValue);
+                    }
                     break;
                 default:
                     if ($cookie->name === '') {
@@ -311,7 +316,12 @@ class Request
                     }
             }
         }
-        $this->cookieHandler->storeCookie($cookie);
+
+        if ($this->cookieShouldBeDeleted($cookie)) {
+            $this->cookieHandler->deleteCookie($cookie->name);
+        } else {
+            $this->cookieHandler->storeCookie($cookie);
+        }
     }
 
     /**
@@ -321,11 +331,26 @@ class Request
      * @return false if the target url is not set
      *
      */
-
     private function checkMandatoryProperties()
     {
         if ($this->url == null) {
             throw RpcException('Request url is not defined');
         }
+    }
+
+    /**
+     * Checks if an specific cookie is expired or with a value='deleted'
+     *
+     * @return true if the cookie should be deleted, false otherwise
+     *
+     */
+    private function cookieShouldBeDeleted($cookie) {
+        $now = new DateTime();
+        $isExpired = isset($cookie->expires) &&
+                     $cookie->expires !== 0 &&
+                     ($cookie->expires->getTimestamp() < $now->getTimestamp());
+                     //cookie expires is previous to current time
+
+        return $isExpired || ($cookie->value === 'deleted');
     }
 }
