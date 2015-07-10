@@ -58,4 +58,10 @@ input[type=submit] { margin:8px 0; }
     #classicHref { }
 }
 
-#versionInfo { position:absolute; bottom:10px; right:8px; font-size:80%; text-align:right; color:#AAA; }
+#versionInfo { position:absolute; font-size:80%; text-align:right; color:#AAA; }
+@media (max-height:350px) { /* if screen doesn't have enough height */
+    #versionInfo { top:-500px; } /* not display:none because of eventual JS fadeIn() */
+}
+@media (min-height:351px) {
+    #versionInfo { bottom:10px; right:8px; }
+}
