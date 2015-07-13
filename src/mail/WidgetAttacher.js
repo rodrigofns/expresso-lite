@@ -8,7 +8,11 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/UploadFile', 'mail/ThreadMail'],
+define(['jquery',
+    'common-js/App',
+    'common-js/UploadFile',
+    'mail/ThreadMail'
+],
 function($, App, UploadFile, ThreadMail) {
 App.LoadCss('mail/WidgetAttacher.css');
 var WidgetAttacher = function(options) {

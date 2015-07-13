@@ -8,7 +8,11 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'mail/Contacts'], function($, App, Contacts) {
+define(['jquery',
+    'common-js/App',
+    'mail/Contacts'
+],
+function($, App, Contacts) {
 App.LoadCss('mail/WidgetSearchAddr.css');
 var WidgetSearchAddr = function(options) {
     var userOpts = $.extend({

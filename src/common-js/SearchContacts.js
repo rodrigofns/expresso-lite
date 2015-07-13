@@ -8,9 +8,13 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/Contacts', 'inc/Dialog'],
+define(['jquery',
+    'common-js/App',
+    'common-js/Contacts',
+    'common-js/Dialog'
+],
 function($, App, Contacts, Dialog) {
-App.LoadCss('inc/SearchContacts.css');
+App.LoadCss('common-js/SearchContacts.css');
 var SearchContacts = function(options) {
     var userOpts = $.extend({
         caption: 'Pesquisar contato',
@@ -262,7 +266,7 @@ SearchContacts.Load = function() {
     // Static method, since this class can be instantied ad-hoc.
     return $('#SearchContacts_template').length ?
         $.Deferred().resolve().promise() :
-        App.LoadTemplate('../inc/SearchContacts.html');
+        App.LoadTemplate('../common-js/SearchContacts.html');
 };
 
 return SearchContacts;

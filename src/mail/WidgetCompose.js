@@ -8,8 +8,14 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/Dialog',
-    'inc/SearchContacts', 'mail/ThreadMail', 'mail/WidgetAttacher' ],
+define(['jquery',
+    'common-js/App',
+    'common-js/DateFormat',
+    'common-js/Dialog',
+    'common-js/SearchContacts',
+    'mail/ThreadMail',
+    'mail/WidgetAttacher'
+],
 function($, App, DateFormat, Dialog, SearchContacts, ThreadMail, WidgetAttacher) {
 App.LoadCss('mail/WidgetCompose.css');
 return function(options) {

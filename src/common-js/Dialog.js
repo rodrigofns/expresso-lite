@@ -8,8 +8,12 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/UrlStack'], function($, App, UrlStack) {
-App.LoadCss('inc/Dialog.css');
+define(['jquery',
+    'common-js/App',
+    'common-js/UrlStack'
+],
+function($, App, UrlStack) {
+App.LoadCss('common-js/Dialog.css');
 var Dialog = function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
@@ -292,7 +296,7 @@ Dialog.Load = function() {
     // Static method, since this class can be instantied ad-hoc.
     return $('#Dialog_template').length ?
         $.Deferred().resolve().promise() :
-        App.LoadTemplate('../inc/Dialog.html');
+        App.LoadTemplate('../common-js/Dialog.html');
 };
 
 return Dialog;

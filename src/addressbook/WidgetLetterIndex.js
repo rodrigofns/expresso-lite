@@ -9,7 +9,9 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App'],
+define(['jquery',
+    'common-js/App'
+],
 function($, App) {
     App.LoadCss('addressbook/WidgetLetterIndex.css');
 

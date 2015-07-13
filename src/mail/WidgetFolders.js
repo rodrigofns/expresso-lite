@@ -8,7 +8,10 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App'], function($, App) {
+define(['jquery',
+    'common-js/App'
+],
+function($, App) {
 App.LoadCss('mail/WidgetFolders.css');
 return function(options) {
     var userOpts = $.extend({

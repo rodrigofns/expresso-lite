@@ -8,8 +8,12 @@
  * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/UrlStack'], function($, App, UrlStack) {
-App.LoadCss('inc/ContextMenu.css');
+define(['jquery',
+    'common-js/App',
+    'common-js/UrlStack'
+],
+function($, App, UrlStack) {
+App.LoadCss('common-js/ContextMenu.css');
 return function(options) {
     var userOpts = $.extend({
         $btn: null // jQuery object for the target button

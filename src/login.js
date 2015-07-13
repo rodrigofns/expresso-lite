@@ -9,10 +9,13 @@
  */
 
 require.config({
-    paths: { jquery: 'inc/jquery.min' }
+    paths: { jquery: 'common-js/jquery.min' }
 });
 
-require(['jquery', 'inc/App'], function($, App) {
+require(['jquery',
+    'common-js/App'
+],
+function($, App) {
     $(document).ready(function() {
         var isBrowserValid = ValidateBrowser([
             { name:'Firefox', version:24 },

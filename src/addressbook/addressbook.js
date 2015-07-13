@@ -10,18 +10,17 @@
 
 require.config({
     baseUrl: '..',
-    paths: { jquery: 'inc/jquery.min' }
+    paths: { jquery: 'common-js/jquery.min' }
 });
 
-require(['jquery', 'inc/App', 'inc/Layout',
-         'addressbook/WidgetCatalogMenu',
-         'addressbook/WidgetContactList',
-         'addressbook/WidgetContactDetails'],
-function($, App, Layout,
-        WidgetCatalogMenu,
-        WidgetContactList,
-        WidgetContactDetails) {
-
+require(['jquery',
+    'common-js/App',
+    'common-js/Layout',
+    'addressbook/WidgetCatalogMenu',
+    'addressbook/WidgetContactList',
+    'addressbook/WidgetContactDetails'
+],
+function($, App, Layout, WidgetCatalogMenu, WidgetContactList, WidgetContactDetails) {
 window.Cache = {
     layout: null,
     widgetCatalogMenu: null,

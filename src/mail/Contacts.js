@@ -8,7 +8,10 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App'], function($, App) {
+define(['jquery',
+    'common-js/App'
+],
+function($, App) {
     function _Hex2bin(hex) {
         var bytes = [];
         for (var i = 0; i < hex.length - 1; i += 2) {

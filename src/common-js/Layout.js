@@ -9,9 +9,13 @@
  * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/UrlStack', 'inc/ContextMenu'],
+define(['jquery',
+    'common-js/App',
+    'common-js/UrlStack',
+    'common-js/ContextMenu'
+],
 function($, App, UrlStack, ContextMenu) {
-App.LoadCss('inc/Layout.css');
+App.LoadCss('common-js/Layout.css');
 return function(options) {
     var userOpts = $.extend({
         userMail: '',   // string with user email, for displaying purposes
@@ -30,7 +34,7 @@ return function(options) {
 
     THIS.load = function() {
         var defer = $.Deferred();
-        App.LoadTemplate('../inc/Layout.html').done(function() {
+        App.LoadTemplate('../common-js/Layout.html').done(function() {
             // Detach and attach the user DIVs on the layout structure.
             $('#Layout_menuDarkCover,#Layout_arrowLeft').css('display', 'none');
             $('#Layout_menu').append(userOpts.$menu); // user elements are detached and attached

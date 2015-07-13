@@ -8,7 +8,12 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery', 'inc/App', 'inc/DateFormat', 'inc/Contacts', 'mail/ThreadMail'],
+define(['jquery',
+    'common-js/App',
+    'common-js/DateFormat',
+    'common-js/Contacts',
+    'mail/ThreadMail'
+],
 function($, App, DateFormat, Contacts, ThreadMail) {
 App.LoadCss('mail/WidgetHeadlines.css');
 return function(options) {

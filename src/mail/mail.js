@@ -10,12 +10,23 @@
 
 require.config({
     baseUrl: '..',
-    paths: { jquery: 'inc/jquery.min' }
+    paths: { jquery: 'common-js/jquery.min' }
 });
 
-require(['jquery', 'inc/App', 'inc/UrlStack', 'inc/Layout', 'inc/Contacts', 'mail/ThreadMail',
-    'mail/WidgetCompose', 'mail/WidgetFolders', 'mail/WidgetHeadlines', 'mail/WidgetMessages', 'inc/SearchContacts'],
-function($, App, UrlStack, Layout, Contacts, ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages, SearchContacts) {
+require(['jquery',
+    'common-js/App',
+    'common-js/UrlStack',
+    'common-js/Layout',
+    'common-js/Contacts',
+    'common-js/SearchContacts',
+    'mail/ThreadMail',
+    'mail/WidgetCompose',
+    'mail/WidgetFolders',
+    'mail/WidgetHeadlines',
+    'mail/WidgetMessages'
+],
+function($, App, UrlStack, Layout, Contacts, SearchContacts,
+    ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
     MAILBATCH: App.GetUserInfo('mailBatch'),
     folders: [], // all folder objects
