@@ -20,14 +20,16 @@ define([], function() {
     };
 
     UrlStack.push = function(label, onPop) {
-        var newState = { label:label, callback:onPop };
-        states.push(newState);
-        window.history.pushState(null, '', label);
+        if (location.href.match(new RegExp(label+'$')) === null) { // if label not there
+            var newState = { label:label, callback:onPop };
+            states.push(newState);
+            window.history.pushState(null, '', label);
+        }
         return UrlStack;
     };
 
     UrlStack.pop = function(label) {
-        if (location.href.match(new RegExp(label+'$'))) {
+        if (location.href.match(new RegExp(label+'$')) !== null) {
             var lastState = states.pop();
             window.history.replaceState(null, '',
                 states.length ? states[states.length-1].label : location.pathname); // force back key

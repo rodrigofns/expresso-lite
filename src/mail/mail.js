@@ -18,15 +18,14 @@ require(['jquery',
     'common-js/UrlStack',
     'common-js/Layout',
     'common-js/Contacts',
-    'common-js/SearchContacts',
     'mail/ThreadMail',
     'mail/WidgetCompose',
     'mail/WidgetFolders',
     'mail/WidgetHeadlines',
     'mail/WidgetMessages'
 ],
-function($, App, UrlStack, Layout, Contacts, SearchContacts,
-    ThreadMail, WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
+function($, App, UrlStack, Layout, Contacts, ThreadMail,
+    WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
     MAILBATCH: App.GetUserInfo('mailBatch'),
     folders: [], // all folder objects

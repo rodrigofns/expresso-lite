@@ -12,11 +12,12 @@ define(['jquery',
     'common-js/App',
     'common-js/DateFormat',
     'common-js/Dialog',
-    'common-js/SearchContacts',
+    'common-js/TextBadges',
+    'common-js/ContactsAutocomplete',
     'mail/ThreadMail',
     'mail/WidgetAttacher'
 ],
-function($, App, DateFormat, Dialog, SearchContacts, ThreadMail, WidgetAttacher) {
+function($, App, DateFormat, Dialog, TextBadges, ContactsAutocomplete, ThreadMail, WidgetAttacher) {
 App.LoadCss('mail/WidgetCompose.css');
 return function(options) {
     var userOpts = $.extend({
@@ -31,6 +32,8 @@ return function(options) {
     var onDraftCB = null;
     var $tpl      = null; // jQuery object with our HTML template
     var popup     = null; // Dialog object, created on show()
+    var txtBadgesTo = null, txtBadgesCc = null, txtBadgesBcc = null;
+    var autocompTo = null, autocompCc = null, autocompBcc = null;
     var attacher  = null; // WidgetAttacher object, created on show()
     var msg       = { fwd:null, re:null, reAll:null, draft:null }; // we have a forwarded/replied/draft message
     var isSending = false; // a "send" async request is running
@@ -94,9 +97,9 @@ return function(options) {
                 .replace(/^[,\s]+|[,\s]+$/g, '');
         }
         var curAddr = {
-            to: removeSpacesAndTrimCommas($tpl.find('.Compose_toAddrs').text()),
-            cc: removeSpacesAndTrimCommas($tpl.find('.Compose_ccAddrs').text()),
-            bcc: removeSpacesAndTrimCommas($tpl.find('.Compose_bccAddrs').text())
+            to: removeSpacesAndTrimCommas(txtBadgesTo.getBadgeValues().join(',')),
+            cc: removeSpacesAndTrimCommas(txtBadgesCc.getBadgeValues().join(',')),
+            bcc: removeSpacesAndTrimCommas(txtBadgesBcc.getBadgeValues().join(','))
         };
         var changedDraftAddr = (msg.draft !== null && (
             curAddr.to !== removeSpacesAndTrimCommas(msg.draft.to.join(',')) ||
@@ -160,23 +163,32 @@ return function(options) {
                     _ValidateAddresses(elem).status;
             });
         if (clonedTo.length && clonedCc.length) {
-            return clonedTo.join(', ')+', '+clonedCc.join(', ');
+            clonedTo.push.apply(clonedTo, clonedCc);
+            return clonedTo;
         } else if (clonedTo.length) {
-            return clonedTo.join(', ');
+            return clonedTo;
         } else if (clonedCc.length) {
-            return clonedCc.join(', ');
-        } else {
-            return '';
+            return clonedCc;
         }
+        return [];
+    }
+
+    function _NameFromAddr(addr) {
+        var name = addr.substr(0, addr.indexOf('@')).toLowerCase();
+        var parts = name.split(/[\.-]+/);
+        for (var i = 0; i < parts.length; ++i) {
+            parts[i] = parts[i][0].toUpperCase() + parts[i].slice(1);
+        }
+        return parts.join(' ');
     }
 
     function _BuildMessageObject() {
         var message = {
             subject: $.trim($tpl.find('.Compose_subject').val()),
             body: $tpl.find('.Compose_body').html(),
-            to: $tpl.find('.Compose_toAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''), // trim spaces and commas
-            cc: $tpl.find('.Compose_ccAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''),
-            bcc: $tpl.find('.Compose_bccAddrs').text().replace(/^[,\s]+|[,\s]+$/g, ''),
+            to: txtBadgesTo.getBadgeValues().join(',').replace(/^[,\s]+|[,\s]+$/g, ''), // trim spaces and commas
+            cc: txtBadgesCc.getBadgeValues().join(',').replace(/^[,\s]+|[,\s]+$/g, ''),
+            bcc: txtBadgesBcc.getBadgeValues().join(',').replace(/^[,\s]+|[,\s]+$/g, ''),
             isImportant: '0', // 0|1 means false|true
             replyToId: null,
             forwardFromId: null,
@@ -215,7 +227,7 @@ return function(options) {
             return false;
         } else if (allowBlankDest === undefined && message.to == '' && message.cc == '' && message.bcc == '') {
             window.alert('Não há destinatários para o email.');
-            //~ $tpl.find('.Compose_to').focus();
+            $tpl.find('.Compose_to').focus();
             return false;
         }
 
@@ -245,7 +257,10 @@ return function(options) {
     }
 
     function _PopupClosed() {
-        msg.fwd = null; // cleanup
+        autocompTo.hide(); // cleanup
+        autocompCc.hide();
+        autocompBcc.hide();
+        msg.fwd = null;
         msg.re = null;
         msg.reAll = null;
         msg.draft = null;
@@ -273,39 +288,43 @@ return function(options) {
         } else if (showOpts.reply !== null) {
             msg.re = showOpts.reply; // keep replied headline
             $tpl.find('.Compose_subject').val('Re: '+msg.re.subject);
-            $tpl.find('.Compose_to').show();
-            $tpl.find('.Compose_toBtn').hide();
-            $tpl.find('.Compose_toAddrs').text(msg.re.from.email);
+            txtBadgesTo.addBadge(_NameFromAddr(msg.re.from.email), msg.re.from.email);
         } else if (showOpts.replyToAll !== null) {
             msg.reAll = showOpts.replyToAll; // keep replied headline
             $tpl.find('.Compose_subject').val('Re: '+msg.reAll.subject);
-            $tpl.find('.Compose_to').show();
-            $tpl.find('.Compose_toBtn').hide();
-            $tpl.find('.Compose_toAddrs').text(msg.reAll.from.email);
+            txtBadgesTo.addBadge(_NameFromAddr(msg.reAll.from.email), msg.reAll.from.email);
 
-            var replyAddrs = _JoinReplyAddresses(msg.reAll).toLowerCase();
+            var replyAddrs = _JoinReplyAddresses(msg.reAll); // array
             if (replyAddrs.length) {
-                $tpl.find('.Compose_cc').show();
-                $tpl.find('.Compose_ccBtn').hide();
-                $tpl.find('.Compose_ccAddrs').text(replyAddrs);
+                $tpl.find('.Compose_ccToggle').hide();
+                $tpl.find('.Compose_ccBlock').show();
+                for (var i = 0; i < replyAddrs.length; ++i) {
+                    txtBadgesCc.addBadge(_NameFromAddr(replyAddrs[i]),
+                        replyAddrs[i].toLowerCase());
+                }
             }
         } else if (showOpts.draft !== null) {
             msg.draft = showOpts.draft; // keep draft headline
             $tpl.find('.Compose_subject').val(msg.draft.subject);
-            if (msg.draft.to.length) {
-                $tpl.find('.Compose_to').show();
-                $tpl.find('.Compose_toBtn').hide();
-                $tpl.find('.Compose_toAddrs').text(msg.draft.to.join(', ').toLowerCase());
+            for (var i = 0; i < msg.draft.to.length; ++i) {
+                txtBadgesTo.addBadge(_NameFromAddr(msg.draft.to[i]),
+                    msg.draft.to[i].toLowerCase());
             }
             if (msg.draft.cc.length) {
-                $tpl.find('.Compose_cc').show();
-                $tpl.find('.Compose_ccBtn').hide();
-                $tpl.find('.Compose_ccAddrs').text(msg.draft.cc.join(', ').toLowerCase());
+                $tpl.find('.Compose_ccToggle').hide();
+                $tpl.find('.Compose_ccBlock').show();
+                for (var i = 0; i < msg.draft.cc.length; ++i) {
+                    txtBadgesCc.addBadge(_NameFromAddr(msg.draft.cc[i]),
+                        msg.draft.cc[i].toLowerCase());
+                }
             }
             if (msg.draft.bcc.length) {
-                $tpl.find('.Compose_bcc').show();
-                $tpl.find('.Compose_bccBtn').hide();
-                $tpl.find('.Compose_bccAddrs').text(msg.draft.bcc.join(', ').toLowerCase());
+                $tpl.find('.Compose_bccToggle').hide();
+                $tpl.find('.Compose_bccBlock').show();
+                for (var i = 0; i < msg.draft.bcc.length; ++i) {
+                    txtBadgesBcc.addBadge(_NameFromAddr(msg.draft.bcc[i]),
+                        msg.draft.bcc[i].toLowerCase());
+                }
             }
             attacher.rebuildFromMsg(msg.draft); // keep attachments
         }
@@ -335,67 +354,62 @@ return function(options) {
             _ResizeWriteField();
         });
 
-        $tpl.find('.Compose_toBtn,.Compose_ccBtn,.Compose_bccBtn').on('click', function(ev) { // click To, Cc or Bcc link
-            var $lnk = $(this);
-            var prefix = $lnk.attr('class'); // like "Compose_toBtn"
-            prefix = '.'+prefix.substr(0, prefix.length - 3); // like ".Compose_to"
+        function onClickShowField(cc, txtBadges) {
+            $tpl.find('.Compose_'+cc+'Toggle').hide();
+            $tpl.find('.Compose_'+cc+'Block').show();
+            txtBadges.setFocus();
+            _ResizeWriteField();
+        }
+        $tpl.find('.Compose_ccToggle').on('click', function() { onClickShowField('cc', txtBadgesCc); });
+        $tpl.find('.Compose_bccToggle').on('click', function() { onClickShowField('bcc', txtBadgesBcc); });
 
-            ( new SearchContacts({ caption:$lnk.text() }) ).onClose(function(emails) {
-                if (!emails.length) return;
-                $lnk.hide();
-                $tpl.find(prefix).show();
-                $tpl.find(prefix+'Addrs').text(emails.join(', '));
-                if (!$tpl.find('.Compose_toggs a:visible').length) {
-                    $tpl.find('.Compose_toggs').hide(); // if all three fields are shown, hide links container
-                }
+        function onBlurBadges(text, cc, txtBadges) {
+            if (!text.length && !txtBadges.getBadgeValues().length) {
+                $tpl.find('.Compose_'+cc+'Block').hide(); // if field is empty, hide field & show button
+                $tpl.find('.Compose_'+cc+'Toggle').show();
+                _ResizeWriteField();
+            }
+        }
+        txtBadgesCc.onBlur(function(text) { onBlurBadge(text, 'cc', txtBadgesCc); });
+        txtBadgesBcc.onBlur(function(text) { onBlurBadge(text, 'bcc', txtBadgesBcc); });
 
-                var $subj = $tpl.find('.Compose_subject');
-                $subj.focus();
-                $subj[0].setSelectionRange($subj.val().length, $subj.val().length);
+        txtBadgesTo.onRemove(function() { _ResizeWriteField(); });
+        txtBadgesCc.onRemove(function() { _ResizeWriteField(); });
+        txtBadgesBcc.onRemove(function() { _ResizeWriteField(); });
+
+        function onAutocompSelect(addrs, autocomp, txtBadges) {
+            var promises = [];
+            for (var i = 0; i < addrs.length; ++i) {
+                promises.push( txtBadges.addBadge( // a new address was selected, make it a badge
+                    _NameFromAddr(addrs[i]),
+                    addrs[i].toLowerCase()) );
+            }
+            _ResizeWriteField();
+            $.when.apply(null, promises).done(function() {
+                $tpl.find('.Compose_fieldAddr').scrollTop(999999); // scroll all to bottom, just in case
                 _ResizeWriteField();
             });
-            return false;
-        });
+        }
+        autocompTo.onSelect(function(addrs) { onAutocompSelect(addrs, autocompTo, txtBadgesTo); });
+        autocompCc.onSelect(function(addrs) { onAutocompSelect(addrs, autocompCc, txtBadgesCc); });
+        autocompBcc.onSelect(function(addrs) { onAutocompSelect(addrs, autocompBcc, txtBadgesBcc); });
 
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('click', function(ev) { // emails field click
-            var $div = $(this);
-            var prefix = '.'+$div.attr('class'); // like ".Compose_to"
-            var capt = '';
-            switch (prefix) {
-                case '.Compose_to': capt = 'Para...'; break;
-                case '.Compose_cc': capt = 'Cc...'; break;
-                case '.Compose_bcc': capt = 'Bcc...';
-            }
-
-            ( new SearchContacts({
-                caption: capt,
-                text: $tpl.find(prefix+'Addrs').text()
-            }) ).onClose(function(emails) {
-                if (!emails.length) {
-                    $tpl.find(prefix+'Addrs').text('');
-                    $div.hide();
-                    $tpl.find('.Compose_toggs').show(); // show links container
-                    $tpl.find(prefix+'Btn').show();
-                    _ResizeWriteField();
-                } else {
-                    $tpl.find(prefix+'Addrs').text(emails.join(', '));
-                }
-
-                var $subj = $tpl.find('.Compose_subject');
-                $subj.focus();
-                $subj[0].setSelectionRange($subj.val().length, $subj.val().length);
-                _ResizeWriteField();
-            });
-        });
-
-        $tpl.find('.Compose_to,.Compose_cc,.Compose_bcc').on('keydown', function(ev) {
-            if (ev.which === 13) { // enter
-                $(this).trigger('click');
-            }
-        });
+        autocompTo.onBackspace(function() { txtBadgesTo.removeLastBadge(); });
+        autocompCc.onBackspace(function() { txtBadgesCc.removeLastBadge(); });
+        autocompBcc.onBackspace(function() { txtBadgesBcc.removeLastBadge(); });
 
         $tpl.find('.Compose_send').on('click', function() { // send email
             $(this).blur();
+
+            var txtBadges = [ txtBadgesTo, txtBadgesCc, txtBadgesBcc ];
+            for (var i = 0; i < 3; ++i) { // all addresses must be in badges
+                if (txtBadges[i].getInputField().val().length) {
+                    window.alert('Endereço de email inválido.');
+                    txtBadges[i].getInputField().focus();
+                    return;
+                }
+            }
+
             var message = _BuildMessageObject();
             if (_ValidateSend(message)) {
                 isSending = true;
@@ -474,7 +488,7 @@ return function(options) {
         popup = new Dialog({ // create new modeless dialog object
             $elem: $tpl,
             caption: 'Escrever email',
-            width: 620,
+            width: 680,
             height: $(window).outerHeight() - 120,
             minWidth: 300,
             minHeight: 450,
@@ -487,9 +501,10 @@ return function(options) {
                 showOpts.draft === null;
 
             if (isNewMessage) {
-                $tpl.find('.Compose_toBtn').focus();
+                txtBadgesTo.setFocus();
             } else if (showOpts.forward !== null) {
-                $tpl.find('.Compose_body').html(_PrepareBodyToQuote('forward', msg.fwd)).focus();
+                $tpl.find('.Compose_body').html(_PrepareBodyToQuote('forward', msg.fwd));
+                txtBadgesTo.setFocus();
             } else if (showOpts.reply !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('reply', msg.re)).focus();
             } else if (showOpts.replyToAll !== null) {
@@ -499,6 +514,30 @@ return function(options) {
             }
             defer.resolve();
         });
+
+        txtBadgesTo = new TextBadges({ $target:$tpl.find('.Compose_to'), inputType:'email' });
+        txtBadgesCc = new TextBadges({ $target:$tpl.find('.Compose_cc'), inputType:'email' });
+        txtBadgesBcc = new TextBadges({ $target:$tpl.find('.Compose_bcc'), inputType:'email' });
+
+        autocompTo = new ContactsAutocomplete({
+            $txtField: txtBadgesTo.getInputField(),
+            $anchorElem: $tpl.find('.Compose_to'),
+            $contentPanel: $tpl
+        });
+        autocompCc = new ContactsAutocomplete({
+            $txtField: txtBadgesCc.getInputField(),
+            $anchorElem: $tpl.find('.Compose_cc'),
+            $contentPanel: $tpl
+        });
+        autocompBcc = new ContactsAutocomplete({
+            $txtField: txtBadgesBcc.getInputField(),
+            $anchorElem: $tpl.find('.Compose_bcc'),
+            $contentPanel: $tpl
+        });
+
+        if (!App.IsPhone()) {
+            $tpl.find('.Compose_subject').removeAttr('placeholder');
+        }
 
         attacher = new WidgetAttacher({ $elem:$tpl.find('.Compose_attacher') });
         _SetEvents();
@@ -514,7 +553,8 @@ return function(options) {
         ).done(function() {
             $.when(
                 Dialog.Load(),
-                SearchContacts.Load(),
+                TextBadges.Load(),
+                ContactsAutocomplete.Load(),
                 WidgetAttacher.Load()
             ).done(function() {
                 defer.resolve();
