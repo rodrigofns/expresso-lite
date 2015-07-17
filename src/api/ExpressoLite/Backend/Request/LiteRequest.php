@@ -66,26 +66,42 @@ abstract class LiteRequest
     }
 
     /**
-     * Checks if user defined in the back-end is the same in the front-end, throwing
-     * exceptions and logging the errors.
+     * Checks all constraints that can prevent this request from 
+     * being executed are met.
+     *
      */
-    public function checkSessionValidity()
+    public function checkConstraints() 
     {
-        if ($this->allowAccessWithoutSession()) {
-            return;
-        }
+        $this->checkIfSessionIsLoggedIn();
+        $this->checkIfSessionUserIsValid();
+    }
 
-        if (!$this->tineSession->isLoggedIn()) {
+    /**
+     * This function throws an exception if user is not logged in when
+     * the request is executed, unless this request explicitly allows so
+     *
+     */
+    private function checkIfSessionIsLoggedIn()
+    {
+        if (!$this->allowAccessWithoutSession() && !$this->tineSession->isLoggedIn()) {
             throw new NoTineSessionException('This request cannot be processed without a previously estabilished tine session');
         }
+    }
 
+    /**
+     * Checks if user defined in the back-end is the same in the front-end, throwing
+     * exceptions and logging the errors.
+     *
+     */
+    protected function checkIfSessionUserIsValid()
+    {
         $clientUser = isset($_COOKIE['user']) ? $_COOKIE['user'] : null;
         $tineSessionUser = $this->tineSession->getAttribute('Expressomail.email');
 
-        if ($clientUser != $tineSessionUser) {
+        if ($tineSessionUser != null && $clientUser != $tineSessionUser) {
             $this->resetTineSession();
             error_log('POSSIBLE SESSION HIJACKING! Client user: ' . $clientUser . '; TineSession user: '. $tineSessionUser);
-            throw new UserMismatchException('Ocorreu um problema com a sua sessão');
+            throw new UserMismatchException();
         }
     }
 
@@ -99,7 +115,7 @@ abstract class LiteRequest
      * @return true or false, indicating whether the request may be invoked
      * without a TineSession
      */
-       public function allowAccessWithoutSession()
+    public function allowAccessWithoutSession()
     {
         // this method is supposed to be overriden by calls that
         // may be executed even without a previously estabilished

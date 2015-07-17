@@ -40,11 +40,13 @@ class LiteRequestProcessor {
      *
      */
     public function executeRequest($requestName, $params = array()) {
-        $requestHandler = $this->prepareLiteRequestHandler ( $requestName, $params );
-        $result = $requestHandler->execute ();
+        $requestHandler = $this->prepareLiteRequestHandler($requestName, $params );
+        $requestHandler->checkConstraints();
 
-        if ($result != null && is_string ( $result )) {
-            return json_decode ( $result );
+        $result = $requestHandler->execute();
+
+        if ($result != null && is_string($result)) {
+            return json_decode ($result);
         } else {
             return $result;
         }

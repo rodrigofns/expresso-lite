@@ -58,6 +58,10 @@ class Login extends LiteRequest
             );
         }
 
+        $this->checkIfSessionUserIsValid();
+        // Its better to check if the tine user matches Expresso Lite user
+        // right away
+
         return (object) array(
             'success' => $result,
             'userInfo' => (object) array (

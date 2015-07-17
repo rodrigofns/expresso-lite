@@ -14,15 +14,10 @@ class UserMismatchException extends LiteException
 {
     /**
      * Creates a new <tt>UserMismatchException</tt>.
-     * It defaults parent class httpCode to 401.
-     *
-     * @param string $message
-     *            The exception message.
-     * @param int $code
-     *            The exception code used for logging.
+     * It sets parent class constructor params with default values
      */
-    public function __construct($message, $code = 0)
+    public function __construct()
     {
-        parent::__construct($message, $code, 401);
+        parent::__construct('UserMismatchException', 0, 500);
     }
 }

@@ -68,6 +68,12 @@ return {
 
         var defer = $.Deferred();
 
+        function returnToLoginScreen() {
+            var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
+            var destHref = currHref.replace(/\b(\/mail|\/addressbook)\b/gi, '') //removes /mail or /addressbook from the address
+            document.location.href = destHref;
+        }
+
         $.post(
             backendUrl + '/api/ajax.php',
             $.extend({r:requestName}, params)
@@ -76,12 +82,14 @@ return {
         }).fail(function (data) {
             if (data.status === 401) { //session timeout
                 window.alert('Sua sessão expirou, é necessário realizar o login novamente.');
-                document.location.href='../';
+                returnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
-            } else if (data.status === 500) { // user lost his credentials
-                window.alert('Você não está mais autenticado, é necessário realizar o login novamente.');
-                document.location.href = '../';
+            } else if (data.status === 500 && data.responseText == 'UserMismatchException') {
+                window.alert('Ocorreu um problema durante a execução desta operação. É necessário realizar o login novamente.');
+                returnToLoginScreen();
+                // as this will leave the current screen, we
+                // won't neither resolve or reject
             } else {
                 defer.reject(data);
             }
