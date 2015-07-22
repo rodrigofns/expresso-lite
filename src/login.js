@@ -47,11 +47,12 @@ function($, App) {
         if (location.href.indexOf('#') !== -1)
             history.pushState('', '', location.pathname);
 
-        $('body').show();
-        LoadServerStatus(); // async
-        $('#user').focus();
-        $('#frmLogin').submit(DoLogin);
-        $('#frmChangePwd').submit(DoChangePassword);
+        $(document.body).fadeIn(300, function() {
+            LoadServerStatus(); // async
+            $('#user').focus();
+            $('#frmLogin').submit(DoLogin);
+            $('#frmChangePwd').submit(DoChangePassword);
+        });
     }
 
     function ValidateBrowser(minBrowsers) {
@@ -132,11 +133,13 @@ function($, App) {
         }
 
         if (!ValidateLogin()) return false;
+        $('#universalAccess,#externalLinks').fadeOut(200);
         $('#btnLogin').hide();
         $('#frmLogin input').prop('disabled', true);
         $('#frmLogin .throbber').show().children('span').text('Efetuando login...');
 
         function RestoreLoginState() {
+            $('#universalAccess,#externalLinks').show();
             $('#btnLogin').show();
             $('#frmLogin input').prop('disabled', false);
             $('#frmLogin .throbber').hide();
@@ -174,7 +177,7 @@ function($, App) {
                     App.SetUserInfo(i, response.userInfo[i]);
                 }
                 App.SetCookie('user', $('#user').val(), 30); // store for 30 days
-                location.href = './mail'; // automatically redirect to email module
+                RedirectToMailModule();
             }
         });
         return false;
@@ -220,5 +223,46 @@ function($, App) {
             });
         }
         return false;
+    }
+
+    function RedirectToMailModule() {
+        $(document.body).css('overflow', 'hidden');
+        $('#versionInfo').hide();
+
+        if (App.IsPhone()) {
+            var animTime = 300;
+            $('#credent').css({
+                    position: 'fixed',
+                    left: $('#credent').offset().left,
+                    top: $('#credent').offset().top
+                })
+                .appendTo(document.body)
+                .animate({ left:-$(window).width() }, { duration:animTime, queue:false });
+            $('#frmLogin').css({
+                    position: 'fixed',
+                    display: 'block',
+                    left: $('#logo-top').offset().left,
+                    top: $('#frmLogin').offset().top
+                })
+                .appendTo(document.body)
+                .animate({ left:$(window).width() }, {
+                    duration: animTime,
+                    queue: false,
+                    complete: function() {
+                        location.href = './mail';
+                    }
+                });
+        } else {
+            var animTime = 600;
+            $('#topgray').animate({ opacity:0 }, { duration:animTime, queue:false });
+            $('#thebg').animate({ left:-$(window).width(), opacity:0 }, { duration:animTime, queue:false });
+            $('#credent').animate({ top:$(window).height() }, {
+                duration: animTime,
+                queue: false,
+                complete: function() {
+                    location.href = './mail';
+                }
+            });
+        }
     }
 });
