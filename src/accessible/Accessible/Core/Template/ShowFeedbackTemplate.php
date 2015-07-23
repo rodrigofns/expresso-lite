@@ -13,22 +13,29 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
+    <link type="text/css" rel="stylesheet" href="./Accessible/Core/Template/general.css" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Core/Template/ShowFeedbackTemplate.css" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
     <title>Aviso - ExpressoBr Acessível</title>
 </head>
 <body>
 
-<div id="anchors">
+<div id="top" name="top">
     <div id="logomark"></div>
+    <div id="anchors" name="anchors" class="links systemLinks">
+        <nav class="contentAlign">
+            <ul>
+                <li><a href="<?= $VIEW->destinationUrl ?>" accesskey="v"><?= $VIEW->destinationText ?> [v]</a></li>
+            </ul>
+        </nav>
+    </div>
 </div>
 
-<h2 class="anchors_title">Mensagens</h2>
-<div id="feedbackMessageContainer">
-    <div class="feedbackMessage <?= $VIEW->typeMsg ?>"> <?= $VIEW->message ?></div>
-    <div id="feedbackLink" name="feedbackLink">
-        <a href="<?= $VIEW->destinationUrl ?>" accesskey="v"><?= $VIEW->destinationText ?> [v]</a>
-    </div>
+<h2 class="anchorsTitle">Mensagens</h2>
+<div id="feedback" name="feedback">
+    <div id="feedbackType" id="feedbackType" class="<?= $VIEW->typeMsg ?>" ></div>
+        <p id="feedbackMessage" name="feedbackMessage"> <?= $VIEW->message ?> </p>
+    <div class="clear"> </div>
 </div>
 
 </body>

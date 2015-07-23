@@ -8,97 +8,40 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-body, table, input[type=button], input[type=text], input[type=password], input[type=submit], input[type=file],
-select, button, textarea { font:11pt Arial,sans-serif; color:#272F37; background: #FFF; }
-
-a { font-size: 100%; color: #000; text-decoration: none; }
-li { list-style: none; }
 blockquote { margin:2px 0 4px 15px; padding-left:5px; border-left:1px solid #BFD2E1; }
 
-#anchors { display: table;}
-#logomark {
-    background-image: url("../../../../img/logo-expressobr-top.png");
-    background-repeat: no-repeat;
-    background-position: top left;
-    width: 248px;
-    height: 97px;
-    float:left;
-}
-#anchors_area { position: absolute; right: 46px; padding: 0x; }
-.anchors-title {
-    font-weight: 400;
-    font-size: 130%;
-    background-color: #003852;
-    color: #FFF;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-.menu ul li a{ display: block; padding: 5px 10px; border: 1px solid #FFF; background-color: #F4F4F4; }
-.menu ul li a:hover { background-color: #FFDB79; color: #1B2026; }
-.menu ul li a:focus { background-color:#FF6536; color: #FFF; }
+.dialogEmail { border:none; padding:0px; margin-right:20px; }
 
-.Dialog_email { padding-right: 40px; padding-left: 25px; border: none; }
-.Dialog_field { padding-bottom: 15px; }
-.Dialog_field label{ color: #003852; }
-
-.Dialog_field input[type=text],
-.Dialog_field input[type=email] {
-    padding: 6px;
-    width:100%; /*-6px to account for left and right padding*/
-    border: 1px solid #CCC;
-    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
-    display: block;
-    font-size: 80%;
+.attach {
+    display:block;
+    padding:5px 10px 12px;
+    border:1px solid #FFF;
+    background-color:#F4F4F4;
+    list-style:none;
+    margin-bottom:-0.8em;
 }
 
-.Dialog_field input[type=file] {
-    width: 100%;
-    border: 1px solid #CCC;
-    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+.composeSign {
+    color:#003852;
+    background-color:#F4F4F4;
+    font-size:80%;
+    padding:20px 25px;
+    margin:10px 0px 20px 0px;
 }
 
-.Dialog_message { width: 100%; display: block; margin-bottom: 15px; }
-.Dialog_message label{ color: #003852; }
-.Dialog_message textarea{
-    margin: 0px;
-    padding: 6px;
-    width: 100%;
-    height: 250px;
-    border: 1px solid #CCC;
-    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
-    resize: none;
-    overflow-y: scroll;
+.messageText {
+    border:1px solid #CCC;
+    box-shadow:2px 2px 2px rgba(0,0,0,0.2);
+    height:250px;
+    overflow-y:auto;
+    padding:6px 6px;
+    width:100%;
 }
 
-.Attach {
-    display: block;
-    padding: 5px 10px 12px;
-    border: 1px solid #FFF;
-    background-color: #F4F4F4;
-    list-style: none;
-    margin-bottom: -0.8em
+.messageText pre {
+    overflow-x:auto;
+    white-space:pre-wrap; /* css-3 */
+    white-space:-moz-pre-wrap !important; /* Mozilla, since 1999 */
 }
 
-.compose_sign { color:#003852; background-color: #F4F4F4; font-size: 80%; padding: 20px 25px ; margin: 10px 0px 20px 0px; }
-.compose_footer { margin-top: 5px; display: inline-block; padding: 5px 10px; color: #003852; }
-.compose_footer h3 { padding: 5px 25px; font-size: 80%; color: #003852; }
-
-.compose_footer input { padding: 5px 30px; background-color: #003852; color: #FFF; text-decoration: none; box-sizing: border-box; }
-.compose_footer input:hover { background-color: #FFDB79; color: #1B2026; }
-.compose_footer input:focus { background-color: #FF6536; color: #FFF; }
-
-.message_text {
-    border: 1px solid #CCC;
-    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
-    height: 250px;
-    overflow-y: auto;
-    padding: 6px 6px;
-    width: 100%;
-}
-.quoted_label{ padding-bottom: 20px; padding-top: 10px; color: #003852; }
-.message_text pre {
-    overflow-x: auto;
-    white-space: pre-wrap; /* css-3 */
-    white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
-}
+.composeFooter { margin-top:5px; display:inline-block; padding:0px; color:#003852; }

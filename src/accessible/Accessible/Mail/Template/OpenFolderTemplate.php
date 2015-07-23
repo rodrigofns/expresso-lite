@@ -14,31 +14,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1" />
     <link rel="icon" type="image/png" href="../img/favicon.png" />
+    <link type="text/css" rel="stylesheet" href="./Accessible/Core/Template/general.css" />
     <link type="text/css" rel="stylesheet" href="./Accessible/Mail/Template/OpenFolderTemplate.css" />
     <title>Seleção de pasta - ExpressoBr Acessível</title>
 </head>
 <body>
 
-<div id="anchors">
+<div id="top" name="top">
     <div id="logomark"></div>
-    <div id="anchors_area" name="anchors_area">
-        <nav id="anchors_nav" name="anchors_nav" class="menu">
+    <div id="anchors" name="anchors" class="links systemLinks">
+        <nav class="contentAlign">
             <ul>
-                <li><a href="#folders_area" accesskey="1">Ir para listagem de pastas [1]</a></li>
-                <!-- <li><a href="#menu_area" accesskey="2">Ir para ações da pasta de email [2]</a></li> -->
+                <li><a href="#folders" accesskey="1">Ir para listagem de pastas [1]</a></li>
                 <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="v">Voltar para <?= $VIEW->folderName ?> [v]</a></li>
             </ul>
         </nav>
     </div>
 </div>
 
-<div id="folders_area" name="folders_area" class="menu">
-<h2 class="anchors_title">Pastas</h2>
-    <ul>
-        <?php FOREACH ($VIEW->folders AS $FOLDER) : ?>
-            <li><a href="<?= $FOLDER->lnkOpenFolder ?> " title="<?= $FOLDER->title ?>"><?= $FOLDER->localName ?></a></li>
-        <?php ENDFOREACH ?>
-    </ul>
+<div id="folders" name="folders">
+<h2 class="anchorsTitle">Pastas</h2>
+    <div class="links systemLinks">
+        <ul >
+            <?php FOREACH ($VIEW->folders AS $FOLDER) : ?>
+                <li><a href="<?= $FOLDER->lnkOpenFolder ?> " title="<?= $FOLDER->title ?>"><?= $FOLDER->localName ?></a></li>
+            <?php ENDFOREACH ?>
+        </ul>
+    </div>
 </div>
 
 </body>

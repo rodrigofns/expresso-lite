@@ -8,66 +8,16 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-body, table, input[type=button], input[type=text], input[type=password],
-    input[type=submit], select, button, textarea {
-    font: 11pt Arial, sans-serif;
-    color: #000;
-    background: #FFF;
-}
 blockquote { margin:2px 0 4px 14px; padding-left:5px; border-left:1px solid #BFD2E1; }
-a { font-size: 100%; color: #000; text-decoration: none; }
-ul { list-style-type: none; }
 
-#anchors { display: table; }
+.fieldName { font-weight:bold; }
+.attachName { font-weight:600; }
 
-#logomark {
-    background-image: url("../../../../img/logo-expressobr-top.png");
-    background-repeat: no-repeat;
-    background-position: top left;
-    width: 248px;
-    height: 97px;
-    float: left;
+#composePanelBody { border:1px solid #CCC; padding:6px 6px; }
+#composePanelBody pre {
+    overflow-x:auto;
+    white-space:pre-wrap; /* css-3 */
+    white-space:-moz-pre-wrap !important; /* Mozilla, since 1999 */
 }
 
-.menu ul li a { display: block; padding: 5px 10px; border: 1px solid #FFF; background-color: #F4F4F4; }
-.menu ul li a:hover { background-color: #FFDB79; color: #1B2026; }
-.menu ul li a:focus { background-color: #FF6536; color: #FFF; }
-
-#anchors_area { position: absolute; right: 46px; padding: 0x; }
-
-.anchors-title {
-    font-weight: 400;
-    font-size: 130%;
-    background-color: #003852;
-    color: #FFF;
-    padding: 7px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-#composePanel_body {
-    border: 1px solid #CCC;
-    padding: 6px 6px;
-}
-#composePanel_body pre {
-    overflow-x: auto;
-    white-space: pre-wrap; /* css-3 */
-    white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
-}
-#email_content ul { list-style-type: inherit !important; }
-#email_actions li {
-    display: inline-block;
-    margin-bottom: 20px;
-}
-#email_actions ul li a {
-    padding: 5px 10px;
-    width: 40px;
-    background-color: #005076;
-    border: 1px solid #005076;
-    color: #FFF;
-    border-radius: 4px;
-}
-#email_actions li a:hover { background-color: #FFDB79; color: #1B2026; }
-#email_actions ul li a:focus { background-color: #FF6536; color: #FFF; }
-
-.fieldName { font-weight: bold; }
-.attachName { font-weight: 600; }
+#emailActions ul { margin-left:-30px; }

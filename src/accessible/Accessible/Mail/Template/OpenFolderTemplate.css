@@ -8,41 +8,4 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-body, table, input[type=button], input[type=text], input[type=password],
-    input[type=submit], select, button, textarea {
-    font: 11pt Arial, sans-serif;
-    color: #00405E;
-    background: #FFF;
-}
-
-a { font-size: 100%; color: #000; text-decoration: none; }
-
-li { list-style: none; }
-
-#anchors { display: table; }
-
-#anchors_area { position: absolute; right: 46px; padding: 0x; }
-
-.anchors_title {
-    font-weight: 400;
-    font-size: 130%;
-    background-color: #003852;
-    color: #FFF;
-    padding: 7px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-#logomark {
-    background-image: url("../../../../img/logo-expressobr-top.png");
-    background-position: top left;
-    width: 248px;
-    height: 97px;
-    float: left;
-}
-
-#folders_area ul li a { width: calc(100% - 60px); }
-
-.menu ul li a { list-style: none; display: block; padding: 5px 10px; border: 1px solid #FFF;  background-color: #F4F4F4; }
-.menu ul li a:hover { background-color: #FFDB79; color: #1B2026; }
-.menu ul li a:focus { background-color: #FF6536; color: #FFF; }
+#folders ul { margin-left:-30px; margin-right:10px; }

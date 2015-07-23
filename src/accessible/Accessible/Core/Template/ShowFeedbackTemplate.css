@@ -8,75 +8,48 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-body, table, input[type=button], input[type=text], input[type=password],
-    input[type=submit], select, button, textarea {
-    font: 11pt Arial, sans-serif;
-    color: #272F37;
-    background: #FFF;
+#feedback {
+    display:table;
+    margin:0 auto;
+    padding:20px 5px 20px 5px;
+    border:2px solid #2C353E;
+    border-radius:10px;
 }
 
-a { font-size: 100%; color: #000; text-decoration: none; }
+.clear { clear:both; }
 
-#anchors { display: table; }
-
-#logomark {
-    background-image: url("../../../../img/logo-expressobr-top.png");
-    background-repeat: no-repeat;
-    background-position: top left;
-    width: 248px;
-    height: 97px;
-    float: left;
+#feedbackType {
+    background-position:left;
+    background-repeat:no-repeat;
+    height:100px;
+    float:left;
+    width:25%;
 }
 
-.anchors_title {
-    font-weight: 400;
-    font-size: 130%;
-    background-color: #003852;
-    color: #FFF;
-    padding: 7px 10px;
-    text-decoration: none;
-    border-radius: 5px;
+#feedbackMessage {
+    color:#2C353E;
+    font-weight:600;
+    font-size:150%;
+    border-radius:10px;
+    border-left:none;
+    border-bottom-left-radius:0px;
+    border-top-left-radius:0px;
+    margin-right:30px;
 }
 
-#feedbackMessageContainer { text-align: center; }
+.feedbackMessageSuccess { background-image:url("../../../../img/72px_ok.png"); }
+.feedbackMessageError { background-image:url("../../../../img/48px_error.png"); }
+.feedbackMessageAlert { background-image:url("../../../../img/72px_Alert.png"); }
 
-.feedbackMessage {
-    display: inline-block;
-    background-repeat: no-repeat;
-    background-position: center left;
-    width: 320px;
-    height: 30px;
-    padding: 28px 45px 35px 80px;
-    text-align: left;
-    font-size: 120%;
-    color: #2C353E;
-    border: 2px solid #2C353E;
-    font-weight: 600;
-    margin-bottom: 20px;
-    border-radius: 10px;
-}
-
-.feedbackMessageSuccess {
-    background-image: url("../../../../img/72px_ok.png");
-}
-
-.feedbackMessageError {
-    background-image: url("../../../../img/48px_error.png");
-}
-
-.feedbackMessageAlert {
-    background-image: url("../../../../img/72px_Alert.png");
-}
-
+#feedbackLink { margin-top:20px; text-align:center }
 #feedbackLink a {
-    padding: 5px 10px;
-    text-align: center;
-    width: 40px;
-    background-color: #005076;
-    border: 1px solid #005076;
-    border-radius: 4px;
-    color: #FFF;
+    padding:5px 10px;
+    text-align:center;
+    width:40px;
+    background-color:#005076;
+    border:1px solid #005076;
+    border-radius:4px;
+    color:#FFF;
 }
-
-#feedbackLink a:hover { background-color: #FFDB79; color: #1B2026; }
-#feedbackLink a:focus { background-color: #FF6536; color: #FFF; }
+#feedbackLink a:hover { background-color:#FFDB79; color:#1B2026; }
+#feedbackLink a:focus { background-color:#FF6536; color:#FFF; }
