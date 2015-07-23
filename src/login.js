@@ -139,7 +139,8 @@ function($, App) {
         $('#frmLogin .throbber').show().children('span').text('Efetuando login...');
 
         function RestoreLoginState() {
-            $('#universalAccess,#externalLinks').show();
+            if (!App.IsPhone()) $('#universalAccess').show();
+            $('#externalLinks').show();
             $('#btnLogin').show();
             $('#frmLogin input').prop('disabled', false);
             $('#frmLogin .throbber').hide();
