@@ -56,6 +56,11 @@ class Login extends LiteRequest
                 time()+60*60*24*30, // expires = actual time + 30 days
                 $cookiePath
             );
+
+            $_COOKIE['user'] = $this->param('user');
+            //setrawcookie() does not update the $_COOKIE array with the new cookie.
+            //So, we do this manually to avoid problems with checkIfSessionUserIsValid
+            //later on
         }
 
         $this->checkIfSessionUserIsValid();
