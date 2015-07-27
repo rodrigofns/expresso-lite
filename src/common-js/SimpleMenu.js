@@ -1,6 +1,6 @@
 /*!
  * Expresso Lite
- * Left menu of addressbook module.
+ * Simple menu for left menu section of Layout.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -13,7 +13,7 @@ define(['jquery',
 ],
 function($, App) {
 
-    App.LoadCss('addressbook/WidgetCatalogMenu.css');
+    App.LoadCss('common-js/SimpleMenu.css');
 
     return function(options) {
         var userOpts = $.extend({
@@ -21,7 +21,7 @@ function($, App) {
         }, options);
 
         var THIS = this;
-        var $ul = $(document.createElement('ul')).attr('id', 'WidgetCatalogMenu_list').appendTo(options.$parentContainer);
+        var $ul = $(document.createElement('ul')).attr('id', 'SimpleMenu_list').appendTo(options.$parentContainer);
         var $selectedLi = null;
 
         function selectLi($li) {

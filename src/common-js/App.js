@@ -159,7 +159,7 @@ function($, Cordova) {
 
     App.ReturnToLoginScreen = function() {
         var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar)\b/gi, ''); //removes /module from the URL address
+        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar|\/debugger)\b/gi, ''); //removes /module from the URL address
 
         if (destHref.slice(-1) != '/') { //checks last char
             destHref += '/';

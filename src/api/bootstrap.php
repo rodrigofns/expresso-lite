@@ -16,6 +16,8 @@ require_once (dirname(__FILE__).'/../version.php');
 require_once (dirname(__FILE__).'/../conf.php');
 require_once (dirname(__FILE__) .'/SplClassLoader.php');
 
+define('LITE_BASE_DIR', dirname(__FILE__) . '/..');
+
 $classLoader = new SplClassLoader('ExpressoLite', dirname(__FILE__));
 $classLoader->register();
 

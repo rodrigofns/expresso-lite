@@ -308,6 +308,17 @@ class TineSession implements CookieHandler
     }
 
     /**
+     * Replaces the value of an specific cookie
+     *
+     * @param string $cookieName Name of the cookie to be updated.
+     * @param string $newValue The new value to be set for the cookie.
+     */
+    public function replaceCookieValue($cookieName, $newValue)
+    {
+        $this->cookies[$cookieName]->value = $newValue;
+    }
+
+    /**
      * Returns an array with all the stored cookies
      *
      * @return $cookie Array with all the stored cookies

@@ -17,15 +17,17 @@ require(['jquery',
     'common-js/App',
     'common-js/UrlStack',
     'common-js/Layout',
+    'common-js/SimpleMenu',
     'calendar/DateCalc',
     'calendar/Events',
     'calendar/WidgetMonth',
     'calendar/WidgetWeek',
     'calendar/WidgetEvents'
 ],
-function($, App, UrlStack, Layout, DateCalc, Events, WidgetMonth, WidgetWeek, WidgetEvents) {
+function($, App, UrlStack, Layout, SimpleMenu, DateCalc, Events, WidgetMonth, WidgetWeek, WidgetEvents) {
 window.Cache = {
     events: null, // Events object
+    simpleMenu: null, //SimpleMenu object
     viewMonth: null, // WidgetMonth object
     viewWeek: null, // WidgetWeek object
     viewEvents: null // WidgetEvents object
@@ -40,6 +42,7 @@ App.Ready(function() {
         $right: $('#rightBody')
     });
     Cache.events = new Events();
+    Cache.simpleMenu = new SimpleMenu({ $parentContainer: $('#viewSelectionMenu') });
     Cache.viewMonth = new WidgetMonth({ events:Cache.events, $elem: $('#middleBody') });
     Cache.viewWeek = new WidgetWeek({ events:Cache.events, $elem: $('#middleBody') });
     Cache.viewEvents = new WidgetEvents({ events:Cache.events, $elem: $('#rightBody') });
@@ -54,15 +57,16 @@ App.Ready(function() {
         Cache.viewWeek.load(),
         Cache.viewEvents.load()
     ).done(function() {
-        Cache.layout.setLeftMenuVisibleOnPhone(true).done(function() {
-            $('#renderMonth').trigger('click'); // full month is selected by default
-        });
+        Cache.layout.setLeftMenuVisibleOnPhone(true).done(RenderMonth);
 
         // Setup events.
         Cache.layout
             .onKeepAlive(function() { })
             .onHideRightPanel(function() { })
             .onSearch(function() { }); // when user performs a search
+        Cache.simpleMenu
+            .addOption('Mês', RenderMonth)
+            .addOption('Semana', RenderWeek);
         Cache.viewMonth
             .onMonthChanged(UpdateCurrentMonthName)
             .onEventClicked(EventClicked);
@@ -70,9 +74,26 @@ App.Ready(function() {
             .onWeekChanged(UpdateCurrentWeekName)
             .onEventClicked(EventClicked);
         $('#btnRefresh').on('click', RefreshEvents);
-        $('#renderOptions li').on('click', ChangeRenderOption);
     });
 });
+
+function RenderMonth() {
+    Cache.viewWeek.hide();
+    Cache.viewMonth.show(Cache.viewWeek.getCurDate()).done(function() {
+        UpdateCurrentMonthName();
+    });
+}
+
+function RenderWeek() {
+    var curMonth = DateCalc.firstOfMonth(Cache.viewMonth.getCurDate());
+    if (DateCalc.isSameMonth(curMonth, DateCalc.today())) {
+        curMonth = DateCalc.today();
+    }
+    Cache.viewMonth.hide();
+    Cache.viewWeek.show(curMonth).done(function() {
+        UpdateCurrentWeekName();
+    });
+}
 
 function UpdateCurrentMonthName() {
     var curMonth = DateCalc.firstOfMonth(Cache.viewMonth.getCurDate());
@@ -125,29 +146,6 @@ function RefreshEvents() {
         $('#btnRefresh').show();
         $('#txtRefresh').hide();
     }
-}
-
-function ChangeRenderOption() {
-    var $li = $(this);
-    $('#renderOptions li').removeClass('renderOptionCurrent'); // remove from all LI
-    $li.addClass('renderOptionCurrent');
-    Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
-        if ($li.attr('id') === 'renderMonth') {
-            Cache.viewWeek.hide();
-            Cache.viewMonth.show(Cache.viewWeek.getCurDate()).done(function() {
-                UpdateCurrentMonthName();
-            });
-        } else if ($li.attr('id') === 'renderWeek') {
-            var curMonth = DateCalc.firstOfMonth(Cache.viewMonth.getCurDate());
-            if (DateCalc.isSameMonth(curMonth, DateCalc.today())) {
-                curMonth = DateCalc.today();
-            }
-            Cache.viewMonth.hide();
-            Cache.viewWeek.show(curMonth).done(function() {
-                UpdateCurrentWeekName();
-            });
-        }
-    });
 }
 
 function EventClicked(eventsOfDay) {

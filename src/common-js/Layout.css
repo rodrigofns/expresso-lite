@@ -72,6 +72,7 @@
 
 #Layout_leftContent { padding-bottom:26px; }
 
+#Layout_module_debugger { display: none; }
 
 /* --- Container for middle & right section --- */
 
@@ -118,3 +119,4 @@
 .Layout_iconEmail    { background-position:0 -160px; }
 .Layout_iconAddress  { background-position:0 -192px; }
 .Layout_iconCalendar { background-position:0 -224px; }
+.Layout_iconDebugger { background-position:0 -256px; }

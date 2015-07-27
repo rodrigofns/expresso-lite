@@ -39,10 +39,18 @@ return function(options) {
             $('#Layout_userMail').text(userOpts.userMail);
             userOpts.$menu.appendTo('#Layout_leftContent'); // detach from page, attach to DIV
             userOpts.$middle.appendTo('#Layout_middleContent');
-            userOpts.$right.appendTo('#Layout_rightContent');
+            if (userOpts.$right) {
+                userOpts.$right.appendTo('#Layout_rightContent');
+            }
+
             _SetEvents();
             contextMenu = new ContextMenu({ $btn:$('#Layout_context') });
             THIS.setContextMenuVisible(false); // initially hidden
+
+            if (App.GetUserInfo('showDebuggerModule') === 'show') {
+                $('#Layout_module_debugger').show();
+            }
+
             THIS.setRightPanelVisible(false);
             _SetCurrentModuleAsBold();
             defer.resolve();

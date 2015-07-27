@@ -16,14 +16,14 @@ require.config({
 require(['jquery',
     'common-js/App',
     'common-js/Layout',
-    'addressbook/WidgetCatalogMenu',
+    'common-js/SimpleMenu',
     'addressbook/WidgetContactList',
     'addressbook/WidgetContactDetails'
 ],
-function($, App, Layout, WidgetCatalogMenu, WidgetContactList, WidgetContactDetails) {
+function($, App, Layout, SimpleMenu, WidgetContactList, WidgetContactDetails) {
 window.Cache = {
     layout: null,
-    widgetCatalogMenu: null,
+    simpleMenu: null,
     widgetContactList: null,
     widgetContactDetails: null
 };
@@ -66,11 +66,11 @@ App.Ready(function() {
         });
 
 
-        Cache.widgetCatalogMenu = new WidgetCatalogMenu({
+        Cache.simpleMenu = new SimpleMenu({
             $parentContainer: $('#tipoContatoDiv')
         });
 
-        Cache.widgetCatalogMenu
+        Cache.simpleMenu
         .addOption('Catálogo Corporativo', function () {
             Cache.layout.setLeftMenuVisibleOnPhone(false)
             .done(function() {

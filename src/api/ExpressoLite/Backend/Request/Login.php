@@ -73,6 +73,7 @@ class Login extends LiteRequest
                 'mailAddress' => $this->tineSession->getAttribute('Expressomail.email'),
                 'mailSignature' => $this->tineSession->getAttribute('Expressomail.signature'),
                 'mailBatch' => MAIL_BATCH,
+                'showDebuggerModule' => (defined('SHOW_DEBUGGER_MODULE') && SHOW_DEBUGGER_MODULE === true) ? 'show' : 'hide'
             )
         );
     }
