@@ -370,8 +370,8 @@ return function(options) {
                 _ResizeWriteField();
             }
         }
-        txtBadgesCc.onBlur(function(text) { onBlurBadge(text, 'cc', txtBadgesCc); });
-        txtBadgesBcc.onBlur(function(text) { onBlurBadge(text, 'bcc', txtBadgesBcc); });
+        txtBadgesCc.onBlur(function(text) { onBlurBadges(text, 'cc', txtBadgesCc); });
+        txtBadgesBcc.onBlur(function(text) { onBlurBadges(text, 'bcc', txtBadgesBcc); });
 
         txtBadgesTo.onRemove(function() { _ResizeWriteField(); });
         txtBadgesCc.onRemove(function() { _ResizeWriteField(); });
