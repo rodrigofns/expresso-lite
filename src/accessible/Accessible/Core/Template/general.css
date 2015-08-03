@@ -21,6 +21,12 @@ body { font:12pt Arial,sans-serif; color:#1A1A1A; overflow-y:scroll; margin:0 au
 
 .contentAlign { margin-left:10px; margin-right:10px; }
 
+.onlyForScreenReaders {
+    position: absolute !important;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px, 1px, 1px, 1px);
+}
+
 /* --- Headers --- */
 .anchorsTitle { font-weight:400; font-size:130%; background-color:#003852; color:#FFF; padding:7px 10px; text-decoration:none; }
 

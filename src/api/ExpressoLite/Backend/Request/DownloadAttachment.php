@@ -30,7 +30,7 @@ class DownloadAttachment extends LiteRequest
         $messageId = $this->param('messageId');
         $partId = $this->param('partId');
 
-        $mimeType = $this->getMimeType($fileName);
+        $mimeType = $this->isParamSet('forceDownload') ? null : $this->getMimeType($fileName);
         if ($mimeType != null) {
             //WITHOUT 'attachment' in header, will be opened in browser
             header("Content-Disposition: filename=\"$fileName\"");

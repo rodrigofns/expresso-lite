@@ -21,3 +21,5 @@ blockquote { margin:2px 0 4px 14px; padding-left:5px; border-left:1px solid #BFD
 }
 
 #emailActions ul { margin-left:-30px; }
+
+#emailAttachments ul { margin-left:-30px; }

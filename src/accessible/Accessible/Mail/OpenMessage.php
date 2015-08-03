@@ -91,11 +91,29 @@ class OpenMessage extends Handler
     private function createAttachmentsLinks(array $attachments, $msgId)
     {
         foreach ($attachments as $attach) {
+            $attach->accessibleExtension = strrchr($attach->filename, '.');
+            $attach->accessibleFileName = basename ($attach->filename, $attach->accessibleExtension);
+            $attach->accessibleFileSize = $this->sizeFilter($attach->size);
+
             $attach->lnkDownload = '../api/ajax.php?' .
                 'r=downloadAttachment&' .
+                'forceDownload&' .
                 'fileName=' . urlencode($attach->filename) . '&' .
                 'messageId=' . $msgId . '&' .
                 'partId=' . $attach->partId;
         }
+    }
+
+    /**
+     * Filters file size in Bytes, KBytes, MBytes, GBytes, TBytes.
+     *
+     * @param string $fileSizeBytes       represents size file in bytes.
+     */
+    public function sizeFilter($fileSizeBytes)
+    {
+        $base = log($fileSizeBytes, 1024);
+        $suffixes = array('bytes', 'KB', 'MB', 'GB', 'TB');
+
+        return round(pow(1024, $base - floor($base)), 0) . ' ' . $suffixes[floor($base)];
     }
 }
