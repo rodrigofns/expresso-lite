@@ -14,7 +14,7 @@
 namespace ExpressoLite\TineTunnel;
 
 use ExpressoLite\TineTunnel\Exception\RpcException;
-use ExpressoLite\TineTunnel\Exception\TineTunnelException;
+use ExpressoLite\TineTunnel\Exception\TineErrorException;
 
 class TineJsonRpc extends JsonRpc
 {
@@ -140,7 +140,7 @@ class TineJsonRpc extends JsonRpc
         $response = parent::send();
 
         if (! $this->acceptErrors && isset($response->error)) {
-            throw new TineTunnelException('Tine error ' . $response->error->code . ': ' . $response->error->message);
+            throw new TineErrorException($response->error);
         }
 
         return $response;

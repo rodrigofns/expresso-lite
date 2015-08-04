@@ -31,20 +31,14 @@ class CheckSessionStatus extends LiteRequest
      */
     public function execute()
     {
-        $loggedIn = $this->tineSession->isLoggedIn();
-
-        if ($loggedIn) {
-            // the session may have been expired on Tine.
-            // So we check if it's still there
-            $result = $this->tineSession->jsonRpc('Tinebase.void', (object) array(), true);
-            if (isset($result->error)) {
-                // we assume the only possible error is to be logged off
-                $status = self::STATUS_INACTIVE;
-            } else {
-                $status = self::STATUS_ACTIVE;
-            }
+        if (!$this->tineSession->isLoggedIn() || 
+            !$this->tineSession->tineIsAuthenticated()) {
+            // User logged off explicitly OR
+            // Lite think its logged in, but Tine has no authentication info
+            $status = self::STATUS_INACTIVE; 
         } else {
-            $status = self::STATUS_INACTIVE;
+            //Lite and Tine agree they are both logged in 
+            $status = self::STATUS_ACTIVE;
         }
 
         return (object) array(

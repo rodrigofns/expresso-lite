@@ -9,6 +9,9 @@
  */
 
 define(['jquery'], function($) {
+
+    var isUnloadingPage = false;
+
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
             navigator.userAgent.indexOf('Mozilla') !== -1 &&
@@ -47,6 +50,10 @@ define(['jquery'], function($) {
         });
 
         _DisableRefreshOnPullDown();
+
+        $(window).bind('beforeunload', function () {
+            isUnloadingPage = true;
+        });
     })();
 
 return {
@@ -80,7 +87,13 @@ return {
         ).done(function (data) {
             defer.resolve(data);
         }).fail(function (data) {
-            if (data.status === 401) { //session timeout
+            if (isUnloadingPage) {
+                // we are already going to a new page, so there is no sense
+                // in failing whatever went wrong
+                return;
+            } else if (data.status === 401) { //session timeout
+                isUnloadingPage = true; //this avoids duplicated session expired alerts
+
                 window.alert('Sua sessão expirou, é necessário realizar o login novamente.');
                 returnToLoginScreen();
                 // as this will leave the current screen, we

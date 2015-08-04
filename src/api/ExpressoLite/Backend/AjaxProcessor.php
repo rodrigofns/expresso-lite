@@ -14,6 +14,7 @@ namespace ExpressoLite\Backend;
 
 use \Exception;
 use ExpressoLite\Backend\Exception\LiteException;
+use ExpressoLite\TineTunnel\Exception\TineSessionExpiredException;
 
 class AjaxProcessor {
 
@@ -28,24 +29,32 @@ class AjaxProcessor {
      *
      */
     public function processHttpRequest($httpRequest) {
-        if (! isset ( $httpRequest ['r'] )) {
-            $this->echoResult ( $this->createHttpError ( 400, 'request function [\'r\'] is not defined' ) );
+        if (!isset($httpRequest ['r'])) {
+            $this->echoResult($this->createHttpError(400, 'request function [\'r\'] is not defined'));
         } else {
-            $requestName = $httpRequest ['r'];
-            $params = $this->getParamsFromHttpRequest ( $httpRequest );
+            $requestName = $httpRequest['r'];
+            $params = $this->getParamsFromHttpRequest($httpRequest);
 
             try {
-                $liteRequestProcessor = new LiteRequestProcessor ();
-                $result = $liteRequestProcessor->executeRequest ( $requestName, $params );
-            } catch ( LiteException $le ) {
-                $result = $this->createHttpError ( $le->getHttpCode (), $le->getMessage () );
-            } catch ( Exception $e ) {
-                $msg = $e->getMessage ();
-                // TODO: log exception
-                $result = $this->createHttpError ( 500, "Error executing $requestName. Message: $msg" );
+                $liteRequestProcessor = new LiteRequestProcessor();
+                $result = $liteRequestProcessor->executeRequest($requestName,$params);
+            } catch(LiteException $le) {
+                $result = $this->createHttpError($le->getHttpCode(), $le->getMessage());
+            } catch(TineSessionExpiredException $tsee) {
+                // TODO: It would be better if this exception had an 401 http code and
+                // then be treated like any other LiteException. However, the current
+                // exception package structure does not allow it. When the exceptions
+                // package structure is refactored, this should be changed
+                $result = $this->createHttpError(401, $tsee->getMessage());
+            } catch(Exception $e) {
+                $msg = "Error executing $requestName. Message: "  . $e->getMessage();
+                $result = $this->createHttpError(500, $msg);
+                error_log($msg); // TODO: improve exception logging
+                // Important: DO NOT PRINT THE STACK TRACE HERE, as it may include
+                // sensible user information (password, for instance)
             }
 
-            $this->echoResult ( $result );
+            $this->echoResult($result);
         }
     }
 

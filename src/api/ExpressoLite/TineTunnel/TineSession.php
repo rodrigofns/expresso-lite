@@ -17,6 +17,8 @@ use ExpressoLite\TineTunnel\TineJsonRpc;
 use ExpressoLite\TineTunnel\Exception\PasswordExpiredException;
 use ExpressoLite\TineTunnel\Exception\TineTunnelException;
 use ExpressoLite\TineTunnel\Exception\CaptchaRequiredException;
+use ExpressoLite\TineTunnel\Exception\TineErrorException;
+use ExpressoLite\TineTunnel\Exception\TineSessionExpiredException;
 
 class TineSession implements CookieHandler
 {
@@ -122,9 +124,21 @@ class TineSession implements CookieHandler
             $this->isLocaleSet = true;
         }
 
-        return $this->sendJsonRpc($method, $params, $acceptErrors);
-    }
+        try {
+            return $this->sendJsonRpc($method, $params, $acceptErrors);
+        } catch (TineErrorException $tee) {
+            // We check to see if the error happened because of an expired session in Tine.
+            // This is done here instead of in TineSession because it's only here we have
+            // context enough to check for session expiration
 
+            $error = $tee->getTineError();
+            if (isset($error->code) && $error->code == -32000 && !$this->tineIsAuthenticated()) {
+                throw new TineSessionExpiredException();
+            } else {
+                throw $tee; //its not because of an expired session, its something else
+            }
+        }
+    }
 
     /**
      * Private method that executes a JSON RPC call to tine
@@ -241,7 +255,9 @@ class TineSession implements CookieHandler
 
     /**
      * @return true if this Tine session has already performed a successful
-     * login in Tine, false otherwise
+     * login in Tine, false otherwise. Note that this verification is done only
+     * on Lite's side, without checking if Tine has somehow lost authentication
+     * info. To do that, check TineSession::tineIsAuthenticated
      *
      */
     public function isLoggedIn()
@@ -354,5 +370,22 @@ class TineSession implements CookieHandler
     public function setActivateTineXDebug($activateTineXDebug)
     {
         $this->activateTineXDebug = $activateTineXDebug;
+    }
+
+    /**
+     * Checks if our session with Tine is authenticated. To this, we check
+     * if our registry data has a field name Tinebase->currentAccount
+     *
+     * @return boolean true if session is authenticated, false otherwise
+     */
+    public function tineIsAuthenticated() {
+        try {
+            $registryData = $this->sendJsonRpc('Tinebase.getAllRegistryData', array(), true);
+            return isset($registryData->result->Tinebase) && isset($registryData->result->Tinebase->currentAccount);
+        } catch (\Exception $e) {
+            // Means we are having problem even to detect session authentication
+            // We assume the session is lost
+            return false;
+        }
     }
 }
