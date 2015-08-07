@@ -31,6 +31,7 @@ class SaveMessage extends LiteRequest
         $replyToId = $this->emptyAsNull($this->param('replyToId'));
         $forwardFromId = $this->emptyAsNull($this->param('forwardFromId'));
         $origDraftId = $this->emptyAsNull($this->param('origDraftId'));
+        $wantConfirm = $this->param('wantConfirm') === '1';
 
         $attachs = $this->param('attachs');
         if ($attachs != '') {
@@ -42,7 +43,7 @@ class SaveMessage extends LiteRequest
         $response = $this->jsonRpc('Expressomail.saveMessage', (object) array(
             'recordData' => MessageUtils::buildMessageForSaving(
                 $this->tineSession, $subject, $body, $to, $cc, $bcc,
-                $isImportant, $replyToId, $forwardFromId, $origDraftId, $attachs)
+                $isImportant, $replyToId, $forwardFromId, $origDraftId, $attachs, $wantConfirm)
         ));
 
         return $response->result;

@@ -80,7 +80,8 @@ class MessageUtils
      *
      * @return stdClass object with all attributes that Tine needs to save a message
      */
-    public static function buildMessageForSaving(TineSession $tineSession, $subject, $body, array $to, array $cc, array $bcc, $isImportant = false, $replyToId = null, $forwardFromId = null, $origDraftId = null, array $attachs = array())
+    public static function buildMessageForSaving(TineSession $tineSession, $subject, $body, array $to, array $cc, array $bcc,
+        $isImportant = false, $replyToId = null, $forwardFromId = null, $origDraftId = null, array $attachs = array(), $wantConfirm = false)
     {
         $recordData = (object) array(
             'note' => '0',
@@ -109,6 +110,9 @@ class MessageUtils
             }
         if ($origDraftId !== null) {
             $recordData->original_id = $origDraftId; // editing an existing draft
+        }
+        if($wantConfirm) {
+            $recordData->reading_conf = true;
         }
         return $recordData;
     }
