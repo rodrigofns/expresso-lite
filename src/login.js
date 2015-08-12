@@ -228,7 +228,7 @@ function($, App) {
 
     function RedirectToMailModule() {
         $(document.body).css('overflow', 'hidden');
-        $('#versionInfo').hide();
+        $('#versionInfo, #frmLogin .throbber').hide();
 
         if (App.IsPhone()) {
             var animTime = 300;
