@@ -47,12 +47,12 @@
 
             <div>
                 <label for="subject">Assunto:</label>
-                <input type="text" name="subject" id="subject" required="required" value="<?= $VIEW->subject ?>" />
+                <input type="text" name="subject" id="subject" pattern="(?=.*\S).{1,}" title="O email esta sem assunto" required="required" value="<?= $VIEW->subject ?>" />
             </div>
 
             <div>
                 <label for="addrTo">Destinatário:</label>
-                <input type="email" multiple="multiple" name="addrTo" id="addrTo" required="required" value="<?= $VIEW->to ?>"/>
+                <input type="email" multiple="multiple" name="addrTo" title="Informe um endereço de email válido e utilize a virgula como separador" id="addrTo" required="required" value="<?= $VIEW->to ?>"/>
             </div>
 
             <div>
@@ -67,7 +67,7 @@
 
             <div>
                 <label for="messageBody">Mensagem:</label>
-                <textarea name="messageBody" id="messageBody" required="required"></textarea>
+                <textarea name="messageBody" id="messageBody"></textarea>
                 <?php IF ($VIEW->signature !== '') : ?>
                 <div class="composeSign"><?= $VIEW->signature ?></div>
                 <?php ENDIF; ?>
