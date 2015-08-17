@@ -21,7 +21,6 @@
 <body>
 
 <div id="top" name="top">
-    <div id="logomark"></div>
     <div id="anchors" name="anchors" class="links systemLinks">
         <nav class="contentAlign">
             <ul>
@@ -32,10 +31,18 @@
 </div>
 
 <h2 class="anchorsTitle">Mensagens</h2>
-<div id="feedback" name="feedback">
-    <div id="feedbackType" id="feedbackType" class="<?= $VIEW->typeMsg ?>" ></div>
-        <p id="feedbackMessage" name="feedbackMessage"> <?= $VIEW->message ?> </p>
-    <div class="clear"> </div>
+<div id="feedback" name="feedback" class="<?= $VIEW->typeMsg ?>" >
+    <p id="feedbackMessage" name="feedbackMessage"> <?= $VIEW->message ?> </p>
+
+    <div id="buttons" name="buttons" class="links linkAsButton">
+        <hr />
+        <ul>
+            <?php FOREACH ($VIEW->userButtons AS $BUTTON) : ?>
+                <li><a href="<?= $BUTTON->url ?>"><?= $BUTTON->value ?></a></li>
+            <?php ENDFOREACH; ?>
+        </ul>
+    <div>
+
 </div>
 
 </body>

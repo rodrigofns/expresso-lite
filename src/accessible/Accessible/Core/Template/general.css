@@ -30,6 +30,8 @@ body { font:12pt Arial,sans-serif; color:#1A1A1A; overflow-y:scroll; margin:0 au
 /* --- Headers --- */
 .anchorsTitle { font-weight:400; font-size:130%; background-color:#003852; color:#FFF; padding:7px 10px; text-decoration:none; }
 
+hr { border:0; height:1px; background-image:linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 56, 82, 1), rgba(0, 0, 0, 0)); }
+
 /* --- Form fields --- */
 label { color:#003852; }
 
