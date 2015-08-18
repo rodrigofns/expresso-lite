@@ -68,6 +68,8 @@ class Dispatcher
             $handlerClassName = self::REQUEST_NAMESPACE . str_replace('.', '\\', $request);
             $handlerClass = new ReflectionClass($handlerClassName);
             $requestHandler = $handlerClass->newInstance();
+            header('Pragma: no cache');
+            header('Cache-Control: no-cache');
             $requestHandler->execute($params);
         } catch (NoTineSessionException $ex) {
             self::processRequest(self::LOGIN_REQUEST);
