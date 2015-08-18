@@ -26,6 +26,9 @@
         <nav class="contentAlign">
             <ul>
                 <li><a href="#compose" accesskey="1">Ir para preencher campos [1]</a></li>
+                <?php IF (!EMPTY($VIEW->existingAttachments)) : ?>
+                <li><a href="#emailAttachments" accesskey="2">Ir para anexos de email [2]</a></li>
+                <?php ENDIF; ?>
                 <li><a href="<?= $VIEW->lnkBackUrl ?>" accesskey="v">Voltar para <?= $VIEW->lnkBackText ?> [v]</a></li>
             </ul>
         </nav>
@@ -77,19 +80,42 @@
                 </div>
             <?php ENDIF; ?>
 
-            <div>
-                <p class="attach">
-                    <label for="attach0">Anexar 1º arquivo:</label>&nbsp;
-                    <input type="file" name="attach0" id="attach0" />
-                </p>
-                <p class="attach">
-                    <label for="attach1">Anexar 2º arquivo:</label>&nbsp;
-                    <input type="file" name="attach1" id="attach1" />
-                </p>
-                <p class="attach">
-                    <label for="attach2">Anexar 3º arquivo:</label>&nbsp;
-                    <input type="file" name="attach2" id="attach2" />
-                </p>
+            <div id="emailAttachments" name="emailAttachments" >
+                <h2 class="anchorsTitle">Anexos</h2>
+                <?php IF (!EMPTY($VIEW->existingAttachments)) : ?>
+                    <div id="attachments" name="attachments" class="links systemLinks">
+                        <ul>
+                            <?php FOREACH ($VIEW->existingAttachments as $ATTACH) : ?>
+                                <div class ="existingAttachsForExhibition">
+                                    <li>
+                                        <a href="<?= $ATTACH->lnkDownload ?>">
+                                             Anexo <?= $ATTACH->accessibleFileName ?>
+                                             (formato <?= $ATTACH->accessibleExtension ?>, tamanho <?= $ATTACH->accessibleFileSize ?>)
+                                        </a>
+                                    </li>
+                                    <p>
+                                        <input type="checkbox"  id="checkAttach_<?php ECHO $ATTACH->filename ?>" name="checkAttach_<?php ECHO $ATTACH->filename ?>" value="<?php ECHO $ATTACH->filename?>" title="Marcar este anexo para não ser enviado" />
+                                        <label for="checkAttach_<?php ECHO $ATTACH->filename ?>">Remover anexo</label>
+                                    </p>
+                                </div>
+                            <? ENDFOREACH; ?>
+                        </ul>
+                    </div>
+                <?php ENDIF; ?>
+                <div>
+                    <p class="attach">
+                        <label for="attach0">Anexar 1º arquivo:</label>&nbsp;
+                        <input type="file" name="attach0" id="attach0" />
+                    </p>
+                    <p class="attach">
+                        <label for="attach1">Anexar 2º arquivo:</label>&nbsp;
+                        <input type="file" name="attach1" id="attach1" />
+                    </p>
+                    <p class="attach">
+                        <label for="attach2">Anexar 3º arquivo:</label>&nbsp;
+                        <input type="file" name="attach2" id="attach2" />
+                    </p>
+                </div>
             </div>
 
             <div class="composeFooter">

@@ -53,7 +53,7 @@ class SendMessage extends Handler
             'cc' => $params->addrCc,
             'bcc' => $params->addrBcc,
             'isImportant' => isset($params->important) ? '1' : '0',
-            'attachs' => empty($upFiles) ? '' : json_encode($upFiles),
+            'attachs' => empty($upFiles) && (!is_null($msg) && !$msg->has_attachment) ? '' : $this->formatAllAttachs($params, $msg, $upFiles),
             'replyToId' => $params->replyToId,
             'forwardFromId' => $params->forwardFromId,
             'origDraftId' => ''
@@ -127,5 +127,72 @@ class SendMessage extends Handler
             $upFileObj['name'],
             $upFileObj['type']
         ));
+    }
+
+    /**
+     * Formats attachments (existing and new attachments) data to be sent.
+     *
+     * @param  stdClass $params Request parameters.
+     * @param  stdClass $msg Message object, if replied or forwarded.
+     * @param  array $newUploadedFiles
+     *
+     * @return attachments data that ExpressoLite needs to save a message
+     */
+    private function formatAllAttachs($params, $msg = null, $newUploadedFiles)
+    {
+        $formattedAttchments = array();
+
+        // When msg is not null is certainly a reply/forwarding email message
+        // there may be attachments
+        if (!is_null($msg) && !empty($msg->attachments)) {
+
+            // Perhaps there may be existing attachments
+            // that should not be sent on reply/forwarding email message
+            $attachNamesToBeRemoved = $this->getAttachNamesToBeRemoved($params);
+
+            foreach ($msg->attachments as $attach) {
+                if (!in_array($attach->filename, $attachNamesToBeRemoved)) {
+                    array_push($formattedAttchments, (object) array(
+                        'name' => $attach->filename,
+                        'size' => $attach->size,
+                        'type' => $attach->{'content-type'},
+                        'partId' => $attach->partId
+                    ));
+                }
+            }
+        }
+
+        // New attchment files uploaded
+        if (!empty($newUploadedFiles)) {
+            foreach ($newUploadedFiles as $newUpFile) {
+                array_push($formattedAttchments, $newUpFile);
+            }
+        }
+
+        return json_encode($formattedAttchments);
+    }
+
+    /**
+     * Gets attachment names that should be removed.
+     * All attachments that should be removed are previously marked by a checkbox
+     * when the user is reply/forwarding a message with attachments that should not be sent.
+     *
+     * @param  stdClass $params Request parameters
+     * @return array Attachment names
+     */
+    private function getAttachNamesToBeRemoved($params)
+    {
+        if (is_null($params)) {
+            return array();
+        }
+
+        $objVarsToArray = get_object_vars($params);
+
+        $patternCheckboxAttach = '/checkAttach_/';
+        return array_intersect_key(
+            $objVarsToArray, array_flip(
+                preg_grep($patternCheckboxAttach, array_keys($objVarsToArray), 0)
+            )
+        );
     }
 }

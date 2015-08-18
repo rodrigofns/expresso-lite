@@ -27,7 +27,7 @@
             <ul>
                 <li><a href="#emailHeader" accesskey="1">Ir para o cabeçalho do email [1]</a></li>
                 <li><a href="#emailContent" accesskey="2">Ir para o corpo da mensagem [2]</a></li>
-                <?php IF ($VIEW->message->has_attachment) : ?>
+                <?php IF (count($VIEW->attachmentsForExhibition) > 0) : ?>
                 <li><a href="#emailAttachments" accesskey="3">Ir para anexos de email [3]</a></li>
                 <?php ENDIF?>
                 <li><a href="#emailActions" accesskey="4">Ir para ações de email [4]</a></li>
@@ -81,7 +81,7 @@
     <h2 class="anchorsTitle">Anexos</h2>
     <div id="attachments" name="attachments" class="links systemLinks">
         <ul>
-            <?php FOREACH ($VIEW->message->attachments as $ATTACH) : ?>
+            <?php FOREACH ($VIEW->attachmentsForExhibition as $ATTACH) : ?>
                 <li>
                     <a href="<?= $ATTACH->lnkDownload ?>">
                          Abrir anexo <?= $ATTACH->accessibleFileName ?>

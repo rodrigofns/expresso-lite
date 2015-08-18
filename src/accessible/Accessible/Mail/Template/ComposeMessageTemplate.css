@@ -44,4 +44,8 @@ blockquote { margin:2px 0 4px 15px; padding-left:5px; border-left:1px solid #BFD
     white-space:-moz-pre-wrap !important; /* Mozilla, since 1999 */
 }
 
+.existingAttachsForExhibition { display: table }
+.existingAttachsForExhibition li { float: left }
+.existingAttachsForExhibition p { float: right; margin-top: 5px; font-size: 80%; }
+
 .composeFooter { margin-top:5px; display:inline-block; padding:0px; color:#003852; }

@@ -47,7 +47,8 @@ class ComposeMessage extends Handler
             'lnkBackText' => (isset($params->reply) || isset($params->replyAll) || isset($params->forward)) ?
                 'mensagem de origem' : $params->folderName,
             'lnkBackUrl' => $this->returnLink($params),
-            'lnkSendMessageAction' => $this->makeUrl('Mail.SendMessage')
+            'lnkSendMessageAction' => $this->makeUrl('Mail.SendMessage'),
+            'existingAttachments' => isset($params->attachments) ? json_decode($params->attachments) : array()
         ));
     }
 

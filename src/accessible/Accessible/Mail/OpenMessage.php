@@ -38,7 +38,8 @@ class OpenMessage extends Handler
             $message->subject = '(sem assunto)';
         }
 
-        $this->createAttachmentsLinks($message->attachments, $params->messageId);
+        $attachments = $this->formatAttachments($message->attachments, $params->messageId);
+
         $this->showTemplate('OpenMessageTemplate', (object) array(
             'folderName' => $params->folderName,
             'message' => $message,
@@ -63,33 +64,44 @@ class OpenMessage extends Handler
                 'folderName' => $params->folderName,
                 'page' => $params->page,
                 'messageId' => $params->messageId,
-                'reply' => 'yes'
+                'reply' => 'yes',
+                'attachments' => urlencode(json_encode($attachments))
             )),
             'lnkReplyAll' => $this->makeUrl('Mail.ComposeMessage', array(
                 'folderId' => $params->folderId,
                 'folderName' => $params->folderName,
                 'page' => $params->page,
                 'messageId' => $params->messageId,
-                'replyAll' => 'yes'
+                'replyAll' => 'yes',
+                'attachments' => urlencode(json_encode($attachments))
             )),
             'lnkForward' => $this->makeUrl('Mail.ComposeMessage', array(
                 'folderId' => $params->folderId,
                 'folderName' => $params->folderName,
                 'page' => $params->page,
                 'messageId' => $params->messageId,
-                'forward' => 'yes'
-            ))
+                'forward' => 'yes',
+                'attachments' => urlencode(json_encode($attachments))
+            )),
+            'attachmentsForExhibition' => $attachments
         ));
     }
 
     /**
-     * In-place update of attachments array by adding the download links.
+     * Creates attachments information such as extension, filename, size and
+     * download link for each attachment.
      *
-     * @param array  $attachments Attachments array from message object.
-     * @param string $msgId       ID of current message.
+     * @param array  $attachments      Attachments array from message object.
+     * @param string $msgId            ID of current message.
+     * @return array $formattedAttachments
      */
-    private function createAttachmentsLinks(array $attachments, $msgId)
+    private function formatAttachments(array $attachments, $msgId)
     {
+        if (is_null($attachments) || empty($msgId)) {
+            return array();
+        }
+
+        $formattedAttachments = array();
         foreach ($attachments as $attach) {
             $attach->accessibleExtension = strrchr($attach->filename, '.');
             $attach->accessibleFileName = basename ($attach->filename, $attach->accessibleExtension);
@@ -101,7 +113,9 @@ class OpenMessage extends Handler
                 'fileName=' . urlencode($attach->filename) . '&' .
                 'messageId=' . $msgId . '&' .
                 'partId=' . $attach->partId;
+            array_push($formattedAttachments, $attach);
         }
+        return $formattedAttachments;
     }
 
     /**
