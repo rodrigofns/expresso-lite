@@ -1,7 +1,7 @@
 <?php
 /**
  * Expresso Lite Accessible
- * Reads an email.
+ * Controls the display of feedback and confirmation actions message.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -50,24 +50,24 @@ class ShowFeedback extends Handler
             'destinationUrl' => $this->makeUrl($params->destinationUrl->action,
                 isset($params->destinationUrl->params) ? $params->destinationUrl->params : array()
              ),
-            'userButtons' => isset($params->userButtons) ? $this->formatButtons($params->userButtons) : array()
+            'buttons' => isset($params->buttons) ? $this->prepareButtonsForDisplay($params->buttons) : array()
         ));
     }
 
     /**
-     * Format buttons data such as url and button text value to be displayed.
+     * Prepare buttons data, such as the url and button text value, to be displayed
      *
-     * @param object $paramsOfButton
-     * @return returns
+     * @param object $buttonParams The object that contains the information of the buttons
+     * @return returns an array with prepared buttons configuration to be displayed
      */
-    private function formatButtons($buttonParams)
+    private function prepareButtonsForDisplay($buttonParams)
     {
         $buttons = array();
         foreach ($buttonParams as $buttonParam) {
-            array_push($buttons, (object) array(
+            $buttons[] = (object) array(
                 'url' => $this->makeUrl($buttonParam->action, $buttonParam->params),
-                'value' => $buttonParam->params['buttonAction']
-            ));
+                'value' => $buttonParam->params['confirmOption']
+            );
         }
         return $buttons;
     }

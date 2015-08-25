@@ -15,6 +15,7 @@ use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use Accessible\Dispatcher;
 use Accessible\Core\ShowFeedback;
+use Accessible\Core\MessageIds;
 
 class MarkMessageAsUnread extends Handler
 {
@@ -23,15 +24,26 @@ class MarkMessageAsUnread extends Handler
      */
     public function execute($params)
     {
-        $liteRequestProcessor = new LiteRequestProcessor();
-        $message = $liteRequestProcessor->executeRequest('MarkAsRead', (object) array(
-            'ids' => $params->messageId,
-            'asRead' => '0'
-        ));
+        if ($params->messageIds === '') { // No message id was specified
+            $typeMsg = ShowFeedback::MSG_ERROR;
+            $outMsg = 'Não foi possível marcar mensagem como não lida';
+        } else {
+            $liteRequestProcessor = new LiteRequestProcessor();
+            $message = $liteRequestProcessor->executeRequest('MarkAsRead', (object) array(
+                'ids' => $params->messageIds,
+                'asRead' => '0'
+            ));
+
+            $typeMsg = ShowFeedback::MSG_SUCCESS;
+            $msgCount = MessageIds::messageCount($params->messageIds);
+            $outMsg = $msgCount == 1 ?
+                '1 mensagem marcada como não lida com sucesso.' :
+                "$msgCount mensagens marcadas como não lida com sucesso.";
+        }
 
         Dispatcher::processRequest('Core.ShowFeedback', (object) array(
-            'typeMsg' => ShowFeedback::MSG_SUCCESS,
-            'message' => 'Mensagem marcada como não lida com sucesso.',
+            'typeMsg' => $typeMsg,
+            'message' => $outMsg,
             'destinationText' => 'Voltar para ' . $params->folderName,
             'destinationUrl' => (object) array(
                 'action' => 'Mail.Main',

@@ -19,6 +19,7 @@ use Accessible\Handler;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
 use Accessible\Core\DateUtils;
+use Accessible\Mail\ProcessMessageAction;
 
 class Main extends Handler
 {
@@ -79,6 +80,12 @@ class Main extends Handler
             'lnkNextPage' => $this->makeUrl('Mail.Main', array(
                 'folderId' => $curFolder->id,
                 'page' => $params->page + 1
+            )),
+            'action_mark_unread' => ProcessMessageAction::ACTION_MARK_UNREAD,
+            'lnkConfirmMessageAction' => $this->makeUrl('Mail.ConfirmMessageAction', array(
+                'folderId' => $curFolder->id,
+                'folderName' => $curFolder->localName,
+                'page' => $params->page,
             ))
         ));
     }
@@ -164,18 +171,6 @@ class Main extends Handler
                 'folderId' => $curFolder->id,
                 'folderName' => $curFolder->localName,
                 'page' => $curPage
-            ));
-
-            $headl->lnkDelete = $this->makeUrl('Mail.DeleteMessage', array(
-                'messageId' => $headl->id,
-                'folderId' => $curFolder->id,
-                'folderName' => $curFolder->localName,
-            ));
-
-            $headl->lnkMarkMessage = $this->makeUrl('Mail.MarkMessage', array(
-                'id' => $headl->id,
-                'folderId' => $curFolder->id,
-                'page' => $curPage,
             ));
         }
         return $headlines;

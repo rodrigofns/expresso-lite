@@ -56,7 +56,7 @@ class OpenMessage extends Handler
             )),
             'lnkMark' => $this->makeUrl('Mail.MarkMessageAsUnread', array(
                 'folderName' => $params->folderName,
-                'messageId' => $params->messageId,
+                'messageIds' => $params->messageId,
                 'folderId' => $params->folderId
             )),
             'lnkReply' => $this->makeUrl('Mail.ComposeMessage', array(

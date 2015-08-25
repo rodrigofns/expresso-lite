@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
  * Expresso Lite Accessible
- * Entry page for accessible module.
+ * Template for feedback and confirm actions.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -37,7 +37,7 @@
     <div id="buttons" name="buttons" class="links linkAsButton">
         <hr />
         <ul>
-            <?php FOREACH ($VIEW->userButtons AS $BUTTON) : ?>
+            <?php FOREACH ($VIEW->buttons AS $BUTTON) : ?>
                 <li><a href="<?= $BUTTON->url ?>"><?= $BUTTON->value ?></a></li>
             <?php ENDFOREACH; ?>
         </ul>

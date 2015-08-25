@@ -57,7 +57,7 @@ input[type=file]:focus, input[type=file]:hover, textarea:focus {
 }
 
      /* Form submit/buttons behavior */
-input[type=submit], input[type=button] {
+input[type=submit], input[type=button], button {
     -moz-user-select:none;
     background-color:#4479BA;
     border: 1px solid #4272B2;
@@ -66,8 +66,8 @@ input[type=submit], input[type=button] {
     cursor:pointer;
     padding:5px 10px;
 }
-input[type=submit]:hover, input[type=button]:hover { background-color:#FFDB79; color:#000; }
-input[type=submit]:focus, input[type=button]:focus { background-color:#FF6536; color:#FFF; }
+input[type=submit]:hover, input[type=button]:hover, button:hover{ background-color:#FFDB79; color:#000; }
+input[type=submit]:focus, input[type=button]:focus, button:focus { background-color:#FF6536; color:#FFF; }
 
 /* --- Links --- */
 

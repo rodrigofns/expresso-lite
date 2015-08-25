@@ -53,3 +53,6 @@
 .icoSigned { background-position:0 -80px; opacity:.65; }
 .icoHigh0 { background-position:0 -96px; }
 .icoHigh1 { background-position:0 -112px; }
+
+#actions { margin-bottom: 35px }
+#pagination ul { margin-left:-30px; margin-top: 25px }
