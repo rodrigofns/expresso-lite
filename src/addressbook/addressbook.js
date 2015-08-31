@@ -70,15 +70,15 @@ $(document).ready(function() {
         });
 
         Cache.widgetCatalogMenu
-        .addOption('Catálogo Pessoal', function () {
-            Cache.layout.setLeftMenuVisibleOnPhone(false)
-            .done(function() {
-                Cache.widgetContactList.changeToPersonalCatalog();
-            });
-        }).addOption('Catálogo Corporativo', function () {
+        .addOption('Catálogo Corporativo', function () {
             Cache.layout.setLeftMenuVisibleOnPhone(false)
             .done(function() {
                 Cache.widgetContactList.changeToCorporateCatalog();
+            });
+        }).addOption('Catálogo Pessoal', function () {
+            Cache.layout.setLeftMenuVisibleOnPhone(false)
+            .done(function() {
+                Cache.widgetContactList.changeToPersonalCatalog();
             });
         });
 
@@ -103,7 +103,7 @@ $(document).ready(function() {
             Cache.widgetContactList.load(),
             Cache.layout.load()
         ).done(function() {
-            Cache.widgetContactList.changeToPersonalCatalog();
+            Cache.widgetContactList.changeToCorporateCatalog();
         });
     })();
 }); // $(document).ready
