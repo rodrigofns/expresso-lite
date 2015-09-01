@@ -13,8 +13,8 @@
 
 namespace ExpressoLite\TineTunnel;
 
-use ExpressoLite\TineTunnel\Exception\RpcException;
-use ExpressoLite\TineTunnel\Exception\TineErrorException;
+use ExpressoLite\Exception\RpcException;
+use ExpressoLite\Exception\TineErrorException;
 
 class TineJsonRpc extends JsonRpc
 {

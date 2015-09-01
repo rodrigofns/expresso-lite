@@ -12,7 +12,7 @@
 namespace ExpressoLite\TineTunnel;
 
 use \DateTime;
-use ExpressoLite\TineTunnel\Exception\RpcException;
+use ExpressoLite\Exception\RpcException;
 
 class Request
 {

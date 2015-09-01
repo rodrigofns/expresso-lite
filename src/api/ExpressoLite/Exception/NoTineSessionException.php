@@ -6,25 +6,24 @@
  * LiteRequest->allowAccessWithoutSession() returns true.
  *
  *
- * @package   ExpressoLite\Backend\Exception
+ * @package   ExpressoLite\Exception
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Charles Wust <charles.wust@serpro.gov.br>
  * @copyright Copyright (c) 2014 Serpro (http://www.serpro.gov.br)
  */
-namespace ExpressoLite\Backend\Exception;
 
-class NoTineSessionException extends LiteException {
+namespace ExpressoLite\Exception;
 
+class NoTineSessionException extends LiteException
+{
     /**
      * Creates a new <tt>NoTineSessionException</tt>.
      * It defaults parent class httpCode to 401.
      *
-     * @param string $message
-     *            The exception message.
-     * @param int $code
-     *            The exception code used for logging.
+     * @param string $message The exception message.
      */
-    public function __construct($message, $code = 0) {
-        parent::__construct ( $message, $code, 401 );
+    public function __construct($message)
+    {
+        parent::__construct($message, self::HTTP_401_UNAUTHORIZED);
     }
 }

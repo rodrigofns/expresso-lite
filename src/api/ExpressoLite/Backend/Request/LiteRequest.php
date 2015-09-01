@@ -10,13 +10,13 @@
  */
 namespace ExpressoLite\Backend\Request;
 
-use ExpressoLite\Backend\Exception\NoTineSessionException;
+use ExpressoLite\Exception\NoTineSessionException;
 use ExpressoLite\Backend\AjaxProcessor;
-use ExpressoLite\Backend\Exception\LiteException;
+use ExpressoLite\Exception\LiteException;
 use ExpressoLite\TineTunnel\TineSession;
 use ExpressoLite\Backend\LiteRequestProcessor;
 use ExpressoLite\Backend\TineSessionRepository;
-use ExpressoLite\Backend\Exception\UserMismatchException;
+use ExpressoLite\Exception\UserMismatchException;
 
 abstract class LiteRequest
 {

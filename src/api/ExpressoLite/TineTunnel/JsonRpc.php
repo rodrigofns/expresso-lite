@@ -13,7 +13,7 @@
 
 namespace ExpressoLite\TineTunnel;
 
-use ExpressoLite\TineTunnel\Exception\RpcException;
+use ExpressoLite\Exception\RpcException;
 
 class JsonRpc extends Request
 {

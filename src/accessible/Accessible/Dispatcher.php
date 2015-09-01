@@ -14,7 +14,7 @@ namespace Accessible;
 use \ReflectionClass;
 use \Exception;
 use ExpressoLite\Backend\TineSessionRepository;
-use ExpressoLite\Backend\Exception\NoTineSessionException;
+use ExpressoLite\Exception\NoTineSessionException;
 
 class Dispatcher
 {

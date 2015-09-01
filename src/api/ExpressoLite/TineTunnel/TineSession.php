@@ -14,11 +14,11 @@ namespace ExpressoLite\TineTunnel;
 
 use ExpressoLite\TineTunnel\CookieHandler;
 use ExpressoLite\TineTunnel\TineJsonRpc;
-use ExpressoLite\TineTunnel\Exception\PasswordExpiredException;
-use ExpressoLite\TineTunnel\Exception\TineTunnelException;
-use ExpressoLite\TineTunnel\Exception\CaptchaRequiredException;
-use ExpressoLite\TineTunnel\Exception\TineErrorException;
-use ExpressoLite\TineTunnel\Exception\TineSessionExpiredException;
+use ExpressoLite\Exception\PasswordExpiredException;
+use ExpressoLite\Exception\CaptchaRequiredException;
+use ExpressoLite\Exception\TineErrorException;
+use ExpressoLite\Exception\TineSessionExpiredException;
+use ExpressoLite\Exception\LiteException;
 
 class TineSession implements CookieHandler
 {
@@ -184,7 +184,7 @@ class TineSession implements CookieHandler
                 'securitycode' => $captcha === null ? '' : $captcha
             ));
         } catch (Exception $e) {
-            throw new TineTunnelException('Tinebase.login: ' . $e->getMessage(), 0, $e);
+            throw new LiteException('Tinebase.login failed: ' . $e->getMessage());
         }
     }
 
@@ -282,7 +282,7 @@ class TineSession implements CookieHandler
             // This way, the user will be able to login to a new session and
             // won't be stuck with a bogus tineSession
 
-            throw new TineTunnelException('Tinebase.logout: ' . $e->getMessage(), 0, $e);
+            throw new LiteException('Tinebase.logout: ' . $e->getMessage());
         }
     }
 

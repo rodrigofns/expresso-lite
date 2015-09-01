@@ -12,7 +12,7 @@
  */
 namespace ExpressoLite\Backend\Request;
 
-use ExpressoLite\Backend\Exception\LiteException;
+use ExpressoLite\Exception\LiteException;
 
 class ChangeExpiredPassword extends LiteRequest
 {

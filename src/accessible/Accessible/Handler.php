@@ -14,7 +14,7 @@
 namespace Accessible;
 
 use \ReflectionClass;
-use ExpressoLite\Backend\Exception\LiteException;
+use ExpressoLite\Exception\LiteException;
 
 abstract class Handler
 {

@@ -13,8 +13,7 @@
 namespace ExpressoLite\Backend;
 
 use \Exception;
-use ExpressoLite\Backend\Exception\LiteException;
-use ExpressoLite\TineTunnel\Exception\TineSessionExpiredException;
+use ExpressoLite\Exception\LiteException;
 
 class AjaxProcessor {
 
@@ -40,12 +39,6 @@ class AjaxProcessor {
                 $result = $liteRequestProcessor->executeRequest($requestName,$params);
             } catch(LiteException $le) {
                 $result = $this->createHttpError($le->getHttpCode(), $le->getMessage());
-            } catch(TineSessionExpiredException $tsee) {
-                // TODO: It would be better if this exception had an 401 http code and
-                // then be treated like any other LiteException. However, the current
-                // exception package structure does not allow it. When the exceptions
-                // package structure is refactored, this should be changed
-                $result = $this->createHttpError(401, $tsee->getMessage());
             } catch(Exception $e) {
                 $msg = "Error executing $requestName. Message: "  . $e->getMessage();
                 $result = $this->createHttpError(500, $msg);

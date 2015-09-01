@@ -20,7 +20,7 @@ namespace ExpressoLite\Backend;
 
 use \ReflectionClass;
 use \ReflectionException;
-use ExpressoLite\Backend\Exception\LiteException;
+use ExpressoLite\Exception\LiteException;
 
 class LiteRequestProcessor {
 

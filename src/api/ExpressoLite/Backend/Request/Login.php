@@ -12,7 +12,7 @@
  */
 namespace ExpressoLite\Backend\Request;
 
-use ExpressoLite\TineTunnel\Exception\CaptchaRequiredException;
+use ExpressoLite\Exception\CaptchaRequiredException;
 
 class Login extends LiteRequest
 {
