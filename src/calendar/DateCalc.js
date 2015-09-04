@@ -117,8 +117,8 @@ var DateCalc = {
     },
 
     strToDate: function(str) {
-        // Expected format: '2015-08-04 14:30:00'
-        return new Date(str.replace(' ', 'T')); // this 'T' is a JavaScript requirement
+        // Expected format: '2015-08-04 14:30:00', in UTC±0.
+        return new Date(str.replace(' ', 'T')+'+0000'); // this 'T' is a JavaScript requirement
     },
 
     pad2: function(n) {

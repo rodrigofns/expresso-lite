@@ -79,11 +79,12 @@ class SearchEvents extends LiteRequest
      * @param string $strTime String like '2015-08-05 13:50:00'.
      * @param string $strZone PHP DateTimeZone string, like 'America_SaoPaulo'.
      *
-     * @return string String with datetime converted to user timezone, like '2015-08-05 13:50:00'.
+     * @return string String with datetime, like '2015-08-05 13:50:00', UTC±0 timezone.
      */
     private function parseTimeZone($strTime, $strZone)
     {
         $d = new DateTime($strTime, new DateTimeZone($strZone));
+        $d->setTimezone(new DateTimeZone('UTC'));
         return $d->format('Y-m-d H:i:s');
     }
 
