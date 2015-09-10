@@ -83,7 +83,14 @@ class OpenMessage extends Handler
                 'forward' => 'yes',
                 'attachments' => urlencode(json_encode($attachments))
             )),
-            'attachmentsForExhibition' => $attachments
+            'attachmentsForExhibition' => $attachments,
+            'lnkMoveMsgToFolder' => $this->makeUrl('Mail.OpenFolder', array(
+                'folderId' => $params->folderId,
+                'folderName' => $params->folderName,
+                'page' => $params->page,
+                'messageIds' => $params->messageId,
+                'isMsgBeingMoved' => true
+            ))
         ));
     }
 

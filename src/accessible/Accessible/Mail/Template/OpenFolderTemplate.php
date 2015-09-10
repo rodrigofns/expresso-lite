@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
  * Expresso Lite Accessible
- * Entry index page for mail module.
+ * Entry index page for mail module and change messages to another folder.
  *
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
@@ -26,6 +26,9 @@
         <nav class="contentAlign">
             <ul>
                 <li><a href="#folders" accesskey="1">Ir para listagem de pastas [1]</a></li>
+                <?php IF ($VIEW->isMsgBeingMoved) : ?>
+                    <li><a href="<?= $VIEW->lnkRefreshMessage ?>" accesskey="m">Voltar para mensagem de origem [m]</a></li>
+                <?php ENDIF; ?>
                 <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="v">Voltar para <?= $VIEW->folderName ?> [v]</a></li>
             </ul>
         </nav>

@@ -64,7 +64,7 @@ class Main extends Handler
             )),
             'lnkChangeFolder' => $this->makeUrl('Mail.OpenFolder', array(
                 'folderId' => $curFolder->id,
-                'curFolderName' => $curFolder->localName,
+                'folderName' => $curFolder->localName,
                 'page' => $params->page
             )),
             'lnkComposeMessage' => $this->makeUrl('Mail.ComposeMessage', array(
