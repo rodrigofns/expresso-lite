@@ -43,3 +43,40 @@
         overflow-y: hidden;
     }
 }
+
+@media (min-width:1025px) { /* desktop */
+    #contactListSection.detailView{
+        width: 340px;
+    }
+}
+
+@media (max-width:1024px) { /* mobile */
+    #contactListSection.detailView{
+        display: none;
+    }
+}
+
+#contactDetailsSection {
+    display: none;
+}
+
+#contactDetailsSection.detailView {
+    display: block !important;
+    position: absolute;
+    top: 0px;
+    height: 100%;
+}
+
+@media (min-width:1025px) { /* desktop */
+    #contactDetailsSection.detailView {
+        width: calc(100% - 340px);
+        left: 340px;
+    }
+}
+
+@media (max-width:1024px) { /* mobile */
+    #contactDetailsSection.detailView {
+        width: 100%;
+        left: 0px;
+    }
+}
