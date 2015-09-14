@@ -34,7 +34,8 @@ $(document).ready(function() {
     Cache.layout = new Layout({
         userMail: App.GetUserInfo('mailAddress'),
         $menu: $('#leftColumn'),
-        $content: $('#bigBody')
+        $middle: $('#middleBody'),
+        $right: $('#rightBody')
     });
     Cache.events = new Events();
     Cache.viewMonth = new WidgetMonth({ events:Cache.events, $elem: $('#middleBody') });
@@ -56,6 +57,7 @@ $(document).ready(function() {
         // Setup events.
         Cache.layout
             .onKeepAlive(function() { })
+            .onHideRightPanel(function() { })
             .onSearch(function() { }); // when user performs a search
         Cache.viewMonth.onMonthChanged(UpdateCurrentMonthName);
         Cache.viewWeek.onWeekChanged(UpdateCurrentWeekName);

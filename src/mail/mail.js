@@ -41,7 +41,8 @@ $(document).ready(function() {
     Cache.layout = new Layout({
         userMail: App.GetUserInfo('mailAddress'),
         $menu: $('#leftColumn'),
-        $content: $('#bigBody')
+        $middle: $('#middleBody'),
+        $right: $('#rightBody')
     });
     Cache.wndCompose = new WidgetCompose({
         address: App.GetUserInfo('mailAddress'),
@@ -54,8 +55,6 @@ $(document).ready(function() {
 
     // Some initial work.
     UrlStack.keepClean();
-    $('#middleBody').addClass('middleBody_noMessages');
-    $('#rightBody').addClass('rightBody_noMessages');
     $('#headlinesFooter').css('display', 'none'); // hidden until first headlines load
     Contacts.loadPersonal();
 
@@ -80,6 +79,7 @@ $(document).ready(function() {
         // Setup events.
         Cache.layout
             .onKeepAlive(function() { $('#btnUpdateFolders').trigger('click'); })
+            .onHideRightPanel(function() { ShowMessagesPanel(false); })
             .onSearch(Search); // when user performs a search
         Cache.treeFolders
             .onClick(LoadFirstHeadlines)
@@ -109,7 +109,7 @@ function UpdatePageTitle() {
     var folder = Cache.treeFolders.getCurrent();
     var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
     document.title = counter+folder.localName+' - '+App.GetUserInfo('mailAddress')+' - ExpressoBr';
-    Cache.layout.setTitle(Cache.layout.isContentFullWidth() ?
+    Cache.layout.setTitle(Cache.layout.isRightPanelVisible() ?
         'voltar' :
         folder.localName+(folder.unreadMails ? ' ('+folder.unreadMails+')' : '')
     );
@@ -159,20 +159,18 @@ function RebuildHeadlinesContextMenu() {
             });
         };
         MenuRenderFolderLevel(Cache.folders, 0);
-        Cache.layout.setContextMenuVisible(!Cache.layout.isContentFullWidth());
+        Cache.layout.setContextMenuVisible(!Cache.layout.isRightPanelVisible());
     }
 }
 
-function SetMessagesPanelVisible(isVisible) {
-    if (isVisible) {
+function ShowMessagesPanel(isShow) {
+    if (isShow) {
         Cache.layout.setTitle('voltar');
         Cache.layout.setContextMenuVisible(false);
-        Cache.layout.setContentFullWidth(true).onUnset(function() {
-            SetMessagesPanelVisible(false);
-        });
+        Cache.layout.setRightPanelVisible(true);
     } else {
         UpdatePageTitle();
-        Cache.layout.setContentFullWidth(false);
+        Cache.layout.setRightPanelVisible(false);
         RebuildHeadlinesContextMenu();
         window.setTimeout(function() { Cache.listHeadlines.clearCurrent(); }, 400); // flash hint before go
 
@@ -184,17 +182,11 @@ function SetMessagesPanelVisible(isVisible) {
         }
     }
 
-    Cache.listHeadlines.setCheckboxesVisible(!isVisible);
-    $('#middleBody')
-        .toggleClass('middleBody_noMessages', !isVisible)
-        .toggleClass('middleBody_withMessages', isVisible);
-    $('#rightBody')
-        .toggleClass('rightBody_noMessages', !isVisible)
-        .toggleClass('rightBody_withMessages', isVisible);
+    Cache.listHeadlines.setCheckboxesVisible(!isShow);
 }
 
 function Search(text) {
-    SetMessagesPanelVisible(false);
+    ShowMessagesPanel(false);
     $('#middleBody').scrollTop(0);
     $('#headlinesFooter').css('display', 'none');
 
@@ -236,7 +228,7 @@ function LoadFirstHeadlines(folder) {
 
 function LoadMoreHeadlines() {
     $('#headlinesFooter').css('display', 'none');
-    SetMessagesPanelVisible(false);
+    ShowMessagesPanel(false);
     Cache.listHeadlines.loadMore(Cache.MAILBATCH).done(function() {
         $('#headlinesFooter').css('display', '');
         UpdatePageTitle();
@@ -257,7 +249,7 @@ function HeadlineClicked(thread) {
     if (curFolder.globalName === 'INBOX/Drafts') {
         Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
     } else {
-        SetMessagesPanelVisible(true);
+        ShowMessagesPanel(true);
         var curFolder = Cache.treeFolders.getCurrent();
         Cache.listMessages.render(thread, curFolder); // headlines sorted newest first
         $('#subjectText').text(thread[thread.length-1].subject);
@@ -269,7 +261,7 @@ function HeadlineClicked(thread) {
 }
 
 function ThreadMoved(destFolder) {
-    SetMessagesPanelVisible(false);
+    ShowMessagesPanel(false);
     if (destFolder !== null) {
         Cache.treeFolders.redraw(destFolder);
     }
@@ -284,7 +276,7 @@ function ThreadMoved(destFolder) {
 }
 
 function HeadlineMarkedRead(folder) {
-    SetMessagesPanelVisible(false);
+    ShowMessagesPanel(false);
     Cache.treeFolders.redraw(folder);
     UpdatePageTitle();
     if (folder.id === null) { // we're on a search result
@@ -302,14 +294,14 @@ function MessageMarkedRead(folder, headline) {
 
     var curThread = Cache.listHeadlines.getCurrent();
     if (curThread.length === 1 && headline.unread) {
-        SetMessagesPanelVisible(false);
+        ShowMessagesPanel(false);
     }
 }
 
 function MailMoved(destFolder, origThread) {
     Cache.listHeadlines.redrawByThread(origThread, function() {
         if (!Cache.listMessages.count()) {
-            SetMessagesPanelVisible(false);
+            ShowMessagesPanel(false);
         }
         if (destFolder !== null) {
             Cache.treeFolders.redraw(destFolder);

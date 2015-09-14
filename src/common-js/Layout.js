@@ -20,48 +20,77 @@ return function(options) {
     var userOpts = $.extend({
         userMail: '',   // string with user email, for displaying purposes
         $menu: null,    // jQuery object with the DIV for the left menu
-        $content: null, // jQuery object with the DIV for all the content
-        showMenuTime: 250,
+        $middle: null,
+        $right: null,
+        showMenuTime: 250, // animation time, in ms
         hideMenuTime: 200,
         keepAliveTime: 10 * 60 * 1000 // 10 minutes, Tine default
     }, options);
 
     var THIS               = this;
     var contextMenu        = null; // ContextMenu object
-    var isContentFullWidth = false;
-    var onKeepAliveCB      = null;
+    var onKeepAliveCB      = null; // user callbacks
+    var onHideRightPanelCB = null;
     var onSearchCB         = null;
 
     THIS.load = function() {
         var defer = $.Deferred();
         App.LoadTemplate('../common-js/Layout.html').done(function() {
-            // Detach and attach the user DIVs on the layout structure.
-            $('#Layout_menuDarkCover,#Layout_arrowLeft').css('display', 'none');
-            $('#Layout_menu').append(userOpts.$menu); // user elements are detached and attached
-            $('#Layout_content').append(userOpts.$content);
             $('#Layout_userMail').text(userOpts.userMail);
-
-            // Layout internal events.
+            userOpts.$menu.appendTo('#Layout_leftContent'); // detach from page, attach to DIV
+            userOpts.$middle.appendTo('#Layout_middleContent');
+            userOpts.$right.appendTo('#Layout_rightContent');
             _SetEvents();
-
-            // Init some stuff.
             contextMenu = new ContextMenu({ $btn:$('#Layout_context') });
             THIS.setContextMenuVisible(false); // initially hidden
+            THIS.setRightPanelVisible(false);
             _SetCurrentModuleAsBold();
             defer.resolve();
         });
         return defer.promise();
     };
 
+    THIS.setRightPanelVisible = function(isVisible) {
+        var noChange = (isVisible && THIS.isRightPanelVisible()) ||
+            (!isVisible && !THIS.isRightPanelVisible());
+        if (noChange) return; // do nothing
+
+        $('#Layout_center').toggleClass('wide', isVisible);
+        $('#Layout_left').toggleClass('away', isVisible).scrollTop(0);
+        $('#Layout_middleContent').toggleClass('narrow', isVisible).toggleClass('wide', !isVisible);
+        $('#Layout_rightContent').toggleClass('shown', isVisible).toggleClass('away', !isVisible);
+
+        if (isVisible) {
+            $('#Layout_logo3Lines').css('display', 'none');
+            $('#Layout_arrowLeft').css('display', '');
+            UrlStack.push('#fullContent', function() { THIS.setRightPanelVisible(false); });
+        } else {
+            $('#Layout_logo3Lines').css('display', '');
+            $('#Layout_arrowLeft').css('display', 'none');
+            UrlStack.pop('#fullContent');
+            if (onHideRightPanelCB !== null) {
+                onHideRightPanelCB(); // invoke user callback
+            }
+        }
+
+        return THIS;
+    };
+
+    THIS.isRightPanelVisible = function() {
+        return $('#Layout_rightContent').is(':visible');
+    };
+
     THIS.setLeftMenuVisibleOnPhone = function(isVisible) {
         // Intended to be used when the page is loading, so any loading occurring
         // on the left menu is shown, after that user calls method(false) to hide it.
+
         var defer = $.Deferred();
+        var $leftSec = $('#Layout_left');
+
         if (!App.IsPhone()) {
             window.setTimeout(function() { defer.resolve(); }, 10);
         } else if (isVisible) { // show left menu on phones, does nothing on desktops
-            $('#Layout_menuDarkCover').css('display', ''); // reverting from "none"
-            var $leftSec = $('#Layout_leftSection');
+            _DarkBackground(true);
             var cx = $leftSec.outerWidth();
             $leftSec.css({
                 left: '-'+cx+'px',
@@ -73,9 +102,8 @@ return function(options) {
                 defer.resolve();
             });
         } else { // hides left menu on phones, does nothing on desktops
-            $('#Layout_menuDarkCover').css('display', 'none');
+            _DarkBackground(false);
             UrlStack.pop('#leftMenu');
-            var $leftSec = $('#Layout_leftSection');
             var cx = $leftSec.outerWidth();
             $leftSec.css('left', '0');
             $leftSec.animate({ left:'-'+cx+'px' }, userOpts.hideMenuTime, function() {
@@ -87,61 +115,6 @@ return function(options) {
             });
         }
         return defer.promise();
-    };
-
-    THIS.setContentFullWidth = function(isFullWidth) {
-        // Hides the left menu and sets the content to fill page width.
-        // Does nothing on phone, since left menu is hidden by default.
-
-        var retCallback = { };
-
-        if (isFullWidth) {
-            if (!isContentFullWidth) {
-                isContentFullWidth = true; // set flag
-                if (!App.IsPhone()) {
-                    var $layoutTop = $('#Layout_top');
-                    $('#Layout_content').css({ left:0, width:'100%' });
-                    $('#Layout_leftSection').scrollTop(0).css({
-                        height: $layoutTop.outerHeight()+'px',
-                        overflow: 'hidden',
-                        'border-bottom-width': $layoutTop.css('border-bottom-width'), // copy border-bottom
-                        'border-bottom-style': $layoutTop.css('border-bottom-style'),
-                        'border-bottom-color': $layoutTop.css('border-bottom-color')
-                    });
-                }
-                $('#Layout_logo3Lines').css('display', 'none');
-                $('#Layout_arrowLeft').css('display', '');
-                UrlStack.push('#fullContent', function() { THIS.setContentFullWidth(false); });
-            }
-            retCallback = { // return value will allow onUnset() chained call
-                onUnset: function(callback) { THIS.setContentFullWidthCB = callback; }
-            };
-        } else if (!isFullWidth) {
-            if (isContentFullWidth) {
-                isContentFullWidth = false; // clear flag
-                if (!App.IsPhone()) {
-                    $('#Layout_content').css({ left:'', width:'' });
-                    $('#Layout_leftSection').css({
-                        height: '',
-                        overflow: '',
-                        'border-bottom': ''
-                    });
-                }
-                $('#Layout_logo3Lines').css('display', '');
-                $('#Layout_arrowLeft').css('display', 'none');
-            }
-            UrlStack.pop('#fullContent');
-            if (THIS.setContentFullWidthCB !== undefined) {
-                var userCb = THIS.setContentFullWidthCB;
-                delete THIS.setContentFullWidthCB;
-                userCb();
-            }
-        }
-        return retCallback;
-    };
-
-    THIS.isContentFullWidth = function() {
-        return isContentFullWidth;
     };
 
     THIS.getContextMenu = function() {
@@ -163,44 +136,32 @@ return function(options) {
         return THIS;
     };
 
+    THIS.onHideRightPanel = function(callback) {
+        onHideRightPanelCB = callback; // onHideRightPanel()
+        return THIS;
+    };
+
     THIS.onSearch = function(callback) {
         onSearchCB = callback; // onSearch(text)
         return THIS;
     };
 
-    function _SetCurrentModuleAsBold() {
-        var curModule = location.href;
-        curModule = curModule.split('/');
-        curModule = curModule[curModule.length - 1] !== '' ?
-            curModule[curModule.length - 1] : curModule[curModule.length - 2];
-        $('#Layout_modules li').each(function(i, li) {
-            var module = $(li).find('a:first').attr('href');
-            if (module !== undefined) {
-                module = module.substr(module.indexOf('/') + 1);
-                if (module === curModule) {
-                    $(li).find('span').css('font-weight', 'bold');
-                    return false;
-                }
-            }
-        });
-    }
-
     function _SetEvents() {
-        $('#Layout_logo3Lines').on('click.Layout', function() {
+        $('#Layout_logo3Lines').on('click', function() {
             THIS.setLeftMenuVisibleOnPhone(true);
         });
 
-        $('#Layout_arrowLeft').on('click.Layout', function() {
-            THIS.setContentFullWidth(false);
+        $('#Layout_arrowLeft').on('click', function() {
+            THIS.setRightPanelVisible(false);
         });
 
-        $('#Layout_txtSearch').on('keypress.Layout', function(ev) {
+        $('#Layout_txtSearch').on('keypress', function(ev) {
             if (ev.which === 13) {
                 $('#Layout_btnSearch').trigger('click'); // submit search on Enter
             }
         });
 
-        $('#Layout_btnSearch').on('click.Layout', function() {
+        $('#Layout_btnSearch').on('click', function() {
             if (onSearchCB !== null) {
                 var searchTerm = App.IsPhone() ?
                     window.prompt('Busca') : $('#Layout_txtSearch').val();
@@ -209,15 +170,11 @@ return function(options) {
             }
         });
 
-        $('#Layout_logo,#Layout_menuArrowLeft').on('click.Layout', function() {
+        $('#Layout_logo,#Layout_menuArrowLeft').on('click', function() {
             THIS.setLeftMenuVisibleOnPhone(false);
         });
 
-        $('#Layout_menuDarkCover').on('click.Layout', function() {
-            THIS.setLeftMenuVisibleOnPhone(false);
-        });
-
-        $('#Layout_logoff').on('click.Layout', function(ev) { // logoff the whole application
+        $('#Layout_logoff').on('click', function(ev) { // logoff the whole application
             ev.stopImmediatePropagation();
             $('#Layout_logoff').css('display', 'none');
             $('#Layout_loggingOff').css('display', 'inline-block');
@@ -233,7 +190,7 @@ return function(options) {
             });
         });
 
-        $('#Layout_modules li,#Layout_modules a').on('click.Layout', function(ev) { // click on a module
+        $('#Layout_modules li,#Layout_modules a').on('click', function(ev) { // click on a module
             ev.preventDefault();
             ev.stopImmediatePropagation();
             var href = $(this).attr('href') !== undefined ?
@@ -252,6 +209,43 @@ return function(options) {
                 }, userOpts.keepAliveTime); // X minutes after the last request, an update should be performed (keep-alive)
             }
         });
+    }
+
+    function _SetCurrentModuleAsBold() {
+        var curModule = location.href;
+        curModule = curModule.split('/');
+        curModule = curModule[curModule.length - 1] !== '' ?
+            curModule[curModule.length - 1] : curModule[curModule.length - 2];
+        $('#Layout_modules li').each(function(i, li) {
+            var module = $(li).find('a:first').attr('href');
+            if (module !== undefined) {
+                module = module.substr(module.indexOf('/') + 1);
+                if (module === curModule) {
+                    $(li).find('span').css('font-weight', 'bold');
+                    return false;
+                }
+            }
+        });
+    }
+
+    function _DarkBackground(isCover) {
+        if (isCover && _DarkBackground.$div === undefined) {
+            _DarkBackground.$div = $(document.createElement('div'));
+            _DarkBackground.$div.css({
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                opacity: .4,
+                'background-color': 'black'
+            });
+            _DarkBackground.$div.insertBefore('#Layout_left'); // will appear below left menu
+            _DarkBackground.$div.on('click', function() {
+                THIS.setLeftMenuVisibleOnPhone(false);
+            });
+        } else if (!isCover && _DarkBackground.$div !== undefined) {
+            _DarkBackground.$div.remove();
+            delete _DarkBackground.$div;
+        }
     }
 };
 });

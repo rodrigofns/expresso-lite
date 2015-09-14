@@ -30,19 +30,16 @@ window.Cache = {
 
 $(document).ready(function() {
     function showDetailView() {
-        if (!Cache.layout.isContentFullWidth()) {
-            Cache.layout.setContentFullWidth(true)
-            .onUnset(showListView);
-            $('#mainContent>*').addClass('detailView');
+        if (!Cache.layout.isRightPanelVisible()) {
+            Cache.layout.setRightPanelVisible(true);
             Cache.widgetContactList.scrollToCurrentItem();
         }
     }
 
     function showListView() {
-        $('#mainContent>*').removeClass('detailView');
         Cache.widgetContactList.unselectCurrentItem();
-        if (Cache.layout.isContentFullWidth()) {
-            Cache.layout.setContentFullWidth(false);
+        if (Cache.layout.isRightPanelVisible()) {
+            Cache.layout.setRightPanelVisible(false);
         }
     }
 
@@ -50,13 +47,17 @@ $(document).ready(function() {
         Cache.layout = new Layout({
             userMail: App.GetUserInfo('mailAddress'),
             $menu: $('#leftMenu'),
-            $content: $('#mainContent')
+            $middle: $('#contactListSection'),
+            $right: $('#contactDetailsSection')
         });
 
         Cache.layout
         .onSearch(function (text){
             showListView();
             Cache.widgetContactList.changeQuery(text);
+        })
+        .onHideRightPanel(function () {
+            showListView();
         })
         .onKeepAlive(function () {
             App.Post('checkSessionStatus');
