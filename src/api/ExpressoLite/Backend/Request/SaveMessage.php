@@ -31,7 +31,7 @@ class SaveMessage extends LiteRequest
         $replyToId = $this->emptyAsNull($this->param('replyToId'));
         $forwardFromId = $this->emptyAsNull($this->param('forwardFromId'));
         $origDraftId = $this->emptyAsNull($this->param('origDraftId'));
-        $wantConfirm = $this->param('wantConfirm') === '1';
+        $wantConfirm = $this->isParamSet('wantConfirm') ? $this->param('wantConfirm') == '1' : false;
 
         $attachs = $this->param('attachs');
         if ($attachs != '') {
