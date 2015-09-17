@@ -35,10 +35,11 @@
     </div>
 </div>
 
-<div id="compose" name="compose">
-    <h2 class="anchorsTitle"><?= $VIEW->actionText ?> mensagem</h2>
-    <form action="<?= $VIEW->lnkSendMessageAction ?>" method="post" enctype="multipart/form-data">
-        <fieldset class="dialogEmail contentAlign">
+<form action="<?= $VIEW->lnkSendMessageAction ?>" method="post" enctype="multipart/form-data">
+
+    <div id="compose" name="compose">
+        <h2 class="anchorsTitle"><?= $VIEW->actionText ?> mensagem</h2>
+        <div class="dialogEmail contentAlign">
             <input type="hidden" name="folderId" value="<?= $VIEW->folderId ?>" />
             <input type="hidden" name="folderName" value="<?= $VIEW->folderName ?>" />
             <input type="hidden" name="page" value="<?= $VIEW->page ?>" />
@@ -68,10 +69,11 @@
             <div>
                 <label for="messageBody">Mensagem:</label>
                 <textarea name="messageBody" id="messageBody"></textarea>
-                <?php IF ($VIEW->signature !== '') : ?>
-                <div class="composeSign"><?= $VIEW->signature ?></div>
-                <?php ENDIF; ?>
             </div>
+
+            <?php IF ($VIEW->signature !== '') : ?>
+            <div class="composeSign"><?= $VIEW->signature ?></div>
+            <?php ENDIF; ?>
 
             <?php IF ($VIEW->quotedBody !== '') : ?>
                 <label for="quotedBody">Mensagem citada:</label>
@@ -79,56 +81,58 @@
                     <?= $VIEW->quotedBody ?>
                 </div>
             <?php ENDIF; ?>
+        </div>
+    </div>
 
-            <div id="emailAttachments" name="emailAttachments" >
-                <h2 class="anchorsTitle">Anexos</h2>
-                <?php IF (!EMPTY($VIEW->existingAttachments)) : ?>
-                    <div id="attachments" name="attachments" class="links systemLinks">
-                        <ul>
-                            <?php FOREACH ($VIEW->existingAttachments as $ATTACH) : ?>
-                                <div class ="existingAttachsForExhibition">
-                                    <li>
-                                        <a href="<?= $ATTACH->lnkDownload ?>">
-                                             Anexo <?= $ATTACH->accessibleFileName ?>
-                                             (formato <?= $ATTACH->accessibleExtension ?>, tamanho <?= $ATTACH->accessibleFileSize ?>)
-                                        </a>
-                                    </li>
-                                    <p>
-                                        <input type="checkbox"  id="checkAttach_<?php ECHO $ATTACH->filename ?>" name="checkAttach_<?php ECHO $ATTACH->filename ?>" value="<?php ECHO $ATTACH->filename?>" title="Marcar este anexo para não ser enviado" />
-                                        <label for="checkAttach_<?php ECHO $ATTACH->filename ?>">Remover anexo</label>
-                                    </p>
-                                </div>
-                            <? ENDFOREACH; ?>
-                        </ul>
-                    </div>
-                <?php ENDIF; ?>
-                <div>
-                    <p class="attach">
-                        <label for="attach0">Anexar 1º arquivo:</label>&nbsp;
-                        <input type="file" name="attach0" id="attach0" />
-                    </p>
-                    <p class="attach">
-                        <label for="attach1">Anexar 2º arquivo:</label>&nbsp;
-                        <input type="file" name="attach1" id="attach1" />
-                    </p>
-                    <p class="attach">
-                        <label for="attach2">Anexar 3º arquivo:</label>&nbsp;
-                        <input type="file" name="attach2" id="attach2" />
-                    </p>
-                </div>
+    <div id="emailAttachments" name="emailAttachments" >
+        <h2 class="anchorsTitle">Anexos</h2>
+        <?php IF (!EMPTY($VIEW->existingAttachments)) : ?>
+            <div id="attachments" name="attachments" class="links systemLinks">
+                <ul>
+                    <?php FOREACH ($VIEW->existingAttachments as $ATTACH) : ?>
+                        <div class ="existingAttachsForExhibition">
+                            <li>
+                                <a href="<?= $ATTACH->lnkDownload ?>">
+                                     Anexo <?= $ATTACH->accessibleFileName ?>
+                                     (formato <?= $ATTACH->accessibleExtension ?>, tamanho <?= $ATTACH->accessibleFileSize ?>)
+                                </a>
+                            </li>
+                            <p>
+                                <input type="checkbox"  id="checkAttach_<?php ECHO $ATTACH->filename ?>" name="checkAttach_<?php ECHO $ATTACH->filename ?>" value="<?php ECHO $ATTACH->filename?>" title="Marcar este anexo para não ser enviado" />
+                                <label for="checkAttach_<?php ECHO $ATTACH->filename ?>">Remover anexo</label>
+                            </p>
+                        </div>
+                    <? ENDFOREACH; ?>
+                </ul>
             </div>
+        <?php ENDIF; ?>
+        <div class="contentAlign">
+            <p class="attach">
+                <label for="attach0">Anexar 1º arquivo:</label>&nbsp;
+                <input type="file" name="attach0" id="attach0" />
+            </p>
+            <p class="attach">
+                <label for="attach1">Anexar 2º arquivo:</label>&nbsp;
+                <input type="file" name="attach1" id="attach1" />
+            </p>
+            <p class="attach">
+                <label for="attach2">Anexar 3º arquivo:</label>&nbsp;
+                <input type="file" name="attach2" id="attach2" />
+            </p>
+        </div>
+    </div>
 
-            <div class="composeFooter">
-                <p>
-                    <label for="important">Esta mensagem é importante</label>
-                    <input type="checkbox" name="important" id="important" title="Marcar essa mensagem como importante" />
-                </p>
-                <p>
-                    <input type="submit" value="Enviar" />
-                <p>
-            </div>
-        </fieldset>
-    </form>
-</div>
+    <div class="composeFooter contentAlign">
+        <p>
+            <label for="important">Esta mensagem é importante</label>
+            <input type="checkbox" name="important" id="important" title="Marcar essa mensagem como importante" />
+        </p>
+        <p>
+            <input type="submit" value="Enviar" />
+        <p>
+    </div>
+
+</form>
+
 </body>
 </html>
