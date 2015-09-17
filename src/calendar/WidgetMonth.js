@@ -23,8 +23,9 @@ return function(options) {
 
     var THIS             = this;
     var $templateView    = null; // jQuery object with our HTML template
-    var curDate          = DateCalc.firstOfMonth(DateCalc.today()); // month currently displayed
-    var onMonthChangedCB = null; // user callback
+    var curDate          = DateCalc.today(); // month currently displayed
+    var onMonthChangedCB = null; // user callbacks
+    var onEventClickedCB = null;
 
     THIS.load = function() {
         return $('#Month_template').length ? // load once
@@ -40,7 +41,7 @@ return function(options) {
     };
 
     THIS.show = function(when) {
-        curDate = DateCalc.firstOfMonth(when);
+        curDate = when;
         if ($templateView === null) {
             $templateView = $('#Month_template .Month_container').clone();
             $templateView.appendTo(userOpts.$elem).hide();
@@ -49,8 +50,8 @@ return function(options) {
         return _LoadEventsOfCurMonth();
     };
 
-    THIS.getCurMonth = function() {
-        return curDate; // 1st day of month, at 12:00:00
+    THIS.getCurDate = function() {
+        return curDate;
     };
 
     THIS.onMonthChanged = function(callback) {
@@ -58,10 +59,15 @@ return function(options) {
         return THIS;
     };
 
+    THIS.onEventClicked = function(callback) {
+        onEventClickedCB = callback; // onEventClicked(events)
+        return THIS;
+    };
+
     function _SetWidgetEvents() {
         $templateView.find('.Month_prev').on('click', function() {
             $(this).blur();
-            curDate = DateCalc.prevMonth(curDate);
+            curDate = DateCalc.prevMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
                 if (onMonthChangedCB !== null) {
                     onMonthChangedCB(); // invoke user callback
@@ -71,12 +77,24 @@ return function(options) {
 
         $templateView.find('.Month_next').on('click', function() {
             $(this).blur();
-            curDate = DateCalc.nextMonth(curDate);
+            curDate = DateCalc.nextMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
                 if (onMonthChangedCB !== null) {
                     onMonthChangedCB(); // invoke user callback
                 }
             });
+        });
+
+        $templateView.on('click', '.Month_event', function() {
+            if (onEventClickedCB !== null && !App.IsPhone()) { // single event click works only on desktop
+                onEventClickedCB($(this).parents('.Month_day').data('events')); // invoke user callback
+            }
+        });
+
+        $templateView.on('click', '.Month_day', function() {
+            if (onEventClickedCB !== null && App.IsPhone()) { // whole day click works only on phones
+                onEventClickedCB($(this).data('events')); // invoke user callback
+            }
         });
     }
 
@@ -84,7 +102,7 @@ return function(options) {
         var defer = $.Deferred();
         var $loading = $('#Month_template .Month_loading').clone();
         $templateView.hide().after($loading);
-        userOpts.events.loadMonth(curDate).done(function() {
+        userOpts.events.loadMonth(DateCalc.firstOfMonth(curDate)).done(function() {
             _RenderCells();
             $loading.remove();
             $templateView.fadeIn(userOpts.animationTime, function() {
@@ -98,8 +116,8 @@ return function(options) {
 
     function _RenderCells() {
         var $divMonthCanvas = $templateView.find('.Month_canvas');
-        var numWeeks = DateCalc.weeksInMonth(curDate);
-        var runDate = DateCalc.sundayOfWeek(curDate);
+        var numWeeks = DateCalc.weeksInMonth(DateCalc.firstOfMonth(curDate));
+        var runDate = DateCalc.sundayOfWeek(DateCalc.firstOfMonth(curDate));
         var dateToday = DateCalc.today();
         $divMonthCanvas.empty();
 
@@ -131,7 +149,11 @@ return function(options) {
             $box.css('color', events[i].color);
             $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(events[i].from));
             $box.find('.Month_eventName').text(events[i].summary);
+            if (events[i].status === 'DECLINED') {
+                $box.addClass('Month_eventDeclined');
+            }
             $box.attr('title', events[i].summary);
+            $box.data('event', events[i]);
             $day.find('.Month_dayContent').append($box);
         }
         $day.data('events', events); // store events array for this day

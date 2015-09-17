@@ -21,10 +21,11 @@ return function(options) {
         animationTime: 250
     }, options);
 
-    var THIS           = this;
-    var $templateView  = null; // jQuery object with our HTML template
-    var curDate        = DateCalc.sundayOfWeek(DateCalc.today()); // week currently displayed
-    var onWeekChangeCB = null; // user callback
+    var THIS             = this;
+    var $templateView    = null; // jQuery object with our HTML template
+    var curDate          = DateCalc.today();
+    var onWeekChangeCB   = null; // user callbacks
+    var onEventClickedCB = null;
 
     THIS.load = function() {
         return $('#Week_template').length ? // load once
@@ -40,7 +41,7 @@ return function(options) {
     };
 
     THIS.show = function(when) {
-        curDate = DateCalc.sundayOfWeek(when);
+        curDate = when;
         if ($templateView === null) {
             $templateView = $('#Week_template .Week_container').clone();
             $templateView.appendTo(userOpts.$elem).hide();
@@ -50,8 +51,8 @@ return function(options) {
         return _LoadEventsOfCurWeek();
     };
 
-    THIS.getCurWeek = function() {
-        return curDate; // always the sunday of current week
+    THIS.getCurDate = function() {
+        return curDate;
     };
 
     THIS.onWeekChanged = function(callback) {
@@ -59,10 +60,15 @@ return function(options) {
         return THIS;
     };
 
+    THIS.onEventClicked = function(callback) {
+        onEventClickedCB = callback; // onEventClicked(events)
+        return THIS;
+    };
+
     function _SetWidgetEvents() {
         $templateView.find('.Week_prev').on('click', function() {
             $(this).blur();
-            curDate = DateCalc.prevWeek(curDate);
+            curDate = DateCalc.prevWeek(DateCalc.sundayOfWeek(curDate));
             _LoadEventsOfCurWeek().done(function() {
                 if (onWeekChangedCB !== null) {
                     onWeekChangedCB(); // invoke user callback
@@ -72,20 +78,26 @@ return function(options) {
 
         $templateView.find('.Week_next').on('click', function() {
             $(this).blur();
-            curDate = DateCalc.nextWeek(curDate);
+            curDate = DateCalc.nextWeek(DateCalc.sundayOfWeek(curDate));
             _LoadEventsOfCurWeek().done(function() {
                 if (onWeekChangedCB !== null) {
                     onWeekChangedCB(); // invoke user callback
                 }
             });
         });
+
+        $templateView.on('click', '.Week_event', function() {
+            if (onEventClickedCB !== null) {
+                onEventClickedCB([ $(this).data('event') ]); // invoke user callback
+            }
+        });
     }
 
     function _LoadEventsOfCurWeek() {
         var defer = $.Deferred();
-        var $loading = $('#Week_template .Week_loading').clone();
+        var $loading = $('#Week_template .Week_loading').clone(); // put throbber
         $templateView.hide().after($loading);
-        userOpts.events.loadWeek(curDate).done(function() {
+        userOpts.events.loadWeek(DateCalc.sundayOfWeek(curDate)).done(function() {
             $loading.remove();
             _RenderCells();
             $templateView.show();
@@ -152,6 +164,7 @@ return function(options) {
             for (var e = 0; e < events.length; ++e) {
                 var $ev = $('#Week_template .Week_event').clone();
                 $ev.text(events[e].summary);
+                $ev.attr('title', events[e].summary);
                 var y = events[e].from.getHours() + events[e].from.getMinutes() / 60;
                 var cy = DateCalc.hourDiff(events[e].until, events[e].from);
                 $ev.css({
@@ -159,6 +172,7 @@ return function(options) {
                     height: (cy * cyHour)+'px',
                     'background-color': events[e].color
                 });
+                $ev.data('event', events[e]);
                 $day.append($ev);
             }
 

@@ -9,8 +9,8 @@
  */
 
 #sections { display:none; }
-#middleBody,#rightBody { position:absolute; height:100%; overflow:hidden; }
-#middleBody { width:100%; }
+#middleBody,#rightBody { position:absolute; width:100%; height:100%; overflow:hidden; }
+#rightBody { border-left:1px solid #EEE; overflow-y:auto; }
 
 /* -- Month or week rendering. */
 #renderOptions li, #navMonth li { -moz-user-select:none; -webkit-user-select:none; }

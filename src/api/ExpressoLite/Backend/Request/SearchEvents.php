@@ -67,7 +67,10 @@ class SearchEvents extends LiteRequest
                 'summary' => $e->summary,
                 'description' => $e->description,
                 'location' => $e->location,
-                'color' => $this->getEventColor($e)
+                'color' => $this->getEventColor($e),
+                'status' => $this->getUserStatus($e),
+                'organizer' => $this->getUserInformation($e->organizer),
+                'attendees' => $this->getAttendees($e)
             );
         }
         return $ret;
@@ -102,5 +105,63 @@ class SearchEvents extends LiteRequest
         return is_object($event->container_id) ?
             $event->container_id->color :
             $this->tineSession->getAttribute('Calendar.defaultEventColor');
+    }
+
+    /**
+     * Tells status of current user upon the event.
+     *
+     * @param stdClass $event The event object to retrieve the status.
+     *
+     * @return string Current user status upon the event.
+     */
+    private function getUserStatus($event)
+    {
+        foreach ($event->attendee as $atd) {
+            if (is_object($atd->user_id)) {
+                if ($this->tineSession->getAttribute('Expressomail.email') === $atd->user_id->email) {
+                    return $atd->status;
+                }
+            }
+        }
+        return ''; // if user removed himself from the event, should never happen
+    }
+
+    /**
+     * Returns all event attendees.
+     *
+     * @param stdClass $event The event object to retrieve the attendees.
+     *
+     * @return array[stdClass] All event attendees.
+     */
+    private function getAttendees($event)
+    {
+        $ret = array();
+        foreach ($event->attendee as $atd) {
+            if (is_object($atd->user_id)) {
+                $objAtd = $this->getUserInformation($atd->user_id);
+                $objAtd->status = $atd->status;
+                $ret[] = $objAtd;
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * Filters information about an user.
+     *
+     * @param stdClass $user Raw Tine user object from event.
+     *
+     * @return stdClass Filtered event user information.
+     */
+    private function getUserInformation($user)
+    {
+        return (object) array(
+            'id' => $user->id,
+            'name' => $user->n_fn,
+            'email' => $user->email,
+            'region' => $user->adr_one_region,
+            'orgUnit' => $user->org_unit,
+            'phone' => $user->tel_work
+        );
     }
 }

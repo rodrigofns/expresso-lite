@@ -13,9 +13,15 @@ define([
 function() {
 var DateCalc = {
     monthName: function(number) {
-        var months  = [ 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+        var months = [ 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
             'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro' ];
         return months[number];
+    },
+
+    weekDayName: function(number) {
+        var weekDays = [ 'domingo', 'segunda', 'terça', 'quarta',
+            'quinta', 'sexta', 'sábado' ];
+        return weekDays[number];
     },
 
     create: function(year, month, day) {
@@ -114,6 +120,13 @@ var DateCalc = {
     makeHourMinuteStr: function(when) {
         return DateCalc.pad2(when.getHours()) + ':' +
             DateCalc.pad2(when.getMinutes());
+    },
+
+    makeWeekDayMonthYearStr: function(when) {
+        return DateCalc.weekDayName(when.getDay())+', ' +
+            when.getDate()+' de ' +
+            DateCalc.monthName(when.getMonth())+' de '+
+            when.getFullYear();
     },
 
     strToDate: function(str) {

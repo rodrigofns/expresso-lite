@@ -117,8 +117,11 @@ return function() {
         for (var i = 0; i < rawEvents.length; ++i) { // parse strings to Date objects
             rawEvents[i].from = DateCalc.strToDate(rawEvents[i].from);
             rawEvents[i].until = DateCalc.strToDate(rawEvents[i].until);
+            _OrganizeAttendees(rawEvents[i]);
         }
-        rawEvents.sort(function(a, b) { return a.from - b.from; }); // oldest first
+        rawEvents.sort(function(a, b) { // oldest first
+            return a.from - b.from;
+        });
         for (var i = 0; i < rawEvents.length; ++i) {
             var sunday = DateCalc.sundayOfWeek(rawEvents[i].from);
             var weekHash = _HashFromDate(sunday);
@@ -126,6 +129,31 @@ return function() {
                 allWeeks[weekHash].push(rawEvents[i]);
             }
         }
+    }
+
+    function _OrganizeAttendees(event) {
+        event.attendees.sort(function(a, b) { // alphabetically
+            return a.name.localeCompare(b.name);
+        });
+        var ourMail = App.GetUserInfo('mailAddress');
+        var curUserAttendee = null;
+        var bucket = {
+            'NEEDS-ACTION': [],
+            'ACCEPTED': [],
+            'DECLINED': []
+        };
+        for (var i = 0; i < event.attendees.length; ++i) {
+            if (event.attendees[i].email === ourMail) {
+                curUserAttendee = event.attendees[i];
+            } else {
+                bucket[ event.attendees[i].status ].push(event.attendees[i]);
+            }
+        }
+
+        // Attendees are sorted by status, name; user himself is always first.
+        event.attendees = [ curUserAttendee ].concat(
+            bucket['ACCEPTED'], bucket['NEEDS-ACTION'], bucket['DECLINED']
+        );
     }
 
     function _EventAlreadyAddedToWeek(weekHash, event) {
