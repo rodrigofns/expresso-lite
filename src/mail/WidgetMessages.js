@@ -427,9 +427,12 @@ return function(options) {
                         .append($('#icons .throbber').clone())
                 );
 
-                App.Post('getMessage', { id:headline.id })
-                .always(function() { $divUnit.find('.Messages_loading').remove(); })
-                .fail(function(resp) {
+                App.Post('getMessage', {
+                    id: headline.id,
+                    ajaxUrl: App.GetAjaxUrl()
+                }).always(function() {
+                    $divUnit.find('.Messages_loading').remove();
+                }).fail(function(resp) {
                     window.alert('Erro ao carregar email.\n' +
                         'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
                 }).done(function(msg) {
@@ -460,8 +463,8 @@ return function(options) {
         var idx = $lnk.parent('span').index(); // child index; 0 is "<b>Anexo</b>", others are the link spans
         var headline = $lnk.closest('.Messages_unit').data('headline');
         var attach = headline.attachments[idx - 1];
-        window.open('../api/ajax.php?' +
-            'r=downloadAttachment&' +
+        window.open(App.GetAjaxUrl() +
+            '?r=downloadAttachment&' +
             'fileName='+encodeURIComponent(attach.filename)+'&' +
             'messageId='+headline.id+'&' +
             'partId='+attach.partId,

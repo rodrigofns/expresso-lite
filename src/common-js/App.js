@@ -70,12 +70,16 @@ function($, Cordova) {
         }
     };
 
-    App.Post = function(requestName, params) {
-        // Usage: App.Post('searchFolders', { parentFolder:'1234' });
-        // Returns a promise object.
+    App.GetAjaxUrl = function() {
         var backendUrl = Cordova.isEnabled() ?
                 Cordova.getLiteBackendUrl() :
                 require.toUrl('.'); // follows require.config() baseUrl
+        return backendUrl + '/api/ajax.php';
+    }
+
+    App.Post = function(requestName, params) {
+        // Usage: App.Post('searchFolders', { parentFolder:'1234' });
+        // Returns a promise object.
 
         var defer = $.Deferred();
 
@@ -86,7 +90,7 @@ function($, Cordova) {
         }
 
         $.post(
-            backendUrl + '/api/ajax.php',
+            App.GetAjaxUrl(),
             $.extend({r:requestName}, params)
         ).done(function (data) {
             defer.resolve(data);

@@ -65,7 +65,7 @@ var WidgetAttacher = function(options) {
         var tempFiles = [];
 
         var up = new UploadFile({
-            url: '../api/ajax.php?r=uploadTempFile',
+            url: App.GetAjaxUrl() + '?r=uploadTempFile',
             chunkSize: 1024 * 200 // file sliced into 200 KB chunks
         });
         up.onProgress(function(pct, xhr) {

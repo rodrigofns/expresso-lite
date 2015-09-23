@@ -107,7 +107,7 @@ class GetMessage extends LiteRequest
     {
         return preg_replace(
             '/src="index\.php\?method=Expressomail\.downloadAttachment/',
-            'src="../api/ajax.php?r=downloadAttachment&fileName=inlineAttachment',
+            'src="' . $this->param('ajaxUrl') . '?r=downloadAttachment&fileName=inlineAttachment',
             $text);
     }
 

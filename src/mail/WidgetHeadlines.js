@@ -226,8 +226,10 @@ return function(options) {
             $div.find('.Headlines_check > [class^=icoCheck]').replaceWith(
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
 
-            App.Post('getMessage', { id:headline.id })
-            .always(function() {
+            App.Post('getMessage', {
+                id: headline.id,
+                ajaxUrl: App.GetAjaxUrl()
+            }).always(function() {
                 $div.find('.throbber').replaceWith($check); // restore checkbox
             }).fail(function(resp) {
                 window.alert('Erro ao carregar email.\n' +
