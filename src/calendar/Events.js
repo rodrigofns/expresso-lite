@@ -76,6 +76,21 @@ return function() {
         return events;
     };
 
+    THIS.setConfirmation = function(eventId, confirmation) {
+        var defer = $.Deferred();
+        App.Post('setEventConfirmation', {
+            id: eventId,
+            confirmation: confirmation
+        }).fail(function(resp) {
+            window.alert('Erro na consulta dos eventos.\n' +
+                resp.responseText);
+            defer.reject();
+        }).done(function(resp) {
+            defer.resolve();
+        });
+        return defer.promise();
+    };
+
     function _HashFromDate(when) {
         return '' + when.getFullYear() +
             DateCalc.pad2(when.getMonth()) +
@@ -140,19 +155,23 @@ return function() {
         var bucket = {
             'NEEDS-ACTION': [],
             'ACCEPTED': [],
-            'DECLINED': []
+            'DECLINED': [],
+            'TENTATIVE': []
         };
         for (var i = 0; i < event.attendees.length; ++i) {
             if (event.attendees[i].email === ourMail) {
                 curUserAttendee = event.attendees[i];
             } else {
-                bucket[ event.attendees[i].status ].push(event.attendees[i]);
+                bucket[ event.attendees[i].confirmation ].push(event.attendees[i]);
             }
         }
 
-        // Attendees are sorted by status, name; user himself is always first.
+        // Attendees are sorted by confirmation status, name; user himself is always first.
         event.attendees = [ curUserAttendee ].concat(
-            bucket['ACCEPTED'], bucket['NEEDS-ACTION'], bucket['DECLINED']
+            bucket['ACCEPTED'],
+            bucket['TENTATIVE'],
+            bucket['NEEDS-ACTION'],
+            bucket['DECLINED']
         );
     }
 

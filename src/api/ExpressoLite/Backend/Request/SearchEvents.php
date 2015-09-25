@@ -68,7 +68,7 @@ class SearchEvents extends LiteRequest
                 'description' => $e->description,
                 'location' => $e->location,
                 'color' => $this->getEventColor($e),
-                'status' => $this->getUserStatus($e),
+                'confirmation' => $this->getUserConfirmation($e),
                 'organizer' => $this->getUserInformation($e->organizer),
                 'attendees' => $this->getAttendees($e)
             );
@@ -108,13 +108,13 @@ class SearchEvents extends LiteRequest
     }
 
     /**
-     * Tells status of current user upon the event.
+     * Tells confirmation status of current user upon the event.
      *
-     * @param stdClass $event The event object to retrieve the status.
+     * @param stdClass $event The event object to retrieve the confirmation status.
      *
-     * @return string Current user status upon the event.
+     * @return string Current user confirmation status upon the event.
      */
-    private function getUserStatus($event)
+    private function getUserConfirmation($event)
     {
         foreach ($event->attendee as $atd) {
             if (is_object($atd->user_id)) {
@@ -139,7 +139,7 @@ class SearchEvents extends LiteRequest
         foreach ($event->attendee as $atd) {
             if (is_object($atd->user_id)) {
                 $objAtd = $this->getUserInformation($atd->user_id);
-                $objAtd->status = $atd->status;
+                $objAtd->confirmation = $atd->status;
                 $ret[] = $objAtd;
             }
         }

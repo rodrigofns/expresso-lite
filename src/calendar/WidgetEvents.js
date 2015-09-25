@@ -10,9 +10,10 @@
 
 define(['jquery',
     'common-js/App',
+    'common-js/ContextMenu',
     'calendar/DateCalc'
 ],
-function($, App, DateCalc) {
+function($, App, ContextMenu, DateCalc) {
 App.LoadCss('calendar/WidgetEvents.css');
 return function(options) {
     var userOpts = $.extend({
@@ -73,9 +74,9 @@ return function(options) {
         $unit.find('.Events_summary').css('color', event.color);
         $unit.find('.Events_summary .Events_time').text(DateCalc.makeHourMinuteStr(event.from));
         $unit.find('.Events_summary .Events_text').text(event.summary);
-        $unit.find('.Events_summary .Events_userFlag').append(_BuildStatusIcon(event));
+        $unit.find('.Events_summary .Events_userFlag').append(_BuildConfirmationIcon(event));
 
-        $unit.find('.Events_description .Events_text').html(event.description.replace(/\n/g, '<br />'));
+        $unit.find('.Events_description .Events_text').html(event.description.replace(/\n/g, '<br/>'));
         $unit.find('.Events_when .Events_text').text(
             DateCalc.makeHourMinuteStr(event.from) +
             ' - ' +
@@ -89,14 +90,39 @@ return function(options) {
         $btnShowPeople.val($btnShowPeople.val() +' ('+event.attendees.length+')');
 
         $unit.find('.Events_people .Events_peopleList').append(_BuildPeople(event)).hide();
+        $unit.data('event', event);
+
+        var menu = new ContextMenu({ $btn:$unit.find('.Events_dropdown') });
+        $unit.data('dropdown', menu);
+        _RefreshDropdown($unit);
+
         return $unit;
+    }
+
+    function _RefreshDropdown($unit) {
+        var menu = $unit.data('dropdown');
+        var ev = $unit.data('event');
+        menu.purge();
+
+        if (ev.confirmation !== 'ACCEPTED') {
+            menu.addOption('Confirmar participação', function() { _SetConfirmation($unit, 'ACCEPTED'); });
+        }
+        if (ev.confirmation !== 'TENTATIVE') {
+            menu.addOption('Tentar comparecer', function() { _SetConfirmation($unit, 'TENTATIVE'); });
+        }
+        if (ev.confirmation !== 'DECLINED') {
+            menu.addOption('Rejeitar', function() { _SetConfirmation($unit, 'DECLINED'); });
+        }
+        if (ev.confirmation !== 'NEEDS-ACTION') {
+            menu.addOption('Desfazer', function() { _SetConfirmation($unit, 'NEEDS-ACTION'); });
+        }
     }
 
     function _BuildPeople(event) {
         var $pps = [];
         for (var i = 0; i < event.attendees.length; ++i) {
             $pp = $('#Events_template .Events_person').clone();
-            $pp.find('.Events_personFlag').append(_BuildStatusIcon(event.attendees[i]));
+            $pp.find('.Events_personFlag').append(_BuildConfirmationIcon(event.attendees[i]));
             $pp.find('.Events_personName').text(event.attendees[i].name);
             $pp.find('.Events_personOrg').text(_FormatUserOrg(event.attendees[i]));
             $pps.push($pp);
@@ -104,13 +130,14 @@ return function(options) {
         return $pps;
     }
 
-    function _BuildStatusIcon(attendee) {
+    function _BuildConfirmationIcon(attendee) {
         var icoSt = null;
 
-        switch (attendee.status) {
+        switch (attendee.confirmation) {
             case 'NEEDS-ACTION': icoSt = '.Events_icoWaiting'; break;
             case 'ACCEPTED':     icoSt = '.Events_icoAccepted'; break;
-            case 'DECLINED':     icoSt = '.Events_icoDeclined';
+            case 'DECLINED':     icoSt = '.Events_icoDeclined'; break;
+            case 'TENTATIVE':    icoSt = '.Events_icoTentative';
         }
 
         return $('#Events_template '+icoSt).clone();
@@ -126,6 +153,22 @@ return function(options) {
         } else {
             return user.orgUnit+', '+user.region;
         }
+    }
+
+    function _SetConfirmation($unit, confirmation) {
+        var event = $unit.data('event');
+        event.confirmation = confirmation; // update object
+
+        $unit.find('.Events_summary .Events_userFlag')
+            .empty()
+            .append($('#Events_template .Events_throbber').clone());
+
+        userOpts.events.setConfirmation(event.id, confirmation).done(function() {
+            _RefreshDropdown($unit);
+            $unit.find('.Events_summary .Events_userFlag, .Events_person .Events_personFlag:first')
+                .empty()
+                .append(_BuildConfirmationIcon(event)); // update confirmation icons
+        });
     }
 };
 });

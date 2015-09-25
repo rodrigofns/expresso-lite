@@ -12,7 +12,7 @@ define(['jquery',
     'common-js/App',
     'calendar/DateCalc'
 ],
-function($, App, DateCalc, Events) {
+function($, App, DateCalc) {
 App.LoadCss('calendar/WidgetMonth.css');
 return function(options) {
     var userOpts = $.extend({
@@ -149,7 +149,7 @@ return function(options) {
             $box.css('color', events[i].color);
             $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(events[i].from));
             $box.find('.Month_eventName').text(events[i].summary);
-            if (events[i].status === 'DECLINED') {
+            if (events[i].confirmation === 'DECLINED') {
                 $box.addClass('Month_eventDeclined');
             }
             $box.attr('title', events[i].summary);

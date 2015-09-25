@@ -12,7 +12,7 @@ define(['jquery',
     'common-js/App',
     'calendar/DateCalc'
 ],
-function($, App, DateCalc, Events) {
+function($, App, DateCalc) {
 App.LoadCss('calendar/WidgetWeek.css');
 return function(options) {
     var userOpts = $.extend({
