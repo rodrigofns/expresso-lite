@@ -62,6 +62,24 @@ return function() {
         return defer.promise();
     };
 
+    THIS.clearWeekCache = function(start) {
+        // Assumes 'start' as sunday of week.
+        delete allWeeks[_HashFromDate(start)];
+        return THIS;
+    };
+
+    THIS.clearMonthCache = function(start) {
+        // Assumes 'start' as 1st day of month.
+        delete allWeeks[_HashFromDate(DateCalc.sundayOfWeek(start))];
+        var hashYearMonth = start.getFullYear() + DateCalc.pad2(start.getMonth());
+        for (var hashKey in allWeeks) {
+            if (hashKey.substr(0, 6) === hashYearMonth) {
+                delete allWeeks[hashKey];
+            }
+        }
+        return THIS;
+    };
+
     THIS.inDay = function(when) {
         var events = [];
         var sunday = DateCalc.sundayOfWeek(when);

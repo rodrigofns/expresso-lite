@@ -69,6 +69,7 @@ App.Ready(function() {
         Cache.viewWeek
             .onWeekChanged(UpdateCurrentWeekName)
             .onEventClicked(EventClicked);
+        $('#btnRefresh').on('click', RefreshEvents);
         $('#renderOptions li').on('click', ChangeRenderOption);
     });
 });
@@ -102,6 +103,30 @@ function UpdateCurrentWeekName() {
     }
 }
 
+function RefreshEvents() {
+    var $curLi = $('#renderOptions .renderOptionCurrent');
+
+    Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+        $('#btnRefresh').hide();
+        $('#txtRefresh').show();
+
+        if ($curLi.is('#renderMonth')) {
+            var day1 = DateCalc.firstOfMonth(Cache.viewMonth.getCurDate());
+            Cache.events.clearMonthCache(day1);
+            Cache.viewMonth.show(day1).done(finishedRefreshing);
+        } else if ($curLi.is('#renderWeek')) {
+            var sunday = DateCalc.sundayOfWeek(Cache.viewWeek.getCurDate());
+            Cache.events.clearWeekCache(sunday);
+            Cache.viewWeek.show(sunday).done(finishedRefreshing);
+        }
+    });
+
+    function finishedRefreshing() {
+        $('#btnRefresh').show();
+        $('#txtRefresh').hide();
+    }
+}
+
 function ChangeRenderOption() {
     var $li = $(this);
     $('#renderOptions li').removeClass('renderOptionCurrent'); // remove from all LI
@@ -125,9 +150,8 @@ function ChangeRenderOption() {
     });
 }
 
-function EventClicked(events) {
+function EventClicked(eventsOfDay) {
     Cache.layout.setRightPanelVisible(true);
-    Cache.viewEvents.render(events).done(function() {
-    });
+    Cache.viewEvents.render(eventsOfDay);
 }
 });

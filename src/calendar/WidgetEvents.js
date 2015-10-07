@@ -157,18 +157,24 @@ return function(options) {
 
     function _SetConfirmation($unit, confirmation) {
         var event = $unit.data('event');
-        event.confirmation = confirmation; // update object
 
-        $unit.find('.Events_summary .Events_userFlag')
-            .empty()
-            .append($('#Events_template .Events_throbber').clone());
+        if (DateCalc.isBeforeCurrentTime(event.from)) {
+            window.alert('Não é possível alterar a confirmação deste evento, pois ele já ocorreu.');
+        } else {
+            event.confirmation = confirmation; // update object
+            event.attendees[0].confirmation = confirmation; // user himself is always 1st in attendee list
 
-        userOpts.events.setConfirmation(event.id, confirmation).done(function() {
-            _RefreshDropdown($unit);
-            $unit.find('.Events_summary .Events_userFlag, .Events_person .Events_personFlag:first')
+            $unit.find('.Events_summary .Events_userFlag')
                 .empty()
-                .append(_BuildConfirmationIcon(event)); // update confirmation icons
-        });
+                .append($('#Events_template .Events_throbber').clone());
+
+            userOpts.events.setConfirmation(event.id, confirmation).done(function() {
+                _RefreshDropdown($unit);
+                $unit.find('.Events_summary .Events_userFlag, .Events_person .Events_personFlag:first')
+                    .empty()
+                    .append(_BuildConfirmationIcon(event)); // update confirmation icons
+            });
+        }
     }
 };
 });

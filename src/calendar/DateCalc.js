@@ -50,6 +50,10 @@ var DateCalc = {
             when1.getMonth() === when2.getMonth();
     },
 
+    isBeforeCurrentTime: function(when) {
+        return when.getTime() < Date.now();
+    },
+
     hourDiff: function(when1, when2) {
         // http://stackoverflow.com/questions/7709803/javascript-get-minutes-between-two-dates
         var diffMs = Math.abs(when1 - when2);
