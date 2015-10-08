@@ -96,7 +96,8 @@ class MessageUtils
             'embedded_images' => array(),
             'from_email' => $tineSession->getAttribute('Expressomail.email'),
             'from_name' => $tineSession->getAttribute('Expressomail.from'),
-            'customfields' => (object) array()
+            'customfields' => (object) array(),
+            'add_contacts' => true
         );
         if ($isImportant)
             $recordData->importance = true;

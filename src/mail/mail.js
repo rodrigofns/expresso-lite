@@ -326,7 +326,7 @@ function ShowComposePopup() {
     });
 }
 
-function MailSent(reMsg, fwdMsg, draftMsg) {
+function MailSent(reMsg, fwdMsg, draftMsg, message) {
     var sentFolder = ThreadMail.FindFolderByGlobalName('INBOX/Sent', Cache.folders);
     ++sentFolder.totalMails;
     Cache.treeFolders.redraw(sentFolder);
@@ -355,6 +355,18 @@ function MailSent(reMsg, fwdMsg, draftMsg) {
             LoadFirstHeadlines(draftFolder);
         }
     }
+
+    var contacts = [];
+    if (message.to) {
+        $.merge(contacts, message.to.split(','));
+    }
+    if (message.bcc) {
+        $.merge(contacts, message.bcc.split(','));
+    }
+    if (message.cc) {
+        $.merge(contacts, message.cc.split(','));
+    }
+    Contacts.updatePersonalCache(contacts);
 
     UpdateHeadlineFooter();
 }

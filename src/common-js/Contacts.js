@@ -12,6 +12,8 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
+    var Contacts = { };
+
     function _Hex2bin(hex) {
         var bytes = [];
         for (var i = 0; i < hex.length - 1; i += 2) {
@@ -35,17 +37,34 @@ function($, App) {
         return JSON.parse(sessionStorage.getItem('contacts'));
     }
 
-return {
-    loadPersonal: function() {
+    function _WriteContactsList(contacts) {
+        sessionStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+
+    Contacts.updatePersonalCache = function(contacts) {
+        var contactList = _ReadContactsList();
+        for (var i = 0; i < contacts.length; ++i) {
+            var con = _GetContactByMail(contacts[i], contactList);
+            if (con === null) { // whole contact not cached yet, add new
+                contactList.push({
+                    name: Contacts.humanizeLogin(contacts[i], false),
+                    emails: [ contacts[i] ]
+                });
+            }
+        }
+        _WriteContactsList(contactList);
+    };
+
+    Contacts.loadPersonal = function() {
         var defer = $.Deferred();
         App.Post('getPersonalContacts').done(function(contacts) {
-            sessionStorage.setItem('contacts', JSON.stringify(contacts));
+            _WriteContactsList(contacts);
             defer.resolve();
         });
         return defer.promise();
-    },
+    };
 
-    loadMugshots: function(addrs) {
+    Contacts.loadMugshots = function(addrs) {
         var defer = $.Deferred();
 
         for (var a = addrs.length; a-- > 0; ) {
@@ -77,9 +96,9 @@ return {
             defer.resolve();
         }
         return defer.promise();
-    },
+    };
 
-    getMugshotSrc: function(email) {
+    Contacts.getMugshotSrc = function(email) {
         var mugshot = sessionStorage.getItem('pic$'+email);
         if (mugshot === null || mugshot === '') {
             if (email.indexOf('serpro.gov.br') !== -1) {
@@ -97,9 +116,9 @@ return {
         } else {
             return 'data:image/jpeg;base64,'+_Hex2bin(mugshot); // src attribute of IMG
         }
-    },
+    };
 
-    searchByToken: function(token) {
+    Contacts.searchByToken = function(token) {
         token = token.toLowerCase();
         var ret = [];
         var people = _ReadContactsList();
@@ -115,17 +134,17 @@ return {
             }
         }
         return ret;
-    },
+    };
 
-    summary: function() {
+    Contacts.summary = function() {
         return console.info('Session storage usage:\n' +
             '- contacts: ' +
             (sessionStorage.getItem('contacts').length / 1024).toFixed(2)+' KB\n' +
             '- mugshots: ' +
             (JSON.stringify(sessionStorage).length / 1024).toFixed(2)+' KB'); // for debug purposes
-    },
+    };
 
-    humanizeLogin: function(emailAddr, onlyFirstName) {
+    Contacts.humanizeLogin = function(emailAddr, onlyFirstName) {
         function UppercaseFirst(name) { return name.charAt(0).toUpperCase() + name.substr(1); }
 
         var parts = emailAddr.substr(0, emailAddr.indexOf('@')).split(/[\.-]+/);
@@ -138,6 +157,7 @@ return {
             }
             return ret.substr(0, ret.length - 1); // jose.silva@brasil.gov -> "Jose Silva"
         }
-    }
-}
+    };
+
+    return Contacts;
 });

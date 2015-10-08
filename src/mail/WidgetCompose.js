@@ -436,7 +436,7 @@ return function(options) {
                         isSending = false;
                         popup.close();
                         if (onSendCB !== null) {
-                            onSendCB(reMsg, fwdMsg, draftMsg); // invoke user callback
+                            onSendCB(reMsg, fwdMsg, draftMsg, message); // invoke user callback
                         }
                     });
                 });
