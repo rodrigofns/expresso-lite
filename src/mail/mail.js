@@ -17,6 +17,7 @@ require(['jquery',
     'common-js/App',
     'common-js/UrlStack',
     'common-js/Layout',
+    'common-js/ContextMenu',
     'common-js/Contacts',
     'mail/ThreadMail',
     'mail/WidgetCompose',
@@ -24,7 +25,7 @@ require(['jquery',
     'mail/WidgetHeadlines',
     'mail/WidgetMessages'
 ],
-function($, App, UrlStack, Layout, Contacts, ThreadMail,
+function($, App, UrlStack, Layout, ContextMenu, Contacts, ThreadMail,
     WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
     MAILBATCH: App.GetUserInfo('mailBatch'),
@@ -32,6 +33,7 @@ window.Cache = {
     layout: null, // renders the main page layout
     treeFolders: null, // folder rendering widget
     listHeadlines: null, // headlines list rendering widget
+    subjectMenu: null, // dropdown menu at right of subject text
     listMessages: null, // messages list rendering widget
     wndCompose: null // compose modeless popup
 };
@@ -52,6 +54,7 @@ App.Ready(function() {
     Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });
     Cache.listHeadlines = new WidgetHeadlines({ $elem:$('#headlinesArea'), folderCache:Cache.folders });
     Cache.listMessages = new WidgetMessages({ $elem:$('#messagesArea'), folderCache:Cache.folders, wndCompose:Cache.wndCompose });
+    Cache.subjectMenu = new ContextMenu({ $btn:$('#subjectMenu') }); // actions for the whole opened thread
 
     // Some initial work.
     UrlStack.keepClean();
@@ -79,7 +82,7 @@ App.Ready(function() {
         // Setup events.
         Cache.layout
             .onKeepAlive(function() { $('#btnUpdateFolders').trigger('click'); })
-            .onHideRightPanel(function() { ShowMessagesPanel(false); })
+            .onHideRightPanel(function() { SetMessagesPanelVisible(false); })
             .onSearch(Search); // when user performs a search
         Cache.treeFolders
             .onClick(LoadFirstHeadlines)
@@ -163,7 +166,42 @@ function RebuildHeadlinesContextMenu() {
     }
 }
 
-function ShowMessagesPanel(isShow) {
+function RebuildSubjectThreadMenu(thread) {
+    $('#subjectMenu').toggle(thread.length > 1);
+    if (thread.length > 1) {
+        Cache.subjectMenu.purge()
+            .addOption('Marcar conversa como lida', function() {
+                Cache.listHeadlines.setCurrentChecked();
+                SetMessagesPanelVisible(false);
+                Cache.listHeadlines.markRead(true);
+            }).addOption('Marcar conversa como não lida', function() {
+                Cache.listHeadlines.setCurrentChecked();
+                SetMessagesPanelVisible(false);
+                Cache.listHeadlines.markRead(false);
+            }).addOption('Apagar conversa', function() {
+                Cache.listHeadlines.setCurrentChecked();
+                SetMessagesPanelVisible(false);
+                Cache.listHeadlines.deleteMessages();
+            }).addHeader('Mover conversa para...');
+
+        var curFolder = Cache.treeFolders.getCurrent();
+        var MenuRenderFolderLevel = function(folders, level) {
+            $.each(folders, function(idx, folder) {
+                if (folder.globalName !== curFolder.globalName) { // avoid move to current folder
+                    Cache.subjectMenu.addOption(folder.localName, function() {
+                        Cache.listHeadlines.setCurrentChecked();
+                        SetMessagesPanelVisible(false);
+                        Cache.listHeadlines.moveMessages(folder); // pass folder object
+                    }, level); // indentation
+                }
+                MenuRenderFolderLevel(folder.subfolders, level + 1);
+            });
+        };
+        MenuRenderFolderLevel(Cache.folders, 0);
+    }
+}
+
+function SetMessagesPanelVisible(isShow) {
     if (isShow) {
         Cache.layout.setTitle('voltar');
         Cache.layout.setContextMenuVisible(false);
@@ -186,7 +224,7 @@ function ShowMessagesPanel(isShow) {
 }
 
 function Search(text) {
-    ShowMessagesPanel(false);
+    SetMessagesPanelVisible(false);
     $('#middleBody').scrollTop(0);
     $('#headlinesFooter').css('display', 'none');
 
@@ -228,7 +266,7 @@ function LoadFirstHeadlines(folder) {
 
 function LoadMoreHeadlines() {
     $('#headlinesFooter').css('display', 'none');
-    ShowMessagesPanel(false);
+    SetMessagesPanelVisible(false);
     Cache.listHeadlines.loadMore(Cache.MAILBATCH).done(function() {
         $('#headlinesFooter').css('display', '');
         UpdatePageTitle();
@@ -249,10 +287,11 @@ function HeadlineClicked(thread) {
     if (curFolder.globalName === 'INBOX/Drafts') {
         Cache.wndCompose.show({ draft:thread[0] }); // drafts are not supposed to be threaded, so message is always 1st
     } else {
-        ShowMessagesPanel(true);
+        SetMessagesPanelVisible(true);
         var curFolder = Cache.treeFolders.getCurrent();
         Cache.listMessages.render(thread, curFolder); // headlines sorted newest first
         $('#subjectText').text(thread[thread.length-1].subject);
+        RebuildSubjectThreadMenu(thread);
     }
 
     var cyPos = Cache.listHeadlines.calcScrollTopOf(thread), // scroll headlines to have selected at center
@@ -261,7 +300,7 @@ function HeadlineClicked(thread) {
 }
 
 function ThreadMoved(destFolder) {
-    ShowMessagesPanel(false);
+    SetMessagesPanelVisible(false);
     if (destFolder !== null) {
         Cache.treeFolders.redraw(destFolder);
     }
@@ -276,7 +315,7 @@ function ThreadMoved(destFolder) {
 }
 
 function HeadlineMarkedRead(folder) {
-    ShowMessagesPanel(false);
+    SetMessagesPanelVisible(false);
     Cache.treeFolders.redraw(folder);
     UpdatePageTitle();
     if (folder.id === null) { // we're on a search result
@@ -294,14 +333,14 @@ function MessageMarkedRead(folder, headline) {
 
     var curThread = Cache.listHeadlines.getCurrent();
     if (curThread.length === 1 && headline.unread) {
-        ShowMessagesPanel(false);
+        SetMessagesPanelVisible(false);
     }
 }
 
 function MailMoved(destFolder, origThread) {
     Cache.listHeadlines.redrawByThread(origThread, function() {
         if (!Cache.listMessages.count()) {
-            ShowMessagesPanel(false);
+            SetMessagesPanelVisible(false);
         }
         if (destFolder !== null) {
             Cache.treeFolders.redraw(destFolder);

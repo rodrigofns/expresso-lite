@@ -599,6 +599,22 @@ return function(options) {
         return chThreads;
     };
 
+    THIS.setCurrentChecked = function() {
+        var $checkeds = $targetDiv.find('.Headlines_entryChecked');
+        $checkeds.removeClass('Headlines_entryChecked');
+        $checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
+
+        var $cur = $targetDiv.find('.Headlines_entryCurrent');
+        if ($cur.length) {
+            $cur.addClass('Headlines_entryChecked');
+            $cur.find('.icoCheck0').removeClass('icoCheck0').addClass('icoCheck1');
+            if (onCheckCB !== null) {
+                onCheckCB(); // invoke user callback
+            }
+        }
+        return THIS;
+    };
+
     THIS.clearChecked = function() {
         var $checkeds = $targetDiv.find('.Headlines_entryChecked');
         $checkeds.removeClass('Headlines_entryChecked');
