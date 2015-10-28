@@ -511,6 +511,7 @@ return function(options) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('replyToAll', msg.reAll)).focus();
             } else if (showOpts.draft !== null) {
                 $tpl.find('.Compose_body').html(_PrepareBodyToQuote('draft', msg.draft)).focus();
+                $tpl.find('.Compose_important').prop('checked', msg.draft.important);
             }
             defer.resolve();
         });
