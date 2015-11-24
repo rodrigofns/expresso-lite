@@ -83,12 +83,6 @@ function($, Cordova) {
 
         var defer = $.Deferred();
 
-        function returnToLoginScreen() {
-            var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-            var destHref = currHref.replace(/\b(\/mail|\/addressbook)\b/gi, '') //removes /mail or /addressbook from the address
-            document.location.href = destHref;
-        }
-
         $.post(
             App.GetAjaxUrl(),
             $.extend({r:requestName}, params)
@@ -111,6 +105,8 @@ function($, Cordova) {
                 App.ReturnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
+            } else if (data.status === 500 && data.responseText == 'CurlNotInstalledException') {
+                window.alert('O pacote PHP cURL (php5-curl) não está instalado no servidor');
             } else {
                 defer.reject(data);
             }
