@@ -277,6 +277,7 @@ return function(options) {
             App.Post('markAsRead', { asRead:(asRead?1:0), ids:relevantIds.join(',') })
             .always(function() {
                 $checkedDivs.find('.throbber').replaceWith($check); // restore checkbox
+                THIS.clearChecked();
                 if (onMarkReadCB !== null) {
                     onMarkReadCB(curFolder);
                 }
