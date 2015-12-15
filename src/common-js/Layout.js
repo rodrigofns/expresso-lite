@@ -171,8 +171,9 @@ return function(options) {
             if (onSearchCB !== null) {
                 var searchTerm = App.IsPhone() ?
                     window.prompt('Busca') : $('#Layout_txtSearch').val();
-                if (searchTerm === null) searchTerm = '';
-                onSearchCB(searchTerm);
+                if (searchTerm !== null) {
+                    onSearchCB(searchTerm);
+                }
             }
         });
 
