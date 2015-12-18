@@ -86,7 +86,8 @@ class Main extends Handler
                 'folderId' => $curFolder->id,
                 'folderName' => $curFolder->localName,
                 'page' => $params->page,
-            ))
+            )),
+            'lnkCalendar' => $this->makeUrl('Calendar.Main')
         ));
     }
 

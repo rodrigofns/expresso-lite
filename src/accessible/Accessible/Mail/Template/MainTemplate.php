@@ -41,9 +41,10 @@
     <h2 class="anchorsTitle">Menu</h2>
     <div class="links systemLinks">
         <ul>
-            <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="a">Atualizar lista de emails da pasta <?= $VIEW->curFolder->localName ?> [a]</span></a></li>
+            <!-- <li><a href="<?= $VIEW->lnkCalendar ?>" accesskey="c">Módulo Calendário [c]</a></li> -->
+            <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="a">Atualizar lista de emails da pasta <?= $VIEW->curFolder->localName ?> [a]</a></li>
             <li><a href="<?= $VIEW->lnkChangeFolder ?>" accesskey="p">Selecionar outra pasta [p]</a></li>
-            <li><a href="<?= $VIEW->lnkComposeMessage ?>" accesskey="n">Escrever novo email [n]</span></a></li>
+            <li><a href="<?= $VIEW->lnkComposeMessage ?>" accesskey="n">Escrever novo email [n]</a></li>
             <li><a href="<?= $VIEW->lnkLogoff ?>" title="Sair do expressobr acessível" accesskey="s">Sair do sistema [s]</a></li>
         </ul>
     </div>
