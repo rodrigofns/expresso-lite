@@ -184,11 +184,15 @@ return function(options) {
 
         $('#Layout_logoff').on('click', function(ev) { // logoff the whole application
             ev.stopImmediatePropagation();
-            $('#Layout_logoff').css('display', 'none');
-            $('#Layout_loggingOff').css('display', 'inline-block');
+            $('#Layout_logoffScreen').show();
             App.Post('logoff')
             .done(function(data) {
-                App.ReturnToLoginScreen();
+                $('body').css('overflow', 'hidden');
+                $('#Layout_logoffText').animate({ top:$(window).height() / 4 }, 200, function() {
+                    $('#Layout_logoffText').animate({ top:$(window).height() }, 300, function() {
+                        App.ReturnToLoginScreen();
+                    });
+                });
             }).fail(function(error) {
                 console.error('Logout error: ' + error.responseText);
                 location.href = '.';
