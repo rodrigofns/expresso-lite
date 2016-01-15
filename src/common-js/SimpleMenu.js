@@ -12,45 +12,59 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
+App.LoadCss('common-js/SimpleMenu.css');
+return function(options) {
+    var userOpts = $.extend({
+        $parentContainer: null
+    }, options);
 
-    App.LoadCss('common-js/SimpleMenu.css');
+    var THIS = this;
+    var $ul = $(document.createElement('ul'))
+        .addClass('SimpleMenu_list')
+        .appendTo(options.$parentContainer);
 
-    return function(options) {
-        var userOpts = $.extend({
-            $parentContainer: null
-        }, options);
+    THIS.addOption = function(label, identifier, callback) {
+        var $li = $(document.createElement('li'));
+        $li.append( $(document.createElement('span')).html(label) );
+        $li.data('identifier', identifier);
+        $li.data('callback', callback);
+        $li.appendTo($ul);
+        return THIS;
+    };
 
-        var THIS = this;
-        var $ul = $(document.createElement('ul')).attr('id', 'SimpleMenu_list').appendTo(options.$parentContainer);
-        var $selectedLi = null;
+    THIS.clearSelection = function() {
+        $ul.find('.SimpleMenu_selected').removeClass('SimpleMenu_selected');
+        return THIS;
+    };
 
-        function selectLi($li) {
-            if ($selectedLi != null) {
-                $selectedLi.removeClass('selected');
+    THIS.selectOption = function(identifier) {
+        $ul.find('li').each(function(idx, li) {
+            if ($(li).data('identifier') === identifier) {
+                _SelectLi($(li));
+                return false;
             }
-            $selectedLi = $li;
-            $selectedLi.addClass('selected');
-        }
+        });
+        return THIS;
+    };
 
-        THIS.addOption = function (label, callback) {
-            var $li = $(document.createElement('li'));
+    THIS.selectFirstOption = function() {
+        _SelectLi( $ul.find('li:first') );
+        return THIS;
+    };
 
-            if ($selectedLi == null) {
-                selectLi($li);
-            }
-            $li.html(label);
-            $li.data('callback', callback);
+    THIS.getSelectedIdentifier = function() {
+        return $ul.find('.SimpleMenu_selected').data('identifier');
+    };
 
-            $li.on('click', function () {
-                var $this = $(this);
-                if (!$this.hasClass('selected')) {
-                    selectLi($this);
-                }
-                $this.data('callback')(); //invokes callback associated to <li>
-            });
+    userOpts.$parentContainer.on('click', '.SimpleMenu_list li', function() {
+        THIS.clearSelection();
+        _SelectLi($(this));
+    });
 
-            $li.appendTo($ul);
-            return THIS;
-        }
-    }
+    function _SelectLi($li) {
+        THIS.clearSelection();
+        $li.addClass('SimpleMenu_selected')
+            .data('callback')(); // invoke associated user callback
+    };
+};
 });

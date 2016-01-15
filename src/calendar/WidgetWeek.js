@@ -23,7 +23,8 @@ return function(options) {
 
     var THIS             = this;
     var $templateView    = null; // jQuery object with our HTML template
-    var curDate          = DateCalc.today();
+    var curDate          = DateCalc.today(); // week currently displayed
+    var curCalendarId    = '';   // ID of calendar currently displayed
     var onWeekChangeCB   = null; // user callbacks
     var onEventClickedCB = null;
 
@@ -40,7 +41,8 @@ return function(options) {
         return THIS;
     };
 
-    THIS.show = function(when) {
+    THIS.show = function(calendarId, when) {
+        curCalendarId = calendarId;
         curDate = when;
         if ($templateView === null) {
             $templateView = $('#Week_template .Week_container').clone();
@@ -97,7 +99,7 @@ return function(options) {
         var defer = $.Deferred();
         var $loading = $('#Week_template .Week_loading').clone(); // put throbber
         $templateView.hide().after($loading);
-        userOpts.events.loadWeek(DateCalc.sundayOfWeek(curDate)).done(function() {
+        userOpts.events.loadWeek(curCalendarId, DateCalc.sundayOfWeek(curDate)).done(function() {
             $loading.remove();
             _RenderCells();
             $templateView.show();
@@ -159,7 +161,7 @@ return function(options) {
             }
 
             // Events of the week day.
-            var events = userOpts.events.inDay(runDate);
+            var events = userOpts.events.inDay(curCalendarId, runDate);
             var cyHour = $templateView.find('.Week_eachHour:first').outerHeight();
             for (var e = 0; e < events.length; ++e) {
                 var $ev = $('#Week_template .Week_event').clone();

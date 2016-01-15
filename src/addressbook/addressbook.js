@@ -71,12 +71,12 @@ App.Ready(function() {
         });
 
         Cache.simpleMenu
-        .addOption('Catálogo Corporativo', function () {
+        .addOption('Catálogo Corporativo', 'corporate', function () {
             Cache.layout.setLeftMenuVisibleOnPhone(false)
             .done(function() {
                 Cache.widgetContactList.changeToCorporateCatalog();
             });
-        }).addOption('Catálogo Pessoal', function () {
+        }).addOption('Catálogo Pessoal', 'personal', function () {
             Cache.layout.setLeftMenuVisibleOnPhone(false)
             .done(function() {
                 Cache.widgetContactList.changeToPersonalCatalog();
@@ -104,7 +104,7 @@ App.Ready(function() {
             Cache.widgetContactList.load(),
             Cache.layout.load()
         ).done(function() {
-            Cache.widgetContactList.changeToCorporateCatalog();
+            Cache.simpleMenu.selectFirstOption();
         });
     })();
 }); // App.Ready

@@ -24,6 +24,7 @@ return function(options) {
     var THIS             = this;
     var $templateView    = null; // jQuery object with our HTML template
     var curDate          = DateCalc.today(); // month currently displayed
+    var curCalendarId    = '';   // ID of calendar currently displayed
     var onMonthChangedCB = null; // user callbacks
     var onEventClickedCB = null;
 
@@ -40,7 +41,8 @@ return function(options) {
         return THIS;
     };
 
-    THIS.show = function(when) {
+    THIS.show = function(calendarId, when) {
+        curCalendarId = calendarId;
         curDate = when;
         if ($templateView === null) {
             $templateView = $('#Month_template .Month_container').clone();
@@ -52,6 +54,11 @@ return function(options) {
 
     THIS.getCurDate = function() {
         return curDate;
+    };
+
+    THIS.clearDaySelected = function() {
+        $templateView.find('.Month_daySelected').removeClass('Month_daySelected');
+        return THIS;
     };
 
     THIS.onMonthChanged = function(callback) {
@@ -87,13 +94,19 @@ return function(options) {
 
         $templateView.on('click', '.Month_event', function() {
             if (onEventClickedCB !== null && !App.IsPhone()) { // single event click works only on desktop
-                onEventClickedCB($(this).parents('.Month_day').data('events')); // invoke user callback
+                THIS.clearDaySelected();
+                var $day = $(this).parents('.Month_day');
+                $day.addClass('Month_daySelected');
+                onEventClickedCB($day.data('events')); // invoke user callback
             }
         });
 
         $templateView.on('click', '.Month_day', function() {
             if (onEventClickedCB !== null && App.IsPhone()) { // whole day click works only on phones
-                onEventClickedCB($(this).data('events')); // invoke user callback
+                THIS.clearDaySelected();
+                var $day = $(this);
+                $day.addClass('Month_daySelected');
+                onEventClickedCB($day.data('events')); // invoke user callback
             }
         });
     }
@@ -102,9 +115,10 @@ return function(options) {
         var defer = $.Deferred();
         var $loading = $('#Month_template .Month_loading').clone();
         $templateView.hide().after($loading);
-        userOpts.events.loadMonth(DateCalc.firstOfMonth(curDate)).done(function() {
-            _RenderCells();
+        userOpts.events.loadMonth(curCalendarId, DateCalc.firstOfMonth(curDate)).always(function() {
             $loading.remove();
+        }).done(function() {
+            _RenderCells();
             $templateView.fadeIn(userOpts.animationTime, function() {
                 defer.resolve();
             });
@@ -143,11 +157,13 @@ return function(options) {
     }
 
     function _FillEvents(when, $day) {
-        var events = userOpts.events.inDay(when);
+        var events = userOpts.events.inDay(curCalendarId, when);
         for (var i = 0; i < events.length; ++i) {
             var $box = $('#Month_template .Month_event').clone();
             $box.css('color', events[i].color);
-            $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(events[i].from));
+            if (!events[i].wholeDay) {
+                $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(events[i].from));
+            }
             $box.find('.Month_eventName').text(events[i].summary);
             if (events[i].confirmation === 'DECLINED') {
                 $box.addClass('Month_eventDeclined');

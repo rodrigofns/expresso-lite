@@ -43,7 +43,7 @@ $(document).ready(function() {
             DebugWidgets.widgetTineCookies.Load(),
             DebugWidgets.widgetComponentTest.Load()
        ).done(function() {
-           selectDebugWidget(DebugWidgets.widgetTineCookies);
+           Cache.simpleMenu.selectFirstOption();
         });
     })();
 
@@ -73,9 +73,9 @@ $(document).ready(function() {
         });
 
         Cache.simpleMenu
-        .addOption('Tine Cookies', function() {
+        .addOption('Tine Cookies', 'tine_cookies', function() {
             selectDebugWidget(DebugWidgets.widgetTineCookies);
-        }).addOption('Widget Test', function() {
+        }).addOption('Widget Test', 'widget_test', function() {
             selectDebugWidget(DebugWidgets.widgetComponentTest);
         });
 
