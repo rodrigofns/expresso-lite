@@ -25,8 +25,8 @@ return function(options) {
     var $templateView    = null; // jQuery object with our HTML template
     var curDate          = DateCalc.today(); // week currently displayed
     var curCalendarId    = '';   // ID of calendar currently displayed
-    var onWeekChangeCB   = null; // user callbacks
-    var onEventClickedCB = null;
+    var onWeekChangedCB  = $.noop; // user callbacks
+    var onEventClickedCB = $.noop;
 
     THIS.load = function() {
         return $('#Week_template').length ? // load once
@@ -72,9 +72,7 @@ return function(options) {
             $(this).blur();
             curDate = DateCalc.prevWeek(DateCalc.sundayOfWeek(curDate));
             _LoadEventsOfCurWeek().done(function() {
-                if (onWeekChangedCB !== null) {
-                    onWeekChangedCB(); // invoke user callback
-                }
+                onWeekChangedCB(); // invoke user callback
             });
         });
 
@@ -82,17 +80,13 @@ return function(options) {
             $(this).blur();
             curDate = DateCalc.nextWeek(DateCalc.sundayOfWeek(curDate));
             _LoadEventsOfCurWeek().done(function() {
-                if (onWeekChangedCB !== null) {
-                    onWeekChangedCB(); // invoke user callback
-                }
+                onWeekChangedCB(); // invoke user callback
             });
         });
 
         $templateView.on('click', '.Week_event', function() {
-            if (onEventClickedCB !== null) {
-                var objEv = $(this).data('event');
-                onEventClickedCB([ objEv ], objEv); // invoke user callback
-            }
+            var objEv = $(this).data('event');
+            onEventClickedCB([ objEv ], objEv); // invoke user callback
         });
     }
 

@@ -30,7 +30,7 @@ return function(options) {
     var THIS               = this;
     var contextMenu        = null; // ContextMenu object
     var onKeepAliveCB      = null; // user callbacks
-    var onHideRightPanelCB = null;
+    var onHideRightPanelCB = $.noop;
     var onSearchCB         = null;
 
     THIS.load = function() {
@@ -76,9 +76,7 @@ return function(options) {
             $('#Layout_logo3Lines').css('display', '');
             $('#Layout_arrowLeft').css('display', 'none');
             UrlStack.pop('#fullContent');
-            if (onHideRightPanelCB !== null) {
-                onHideRightPanelCB(); // invoke user callback
-            }
+            onHideRightPanelCB(); // invoke user callback
         }
 
         return THIS;

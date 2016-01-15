@@ -26,10 +26,10 @@ return function(options) {
     var $targetDiv      = userOpts.$elem; // shorthand
     var curFolder       = null; // folder object currently loaded
     var menu            = null; // context menu object
-    var onClickCB       = null; // user callbacks
-    var onCheckCB       = null;
-    var onMarkReadCB    = null;
-    var onMoveCB        = null;
+    var onClickCB       = $.noop; // user callbacks
+    var onCheckCB       = $.noop;
+    var onMarkReadCB    = $.noop;
+    var onMoveCB        = $.noop;
     var $prevClick      = null; // used in checkbox click event, modified by buildContextMenu()
     var lastCheckWith   = null; // 'leftClick' || 'rightClick', used in buildContextMenu()
 
@@ -278,9 +278,7 @@ return function(options) {
             .always(function() {
                 $checkedDivs.find('.throbber').replaceWith($check); // restore checkbox
                 THIS.clearChecked();
-                if (onMarkReadCB !== null) {
-                    onMarkReadCB(curFolder);
-                }
+                onMarkReadCB(curFolder);
             }).fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -336,9 +334,7 @@ return function(options) {
             }
             $checkedDivs.slideUp(200).promise('fx').done(function() {
                 $checkedDivs.remove();
-                if (onMoveCB !== null) {
-                    onMoveCB(destFolder);
-                }
+                onMoveCB(destFolder);
             });
         });
         return THIS;
@@ -418,9 +414,7 @@ return function(options) {
                 }
                 $checkedDivs.slideUp(200).promise('fx').done(function() {
                     $checkedDivs.remove();
-                    if (onMoveCB !== null) {
-                        onMoveCB(null);
-                    }
+                    onMoveCB(null);
                 });
             });
         }
@@ -609,9 +603,7 @@ return function(options) {
         if ($cur.length) {
             $cur.addClass('Headlines_entryChecked');
             $cur.find('.icoCheck0').removeClass('icoCheck0').addClass('icoCheck1');
-            if (onCheckCB !== null) {
-                onCheckCB(); // invoke user callback
-            }
+            onCheckCB(); // invoke user callback
         }
         return THIS;
     };
@@ -620,9 +612,7 @@ return function(options) {
         var $checkeds = $targetDiv.find('.Headlines_entryChecked');
         $checkeds.removeClass('Headlines_entryChecked');
         $checkeds.find('.icoCheck1').removeClass('icoCheck1').addClass('icoCheck0');
-        if (onCheckCB !== null) {
-            onCheckCB(); // invoke user callback
-        }
+        onCheckCB(); // invoke user callback
         return THIS;
     };
 
@@ -710,16 +700,12 @@ return function(options) {
             if (curFolder.globalName === 'INBOX/Drafts') {
                 var headline = thread[0]; // drafts are not supposed to be threaded, so message is always 1st
                 _FetchDraftMessage($div, headline, function() { // get content and remove div from list
-                    if (onClickCB !== null) {
-                        onClickCB([ headline ]); // create a new thread, because the original is destroyed
-                    }
+                    onClickCB([ headline ]); // create a new thread, because the original is destroyed
                 });
             } else {
                 $targetDiv.find('.Headlines_entryCurrent').removeClass('Headlines_entryCurrent');
                 $div.addClass('Headlines_entryCurrent');
-                if (onClickCB !== null) {
-                    onClickCB(thread);
-                }
+                onClickCB(thread);
             }
         }
         return false;
@@ -758,9 +744,7 @@ return function(options) {
         }
 
         $prevClick = $divClicked; // keep
-        if (onCheckCB !== null) {
-            onCheckCB(); // invoke user callback
-        }
+        onCheckCB(); // invoke user callback
     });
 };
 });

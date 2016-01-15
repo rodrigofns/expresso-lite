@@ -25,8 +25,8 @@ return function(options) {
     var $templateView    = null; // jQuery object with our HTML template
     var curDate          = DateCalc.today(); // month currently displayed
     var curCalendarId    = '';   // ID of calendar currently displayed
-    var onMonthChangedCB = null; // user callbacks
-    var onEventClickedCB = null;
+    var onMonthChangedCB = $.noop; // user callbacks
+    var onEventClickedCB = $.noop;
 
     THIS.load = function() {
         return $('#Month_template').length ? // load once
@@ -76,9 +76,7 @@ return function(options) {
             $(this).blur();
             curDate = DateCalc.prevMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
-                if (onMonthChangedCB !== null) {
-                    onMonthChangedCB(); // invoke user callback
-                }
+                onMonthChangedCB(); // invoke user callback
             });
         });
 
@@ -86,14 +84,12 @@ return function(options) {
             $(this).blur();
             curDate = DateCalc.nextMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
-                if (onMonthChangedCB !== null) {
-                    onMonthChangedCB(); // invoke user callback
-                }
+                onMonthChangedCB(); // invoke user callback
             });
         });
 
         $templateView.on('click', '.Month_event', function() {
-            if (onEventClickedCB !== null && !App.IsPhone()) { // single event click works only on desktop
+            if (!App.IsPhone()) { // single event click works only on desktop
                 THIS.clearDaySelected();
                 var $ev = $(this);
                 var $day = $ev.parents('.Month_day');
@@ -103,7 +99,7 @@ return function(options) {
         });
 
         $templateView.on('click', '.Month_day', function() {
-            if (onEventClickedCB !== null && App.IsPhone()) { // whole day click works only on phones
+            if (App.IsPhone()) { // whole day click works only on phones
                 THIS.clearDaySelected();
                 var $day = $(this);
                 $day.addClass('Month_daySelected');
