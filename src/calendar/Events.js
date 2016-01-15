@@ -111,6 +111,13 @@ return function() {
                 }
             }
         }
+        events.sort(function(a, b) { // non-echo first
+            if (a.isEcho !== b.isEcho) {
+                return a.isEcho ? 1 : -1;
+            } else {
+                return a.from.getDate() - b.from.getDate();
+            }
+        });
         return events;
     };
 
@@ -187,6 +194,7 @@ return function() {
             var weekHash = _HashFromDate(sunday);
             if (!_EventAlreadyAddedToWeek(calendarId, weekHash, rawEvents[i])) {
                 cache[calendarId][weekHash].push(rawEvents[i]);
+                _ExplodeEventMoreThanOneDay(calendarId, rawEvents[i]);
             }
         }
     }
@@ -234,6 +242,26 @@ return function() {
             }
         }
         return false;
+    }
+
+    function _ExplodeEventMoreThanOneDay(calendarId, event) {
+        // If an event spans over more than one single day, other "echo"
+        // events will be created on each of these days.
+        event.isEcho = false;
+        if (event.from.getDate() !== event.until.getDate()) { // event spans over more than 1 day?
+            var nextDay = new Date(event.from);
+            do {
+                nextDay.setDate(nextDay.getDate() + 1); // advance to next day
+                var echo = { // create a new echo event object, which is a cheap object
+                    isEcho: true,
+                    from: new Date(nextDay),
+                    origEvent: event
+                };
+                var sunday = DateCalc.sundayOfWeek(nextDay);
+                _ReserveCache(calendarId, sunday, sunday);
+                cache[calendarId][_HashFromDate(sunday)].push(echo);
+            } while (nextDay.getDate() !== event.until.getDate());
+        }
     }
 };
 });

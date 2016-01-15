@@ -63,7 +63,7 @@ return function(options) {
     };
 
     THIS.onEventClicked = function(callback) {
-        onEventClickedCB = callback; // onEventClicked(events)
+        onEventClickedCB = callback; // onEventClicked(eventsOfDay, clickedEvent)
         return THIS;
     };
 
@@ -90,7 +90,8 @@ return function(options) {
 
         $templateView.on('click', '.Week_event', function() {
             if (onEventClickedCB !== null) {
-                onEventClickedCB([ $(this).data('event') ]); // invoke user callback
+                var objEv = $(this).data('event');
+                onEventClickedCB([ objEv ], objEv); // invoke user callback
             }
         });
     }

@@ -56,7 +56,8 @@
 
 .Month_daySelected { background-color:#EEF5FF; }
 
-.Month_event { display:inline-block; margin-bottom:2px; white-space:nowrap; cursor:pointer; }
+.Month_event { display:inline-block; width:100%; margin-bottom:2px;
+    white-space:nowrap; cursor:pointer; }
 @media (max-width:1024px) { /* mobile */
     .Month_eventHour { display:none; }
     .Month_eventName { }
@@ -66,5 +67,8 @@
     .Month_eventName { }
 }
 .Month_eventDeclined { text-decoration:line-through; }
+.Month_eventEcho { opacity:.3; }
+.Month_eventEchoLastDay { font-style:italic; }
+.Month_eventHover { background-color:#0061AA; color:white !important; }
 
 .Month_loading { text-align:center; margin:10px; color:#888; font-style:italic; }

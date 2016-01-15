@@ -67,7 +67,7 @@ return function(options) {
     };
 
     THIS.onEventClicked = function(callback) {
-        onEventClickedCB = callback; // onEventClicked(events)
+        onEventClickedCB = callback; // onEventClicked(eventsOfDay, clickedEvent)
         return THIS;
     };
 
@@ -95,9 +95,10 @@ return function(options) {
         $templateView.on('click', '.Month_event', function() {
             if (onEventClickedCB !== null && !App.IsPhone()) { // single event click works only on desktop
                 THIS.clearDaySelected();
-                var $day = $(this).parents('.Month_day');
+                var $ev = $(this);
+                var $day = $ev.parents('.Month_day');
                 $day.addClass('Month_daySelected');
-                onEventClickedCB($day.data('events')); // invoke user callback
+                onEventClickedCB($day.data('events'), $ev.data('event')); // invoke user callback
             }
         });
 
@@ -108,6 +109,18 @@ return function(options) {
                 $day.addClass('Month_daySelected');
                 onEventClickedCB($day.data('events')); // invoke user callback
             }
+        });
+
+        $templateView.on('mouseover', '.Month_event', function() {
+            var objEv = $(this).data('event');
+            var id = objEv.isEcho ? objEv.origEvent.id : objEv.id;
+            $templateView.find('.Month_event_'+id).addClass('Month_eventHover');
+        });
+
+        $templateView.on('mouseout', '.Month_event', function() {
+            var objEv = $(this).data('event');
+            var id = objEv.isEcho ? objEv.origEvent.id : objEv.id;
+            $templateView.find('.Month_event_'+id).removeClass('Month_eventHover');
         });
     }
 
@@ -160,16 +173,23 @@ return function(options) {
         var events = userOpts.events.inDay(curCalendarId, when);
         for (var i = 0; i < events.length; ++i) {
             var $box = $('#Month_template .Month_event').clone();
-            $box.css('color', events[i].color);
-            if (!events[i].wholeDay) {
-                $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(events[i].from));
+            if (events[i].isEcho) {
+                $box.addClass('Month_eventEcho');
+                if (DateCalc.isSameDay(events[i].origEvent.until, when)) {
+                    $box.addClass('Month_eventEchoLastDay');
+                }
             }
-            $box.find('.Month_eventName').text(events[i].summary);
-            if (events[i].confirmation === 'DECLINED') {
+            var objEv = events[i].isEcho ? events[i].origEvent : events[i];
+            $box.addClass('Month_event_'+objEv.id); // class name with ID to speed up mouseover
+            $box.css('color', objEv.color);
+            if (!objEv.wholeDay) {
+                $box.find('.Month_eventHour').text(DateCalc.makeHourMinuteStr(objEv.from));
+            }
+            $box.find('.Month_eventName').text(objEv.summary);
+            if (objEv.confirmation === 'DECLINED') {
                 $box.addClass('Month_eventDeclined');
             }
-            $box.attr('title', events[i].summary);
-            $box.data('event', events[i]);
+            $box.data('event', objEv);
             $day.find('.Month_dayContent').append($box);
         }
         $day.data('events', events); // store events array for this day

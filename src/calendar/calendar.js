@@ -189,8 +189,8 @@ function RefreshEvents() {
     }
 }
 
-function EventClicked(eventsOfDay) {
+function EventClicked(eventsOfDay, eventClicked) {
     Cache.layout.setRightPanelVisible(true);
-    Cache.viewEvents.render(eventsOfDay);
+    Cache.viewEvents.render(eventsOfDay, eventClicked);
 }
 });
