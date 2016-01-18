@@ -14,6 +14,7 @@ define(['jquery',
 function($, Cordova) {
     var isUnloadingPage = false;
     var App = {};
+    var ajaxUrl = null; // to be cached on first GetAjaxUrl() call
 
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
@@ -71,10 +72,16 @@ function($, Cordova) {
     };
 
     App.GetAjaxUrl = function() {
-        var backendUrl = Cordova.isEnabled() ?
+        if (ajaxUrl === null) {
+            ajaxUrl = Cordova.isEnabled() ?
                 Cordova.getLiteBackendUrl() :
                 require.toUrl('.'); // follows require.config() baseUrl
-        return backendUrl + '/api/ajax.php';
+            if (ajaxUrl.charAt(ajaxUrl.length - 1) !== '/') {
+                ajaxUrl += '/';
+            }
+            ajaxUrl += 'api/ajax.php';
+        }
+        return ajaxUrl;
     }
 
     App.Post = function(requestName, params) {
