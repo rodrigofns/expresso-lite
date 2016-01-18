@@ -167,7 +167,8 @@ return function(options) {
                 $ev.css({
                     top: (y * cyHour)+'px',
                     height: (cy * cyHour)+'px',
-                    'background-color': events[e].color
+                    'background-color': events[e].color,
+                    'margin-left': (e * 20)+'px' // overlayed events will be placed slightly left
                 });
                 $ev.data('event', events[e]);
                 $day.append($ev);
