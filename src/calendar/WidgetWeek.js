@@ -167,7 +167,8 @@ return function(options) {
                 $ev.css({
                     top: (y * cyHour)+'px',
                     height: (cy * cyHour)+'px',
-                    'background-color': events[e].color
+                    'background-color': events[e].color,
+                    'margin-left': (_CalcOverlayMargin(events, e) * 20)+'px' // overlayed events will be placed slightly left
                 });
                 $ev.data('event', events[e]);
                 $day.append($ev);
@@ -177,6 +178,18 @@ return function(options) {
             runDate.setDate(runDate.getDate() + 1);
             $divgridHours.append($day);
         }
+    }
+
+    function _CalcOverlayMargin(events, index) {
+        return (function calcMargin(cur, prev) {
+            if (prev < 0) return 0;
+            var ev1 = events[prev],
+                ev2 = events[cur];
+            var overlayed = (ev2.from >= ev1.from && ev2.from <= ev1.until) ||
+                (ev2.until >= ev1.from && ev2.until <= ev1.until);
+            return (overlayed ? 1 : 0) +
+                calcMargin(cur, prev - 1); // beautifully recursive
+        })(index, index - 1);
     }
 };
 });
