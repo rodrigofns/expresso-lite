@@ -157,25 +157,54 @@ return function(options) {
 
             // Events of the week day.
             var events = userOpts.events.inDay(curCalendarId, runDate);
+            _CalcOverlay(events);
             var cyHour = $templateView.find('.Week_eachHour:first').outerHeight();
+
             for (var e = 0; e < events.length; ++e) {
                 var $ev = $('#Week_template .Week_event').clone();
                 $ev.text(events[e].summary);
                 $ev.attr('title', events[e].summary);
+                var cx = (100 / 7) / (events[e].overlay.shares + 1); // percent
                 var y = events[e].from.getHours() + events[e].from.getMinutes() / 60;
                 var cy = DateCalc.hourDiff(events[e].until, events[e].from);
                 $ev.css({
                     top: (y * cyHour)+'px',
                     height: (cy * cyHour)+'px',
-                    'background-color': events[e].color
+                    'background-color': events[e].color,
+                    'margin-left': events[e].overlay.ident ? (cx * events[e].overlay.ident)+'%' : 0,
+                    width: cx+'%'
                 });
+                delete events[e].overlay; // remove overlay info from event
                 $ev.data('event', events[e]);
                 $day.append($ev);
             }
 
-            /// Advance to tomorrow.
+            // Advance to tomorrow.
             runDate.setDate(runDate.getDate() + 1);
             $divgridHours.append($day);
+        }
+    }
+
+    function _CalcOverlay(events) {
+        for (var i = 0; i < events.length; ++i) { // add overlay info to each weekday event
+            events[i].overlay = {
+                shares: 0, // how many events sharing the same vertical pos
+                ident: 0 // left-identation of cell
+            };
+        }
+
+        for (var i = 0; i < events.length - 1; ++i) {
+            var ev1 = events[i];
+            for (var j = i + 1; j < events.length; ++j) {
+                var ev2 = events[j];
+                var overlayed = (ev2.from >= ev1.from && ev2.from <= ev1.until) ||
+                    (ev2.until >= ev1.from && ev2.until <= ev1.until);
+                if (overlayed) {
+                    ++ev1.overlay.shares;
+                    ++ev2.overlay.shares;
+                    ++ev2.overlay.ident;
+                }
+            }
         }
     }
 };
