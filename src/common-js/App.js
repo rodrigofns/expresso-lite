@@ -47,21 +47,6 @@ function($, Cordova) {
         }
     }
 
-    function _CheckUserInfoAvailability() {
-        var defer = $.Deferred();
-        if (App.GetUserInfo('mailAddress') === null) { // can happen when storage expires and session is still valid
-            App.Post('GetUserInfo').done(function(response) {
-                for (var i in response) {
-                    App.SetUserInfo(i, response[i]);
-                }
-                defer.resolve();
-            });
-        } else {
-            defer.resolve();
-        }
-        return defer.promise();
-    }
-
     (function _Constructor() {
         $.ajaxSetup({ // iOS devices may cache POST requests, so make no-cache explicit
             type: 'POST',
@@ -195,18 +180,16 @@ function($, Cordova) {
     };
 
     App.Ready = function(callback) {
-        _CheckUserInfoAvailability().done(function() {
-            if (Cordova.isEnabled()) {
-                $(document).ready(function() {
-                    document.addEventListener('deviceready', function() {
-                        Cordova.RegisterCordovaListeners();
-                        callback();
-                    }, false);
-                });
-            } else {
-                $(document).ready(callback);
-            }
-        });
+        if (Cordova.isEnabled()) {
+            $(document).ready(function() {
+                document.addEventListener('deviceready', function() {
+                    Cordova.RegisterCordovaListeners();
+                    callback();
+                }, false);
+            });
+        } else {
+            $(document).ready(callback);
+        }
     };
 
     App.GoToFolder = function(folderName) {
