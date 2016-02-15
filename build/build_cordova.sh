@@ -110,7 +110,7 @@ CORDOVA_APP_NAME=ExpressoBr
 
 
 
-#Delete the cordova app dir to force its regenaration, it that is the case
+#Delete the cordova app dir to force its regenaration, if that is the case
 if [ "$MODE" = "$REGENERATE" ]
 then
   echo "Cleaning $CORDOVA_APP_DIR to regenerate project from scratch"
@@ -131,6 +131,8 @@ then
   echo "Adding Android platform"
   cd $CORDOVA_APP_DIR
   cordova platform add android
+  echo "Adding AccountManager plugin"
+  cordova plugin add https://github.com/polychrom/cordova-android-accountmanager.git
 fi
 
 
@@ -155,7 +157,7 @@ done
 
 #Overwrite what needs to be overwritten in the cordova project
 echo "Overwriting cordova project specific files..."
-cp -rf $CORDOVA_MAIN_DIR/cordova-build-src/* $CORDOVA_APP_DIR/www
+cp -rf $CORDOVA_MAIN_DIR/cordova-build-src/* $CORDOVA_APP_DIR
 
 
 #All done, let's call cordova to do what the user asked for

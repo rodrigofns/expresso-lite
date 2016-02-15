@@ -88,7 +88,7 @@ function($, Cordova) {
 
     App.GetAjaxUrl = function() {
         if (ajaxUrl === null) {
-            ajaxUrl = Cordova.isEnabled() ?
+            ajaxUrl = Cordova ?
                 Cordova.getLiteBackendUrl() :
                 require.toUrl('.'); // follows require.config() baseUrl
             if (ajaxUrl.charAt(ajaxUrl.length - 1) !== '/') {
@@ -181,13 +181,13 @@ function($, Cordova) {
 
     App.ReturnToLoginScreen = function() {
         var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar|\/debugger)\b/gi, ''); //removes /module from the URL address
+        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar|\/debugger)(\/index.html)?\b/gi, ''); //removes /module from the URL address
 
         if (destHref.slice(-1) != '/') { //checks last char
             destHref += '/';
         }
 
-        if (Cordova.isEnabled()) {
+        if (Cordova) {
             destHref += 'index.html';
         }
 
@@ -196,7 +196,7 @@ function($, Cordova) {
 
     App.Ready = function(callback) {
         _CheckUserInfoAvailability().done(function() {
-            if (Cordova.isEnabled()) {
+            if (Cordova) {
                 $(document).ready(function() {
                     document.addEventListener('deviceready', function() {
                         Cordova.RegisterCordovaListeners();
@@ -210,7 +210,7 @@ function($, Cordova) {
     };
 
     App.GoToFolder = function(folderName) {
-        document.location.href = folderName + (Cordova.isEnabled() ? '/index.html' : '/');
+        document.location.href = folderName + (Cordova ? '/index.html' : '/');
     };
 
     return App;

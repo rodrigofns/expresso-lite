@@ -20,51 +20,57 @@
     <script src="cordova.js"></script>
     <script src="common-js/require.min.js" data-main="login.js"></script>
 </head>
-<body class="hidden">
-    <div id="universalAccess">
-        <a href="accessible/" accesskey="a" title="Fazer login no módulo Acessibilidade">Acesso universal</a>
-    </div>
-    <div id="topgray"></div>
-    <div id="thebg"></div>
-    <div id="credent">
-        <img id="logo-top" src="img/logo-expressobr-top.png"/>
-        <form id="frmLogin">
-            <div><input type="email" id="user" placeholder="usuário"/></div>
-            <div><input type="password" id="pwd" placeholder="senha"/></div>
-            <div><input type="submit" id="btnLogin" value="login"/></div>
-            <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
-        </form>
-        <div id="unsupportedMsg" class="hidden">Os browsers mínimos suportados são:<br/>
-            Firefox 24, Chrome 25 e Safari 7.<br/>
-            Utilize o webmail padrão do Expresso em:<br/>
-            <a href="http://expressobr.serpro.gov.br">http://expressobr.serpro.gov.br</a>
+<body>
+    <div id="main-screen" class="hidden">
+        <div id="universalAccess">
+            <a href="accessible/" accesskey="a" title="Fazer login no módulo Acessibilidade">Acesso universal</a>
         </div>
-    </div>
-    <section id="templates">
-        <form id="frmChangePwd">
-            <input type="password" id="cpOldPwd" placeholder="senha antiga"/>
-            <input type="password" id="cpNewPwd" placeholder="nova senha"/>
-            <input type="password" id="cpNewPwd2" placeholder="repetir nova senha"/>
-            <input type="submit" id="btnNewPwd" value="trocar"/>
-            <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
-        </form>
-        <div id="captchaDiv">
-            <input type="text" id="captcha" placeholder="captcha"/>
-            <img id="captchaImg" src="" />
+        <div id="topgray"></div>
+        <div id="thebg"></div>
+        <div id="credent">
+            <img id="logo-top" src="img/logo-expressobr-top.png"/>
+            <form id="frmLogin">
+                <div><input type="email" id="user" placeholder="usuário"/></div>
+                <div><input type="password" id="pwd" placeholder="senha"/></div>
+                <div><input type="submit" id="btnLogin" value="login"/></div>
+                <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
+            </form>
+            <div id="unsupportedMsg" class="hidden">Os browsers mínimos suportados são:<br/>
+                Firefox 24, Chrome 25 e Safari 7.<br/>
+                Utilize o webmail padrão do Expresso em:<br/>
+                <a href="http://expressobr.serpro.gov.br">http://expressobr.serpro.gov.br</a>
+            </div>
         </div>
-    </section>
-    <div id="externalLinks" class="hidden">
-        <a id="androidBadge" href="" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
-        <!-- Google Play é uma marca registrada da Google Inc. -->
+        <section id="templates">
+            <form id="frmChangePwd">
+                <input type="password" id="cpOldPwd" placeholder="senha antiga"/>
+                <input type="password" id="cpNewPwd" placeholder="nova senha"/>
+                <input type="password" id="cpNewPwd2" placeholder="repetir nova senha"/>
+                <input type="submit" id="btnNewPwd" value="trocar"/>
+                <div class="throbber"><span></span> &nbsp; <img src="img/chromiumthrobber.svg"/></div>
+            </form>
+            <div id="captchaDiv">
+                <input type="text" id="captcha" placeholder="captcha"/>
+                <img id="captchaImg" src="" />
+            </div>
+            <div id="splash-screen">
+                <img src="img/logo-expressobr-top.png"/><br><br>
+                <div id="splash-text"><img src="img/chromiumthrobber.svg"/></div>
+            </div>
+        </section>
+        <div id="externalLinks" class="hidden">
+            <a id="androidBadge" href="" title="Baixe na Google Play™"><img src="img/store-play.png"/></a>
+            <!-- Google Play é uma marca registrada da Google Inc. -->
 
-        <a id="iosBadge" href="" title="Baixe na Apple Store™"><img src="img/store-apple.png"/></a>
-        <!-- Apple Store é uma marca registrada da Apple Inc. -->
+            <a id="iosBadge" href="" title="Baixe na Apple Store™"><img src="img/store-apple.png"/></a>
+            <!-- Apple Store é uma marca registrada da Apple Inc. -->
 
-        <br/>
-        <a id="classicHref" href="">Ir para a versão clássica do Expresso</a>
-    </div>
-    <div id="versionInfo" class="hidden">
-        Informações da Versão<br />
+            <br/>
+            <a id="classicHref" href="">Ir para a versão clássica do Expresso</a>
+        </div>
+        <div id="versionInfo" class="hidden">
+            Informações da Versão<br />
+        </div>
     </div>
 </body>
 </html>

@@ -12,9 +12,10 @@
 define(['jquery',
     'common-js/App',
     'common-js/UrlStack',
-    'common-js/ContextMenu'
+    'common-js/ContextMenu',
+    'common-js/Cordova'
 ],
-function($, App, UrlStack, ContextMenu) {
+function($, App, UrlStack, ContextMenu, Cordova) {
 App.LoadCss('common-js/Layout.css');
 return function(options) {
     var userOpts = $.extend({
@@ -184,21 +185,36 @@ return function(options) {
         $('#Layout_logoff').on('click', function(ev) { // logoff the whole application
             ev.stopImmediatePropagation();
             $('#Layout_logoffScreen').show();
-            App.Post('logoff')
-            .done(function(data) {
-                $('body').css('overflow', 'hidden');
-                $('#Layout_logoffText').animate({ top:$(window).height() / 4 }, 200, function() {
-                    $('#Layout_logoffText').animate({ top:$(window).height() }, 300, function() {
-                        App.ReturnToLoginScreen();
+
+            function DoLogoff() {
+                App.Post('logoff')
+                .done(function(data) {
+                    $('body').css('overflow', 'hidden');
+                    $('#Layout_logoffText').animate({ top:$(window).height() / 4 }, 200, function() {
+                        $('#Layout_logoffText').animate({ top:$(window).height() }, 300, function() {
+                            App.ReturnToLoginScreen();
+                        });
                     });
+                }).fail(function(error) {
+                    console.error('Logout error: ' + error.responseText);
+                    location.href = '.';
+                    // server side processing will usually invalidate the current
+                    // session even if it throws an error. So, it's reasonably
+                    // safe to fail silently and go back to the login screen
                 });
-            }).fail(function(error) {
-                console.error('Logout error: ' + error.responseText);
-                location.href = '.';
-                // server side processing will usually invalidate the current
-                // session even if it throws an error. So, it's reasonably
-                // safe to fail silently and go back to the login screen
-            });
+            }
+
+            if (Cordova) {
+                Cordova.ClearAllCredentials()
+                .fail(function() {
+                    // This should never happen, but in case something
+                    // goes wrong, at least we'll have a message to investigate
+                    console.log('Could not clear user credentials');
+                })
+                .always(DoLogoff);
+            } else {
+                DoLogoff();
+            }
         });
 
         $('#Layout_modules li,#Layout_modules a').on('click', function(ev) { // click on a module

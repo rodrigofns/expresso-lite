@@ -13,27 +13,38 @@ require.config({
 });
 
 require(['jquery',
-    'common-js/App'
+    'common-js/App',
+    'common-js/Cordova'
 ],
-function($, App) {
+function($, App, Cordova) {
     App.Ready(function() {
-        var isBrowserValid = ValidateBrowser([
-            { name:'Firefox', version:24 },
-            { name:'Chrome', version:25 },
-            { name:'Safari', version:7 }
-        ]);
-        if (!isBrowserValid) {
-            $('body,#unsupportedMsg').show();
-            $('#frmLogin').hide();
-            return false; // won't load anything else
+        if (Cordova) {
+            $('#splash-screen').appendTo($('body'));
+        } else {
+            var isBrowserValid = ValidateBrowser([
+                { name:'Firefox', version:24 },
+                { name:'Chrome', version:25 },
+                { name:'Safari', version:7 }
+            ]);
+
+            if (!isBrowserValid) {
+                $('#main-screen,#unsupportedMsg').show();
+                $('#frmLogin').hide();
+                return false; // won't load anything else
+            }
         }
 
         App.Post('checkSessionStatus')
         .done(function(response) {
-            if (response.status !== 'active') {
-                Init(); // no active session, do normal initialization
-            } else {
+            if (response.status == 'active') {
                 App.GoToFolder('./mail'); // there is an active session, go to mail module
+            } else if (Cordova) {
+                // no active session, but since we have Cordova
+                // we may have the credentials to start a new session
+                DoCordovaInit();
+            } else {
+                // no active session and no Cordova, proceed with usual init
+                Init();
             }
         }).fail(function(error) {
             window.alert('Ocorreu um erro ao realizar a conexão com o Expresso.\n'+
@@ -41,21 +52,75 @@ function($, App) {
         });
     });
 
+    function DoCordovaInit() {
+        Cordova.GetCurrentAccount()
+        .done(function(account) {
+            if (account == null) {
+                Init(); //no credential found, proceed with usual init
+            } else {
+                function CordovaLoginFailed() {
+                    window.alert('Não foi possível se reconectar ao Expresso com as credencias armazenadas.\n' +
+                        'É necessário realizar o login novamente.');
+                    Init();
+                }
+
+                // Use the credential to perform a new login.
+                // This will be transparent to the user,
+                // since no fields are yet being displayed on screen
+                App.Post('login', {
+                    user: account.login,
+                    pwd: account.password
+                })
+                .fail(CordovaLoginFailed)
+                .done(function(response) {
+                    if (!response.success) {
+                        CordovaLoginFailed();
+                    } else {
+                        //since the only visible thing right now is the splash screen,
+                        //just go straight to the mail module, without any fancy animations
+                        App.GoToFolder('./mail');
+                    }
+                });
+            }
+        })
+        .fail(function (error) {
+            // This should not happen, but in case something goes wrong,
+            // at least we'll have some information to work on
+            console.log('Cordova.GetCurrentAccount failed: ' + error);
+            Init();
+        });
+    }
+
+
     function Init() {
-        var user = App.GetCookie('user');
-        if (user !== null) {
-            $('#user').val(user);
+        function ShowScreen() {
+            $('#main-screen').fadeIn(300, function() {
+                $('#splash-screen').hide();
+                LoadServerStatus(); // async
+                $('#user').focus();
+                $('#frmLogin').submit(DoLogin);
+                $('#frmChangePwd').submit(DoChangePassword);
+            });
         }
 
-        if (location.href.indexOf('#') !== -1)
-            history.pushState('', '', location.pathname);
+        if (Cordova) {
+            $('#splash-screen')
+            .animate({ top: '16px' }, {
+                duration: 300,
+                queue: false,
+                complete: ShowScreen
+            });
+        } else {
+            var user = App.GetCookie('user');
+            if (user !== null) {
+                $('#user').val(user);
+            }
 
-        $(document.body).fadeIn(300, function() {
-            LoadServerStatus(); // async
-            $('#user').focus();
-            $('#frmLogin').submit(DoLogin);
-            $('#frmChangePwd').submit(DoChangePassword);
-        });
+            if (location.href.indexOf('#') !== -1)
+                history.pushState('', '', location.pathname);
+
+            ShowScreen();
+        }
     }
 
     function ValidateBrowser(minBrowsers) {
@@ -181,7 +246,16 @@ function($, App) {
                     App.SetUserInfo(i, response.userInfo[i]);
                 }
                 App.SetCookie('user', $('#user').val(), 30); // store for 30 days
-                RedirectToMailModule();
+
+                if (Cordova) {
+                    Cordova.SaveAccount($('#user').val(), $('#pwd').val())
+                    .fail(function() {
+                        console.log('O login foi bem sucedido, mas não foi possível armazenar as credencias do usuário neste dispositivo.');
+                    })
+                    .always(RedirectToMailModule);
+                } else {
+                    RedirectToMailModule();
+                }
             }
         });
         return false;
