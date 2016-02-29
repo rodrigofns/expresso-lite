@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2015-2016 Serpro (http://www.serpro.gov.br)
  */
 
 require.config({
@@ -18,14 +18,16 @@ require(['jquery',
     'common-js/UrlStack',
     'common-js/Layout',
     'common-js/SimpleMenu',
+    'common-js/Contacts',
     'calendar/DateCalc',
     'calendar/Events',
     'calendar/WidgetMonth',
     'calendar/WidgetWeek',
-    'calendar/WidgetEvents'
+    'calendar/WidgetEvents',
+    'calendar/WidgetEditEvent'
 ],
-function($, App, UrlStack, Layout, SimpleMenu, DateCalc, Events,
-    WidgetMonth, WidgetWeek, WidgetEvents) {
+function($, App, UrlStack, Layout, SimpleMenu, Contacts, DateCalc, Events,
+    WidgetMonth, WidgetWeek, WidgetEvents, WidgetEditEvent) {
 window.Cache = {
     events: null, // Events object
     chooseViewMenu: null,
@@ -33,6 +35,7 @@ window.Cache = {
     viewMonth: null, // WidgetMonth object
     viewWeek: null, // WidgetWeek object
     viewEvents: null, // WidgetEvents object
+    wndEditEvent: null, // WidgetEditEvent object, modeless popup
     curView: '', // 'month'|'week'
     curCalendar: null, // calendar object
     curDate: DateCalc.today() // current date being displayed
@@ -52,18 +55,26 @@ App.Ready(function() {
     Cache.viewMonth = new WidgetMonth({ events:Cache.events, $elem: $('#middleBody') });
     Cache.viewWeek = new WidgetWeek({ events:Cache.events, $elem: $('#middleBody') });
     Cache.viewEvents = new WidgetEvents({ events:Cache.events, $elem: $('#rightBody') });
+    Cache.wndEditEvent = new WidgetEditEvent({ });
 
     // Some initial work.
     UrlStack.keepClean();
+    Contacts.loadPersonal();
 
     // Load templates of widgets.
     $.when(
         Cache.layout.load(),
         Cache.viewMonth.load(),
         Cache.viewWeek.load(),
-        Cache.viewEvents.load()
+        Cache.viewEvents.load(),
+        Cache.wndEditEvent.load()
     ).done(function() {
-        Cache.layout.setLeftMenuVisibleOnPhone(true).done(LoadUserCalendars);
+        $('#btnRefresh,#btnCreateEvent').css('display', 'none');
+        Cache.layout.setLeftMenuVisibleOnPhone(true).done(function() {
+            LoadUserCalendars().done(function() {
+                $('#btnRefresh,#btnCreateEvent').css('display', '');
+            });
+        });
 
         // Setup events.
         Cache.layout
@@ -79,16 +90,21 @@ App.Ready(function() {
         Cache.viewWeek
             .onWeekChanged(UpdateCurrentWeekName)
             .onEventClicked(EventClicked);
+        Cache.wndEditEvent
+            .onEventSaved(UpdateAfterSaving);
         $('#btnRefresh').on('click', RefreshEvents);
+        $('#btnCreateEvent').on('click', CreateEvent);
     });
 });
 
 function LoadUserCalendars() {
+    var defer = $.Deferred();
     $('#chooseViewMenu,#chooseCalendarMenu').hide();
     App.Post('getCalendars')
         .fail(function(resp) {
             window.alert('Erro ao carregar calendários pessoais.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            defer.reject();
         }).done(function(cals) {
             $('#loadCalendars').hide();
             $('#chooseViewMenu,#chooseCalendarMenu').show();
@@ -99,7 +115,9 @@ function LoadUserCalendars() {
                 });
             });
             Cache.chooseViewMenu.selectOption('month');
+            defer.resolve();
         });
+    return defer.promise();
 }
 
 function SetCalendarView(view) {
@@ -169,7 +187,7 @@ function UpdateCurrentWeekName() {
 
 function RefreshEvents() {
     Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
-        $('#btnRefresh').hide();
+        $('#btnRefresh,#btnCreateEvent').hide();
         $('#txtRefresh').show();
         var curSel = Cache.chooseViewMenu.getSelectedIdentifier();
         if (curSel === 'month') {
@@ -184,13 +202,24 @@ function RefreshEvents() {
     });
 
     function finishedRefreshing() {
-        $('#btnRefresh').show();
+        $('#btnRefresh,#btnCreateEvent').show();
         $('#txtRefresh').hide();
     }
+}
+
+function CreateEvent() {
+    $('#btnCreateEvent').blur();
+    Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+        Cache.wndEditEvent.show(Cache.curCalendar);
+    });
 }
 
 function EventClicked(eventsOfDay, eventClicked) {
     Cache.layout.setRightPanelVisible(true);
     Cache.viewEvents.render(eventsOfDay, eventClicked);
+}
+
+function UpdateAfterSaving() {
+    $('#btnRefresh').trigger('click');
 }
 });

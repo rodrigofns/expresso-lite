@@ -8,7 +8,7 @@
  * @package   ExpressoLite\TineTunnel
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Charles Wust <charles.wust@serpro.gov.br>
- * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2014-2016 Serpro (http://www.serpro.gov.br)
  */
 namespace ExpressoLite\TineTunnel;
 
@@ -247,6 +247,7 @@ class TineSession implements CookieHandler
         $this->setAttribute('Expressomail.accountId', $registryData->result->Expressomail->accounts->results[0]->id);
         $this->setAttribute('Expressomail.email', $registryData->result->Expressomail->accounts->results[0]->email);
         $this->setAttribute('Tinebase.accountLoginName', $registryData->result->Tinebase->currentAccount->accountLoginName);
+        $this->setAttribute('Tinebase.accountDisplayName', $registryData->result->Tinebase->currentAccount->accountDisplayName);
         $this->setAttribute('Expressomail.from', $registryData->result->Expressomail->accounts->results[0]->from);
         $this->setAttribute('Expressomail.organization', $registryData->result->Expressomail->accounts->results[0]->organization);
         $this->setAttribute('Expressomail.signature', $registryData->result->Expressomail->accounts->results[0]->signature);
