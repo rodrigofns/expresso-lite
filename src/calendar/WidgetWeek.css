@@ -61,8 +61,8 @@
     border-left:1px solid #DDD; border-bottom:1px solid #DDD; }
 .Week_cellHourNonWorking { background-color:#F9F9F9; }
 .Week_event { position:absolute; display:block; width:calc(100% / 7); height:44px;
-    cursor:pointer; padding:0 2px; border:1px solid white; font-size:90%;
+    cursor:pointer; padding:0 2px; border:1px solid white;
     overflow-x:hidden; overflow-y:auto; color:white; opacity:.8; }
-@media (max-width:1024px) { .Week_event { font-size:75%; } } /* mobile */
+@media (max-width:1024px) { .Week_event { font-size:80%; } } /* mobile */
 
 .Week_loading { text-align:center; margin:10px; color:#888; font-style:italic; }
