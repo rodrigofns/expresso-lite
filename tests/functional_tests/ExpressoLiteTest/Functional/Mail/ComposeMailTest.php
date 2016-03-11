@@ -31,12 +31,9 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * Tests sending a simple e-mail, checking if the e-mail composition screen opens and
      * close as expected. Also checks if the sent e-mail data match what was originally typed
-     *
-     * Input data:
-     *
-     * - mail.recipient: a valid e-mail address to be used as recipient
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
-     * - mail.content: content for the test e-mail (will be suffixed with the test id)
+     * 
+     *   CTV3-753
+     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-753
      */
     public function testSendMail()
     {
@@ -82,12 +79,6 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * During e-mail composition, checks if the badges generated for the recipients are correct.
      * Also checks if the list of recipients match what was originally typed
-     *
-     * Input data:
-     *
-     * - mail.recipients: several valid e-mail addresses to be used as recipients
-     * - badges: expected texts for the badges generated for each recipient
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
      */
     public function testBadges()
     {
@@ -128,10 +119,8 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * Checks if an e-mail marked with the "Important" flag is being sent and displayed correctly
      *
-     * Input data:
-     *
-     * - mail.recipient: valid e-mail address to be used as recipient
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
+     * CTV3-890
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-890
      */
     public function testSendImportant()
     {
@@ -173,9 +162,8 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * Checks if the system is validating correctly an attempt to send an e-mail without recipients
      *
-     * Input data:
-     *
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
+     *  CTV3-1053
+     *  http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1053
      */
     public function testNoRecipient()
     {
@@ -207,9 +195,8 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * Checks if the system is validating correctly an attempt to send an e-mail without a subject
      *
-     * Input data:
-     *
-     * - mail.recipient: valid e-mail address to be used as recipient
+     * CTV3-903
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-903
      */
     public function testNoSubject()
     {
@@ -240,14 +227,8 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * During e-mail composition, checks the screen behavior while editing one of the recipients using the BACKSPACE key
      *
-     * Input data:
-     *
-     * - initial.mail.recipients: initial list of valid e-mails to be used as recipients (the last one will be edited)
-     * - initial.badges: list with the expected texts for the badges generated for each one of the initial recipients, BEFORE edition
-     * - extra.recipient: an additional valid e-mail address that will replace the last e-mail of initial.mail.recipients
-     * - final.badges: ist with the expected texts for the badges generated for each one of the recipients AFTER edition of the last
-     * - final.mail.recipients: list of the expected e-mail AFTER the edition of the last
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
+     *  CTV3-975
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-975
      */
     public function testEditBadge()
     {
@@ -302,13 +283,8 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * - During e-mail composition, checks the screen behavior while deleting on of its recipients by clicking on the badge
      *
-     * Input data:
-     *
-     * - initial.mail.recipients: initial list of valid e-mails to be used as recipients (all, except the last, will be removed)
-     * - initial.badges: list with the expected texts for the badges generated for each one of the initial recipients, BEFORE the deletions
-     * - final.badge: Expected text for the only displayed badge AFTER the deletions
-     * - final.mail.recipient: Expected e-mail address to be used as recipient AFTER the deletions
-     * - mail.subject: subject for the test e-mail (will be suffixed with the test id)
+     *   CTV3-977
+     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-977
      */
     public function testDeleteBadge()
     {
@@ -355,4 +331,3 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertEquals(array($FINAL_MAIL_RECIPIENT), $messageUnit->getToAddresses(), 'Recipients in mail do not match what was expected');
     }
 }
-

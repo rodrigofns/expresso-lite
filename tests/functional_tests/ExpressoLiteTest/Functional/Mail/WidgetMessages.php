@@ -74,4 +74,77 @@ class WidgetMessages extends GenericPage
             return $messageUnit[0];
         }
     }
+
+    /**
+     * Moves the mouse over the subject menu to make it show
+     * the available options
+     */
+    public function moveMouseToSubjectMenu()
+    {
+        $this->testCase->moveto($this->byCssSelector('#subjectMenu'));
+    }
+
+    /**
+     * Returns an array of DOM elements that represent each option available
+     * in the currently visible context menu
+     *
+     *  @return array
+     */
+    private function getContextMenuItems()
+    {
+        return $this->mailPage->byCssSelectorMultiple('.ContextMenu_liOption');
+    }
+
+    /**
+     * Opens the Subject menu and click in one the options inside it
+     *
+     * @param string $itemText The text of the item to be clicked
+     *
+     * @throws \Exception If there is no option with the specified text
+     */
+    private function clickOnSubjectMenuItemByText($itemText)
+    {
+        $this->moveMouseToSubjectMenu();
+        foreach ($this->getContextMenuItems() as $menuItem) {
+            if (trim($menuItem->text()) == $itemText) {
+                $menuItem->click();
+                return;
+            }
+        }
+        throw new \Exception("The subject menu item with text $itemText was found");
+    }
+
+    /**
+     * Opens the Subject menu and clicks in the "Apagar conversa" option
+     */
+    public function clickSubjectMenuOptionDelete()
+    {
+        $this->clickOnSubjectMenuItemByText("Apagar conversa");
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Opens the subject menu and clicks in the move thread option
+     */
+    public function clickSubjectMenuOptionMove($folderName)
+    {
+        $this->clickOnSubjectMenuItemByText($folderName);
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Opens the subject menu and clicks in "Marcar conversa como lida" option
+     */
+    public function clickSubjectMenuOptionMarkRead()
+    {
+        $this->clickOnSubjectMenuItemByText('Marcar conversa como lida');
+    }
+
+    /**
+     * Opens the subject menu and clicks in "Marcar conversa como não lida" option
+     */
+    public function clickSubjectMenuOptionMarkUnread()
+    {
+        $this->clickOnSubjectMenuItemByText('Marcar conversa como não lida');
+    }
 }

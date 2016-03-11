@@ -11,6 +11,8 @@
 
 namespace ExpressoLiteTest\Functional\Generic;
 
+use ExpressoLiteTest\Functional\Login\LoginPage;
+
 abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
     /**
@@ -80,7 +82,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
         $this->url($initialUrl);
 
         usleep(500000);
-        //TODO: this is used to wait for the initial animation on the login screen,
+        //This is used to wait for the initial animation on the login screen,
         //but should be replaced by a more reliable mechanism
     }
 
@@ -152,6 +154,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
      */
     public function waitForAjaxToComplete()
     {
+        usleep(200000);
         $this->waitUntil(function($testCase) {
             $activeAjaxCalls = $testCase->execute(array(
                     'script' => 'return $.active;',
@@ -160,6 +163,22 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
             return $activeAjaxCalls > 0 ? null : true;
         }, self::IMPLICIT_WAIT);
     }
+
+    /**
+     * This function will wait for any pending AJAX calls still being run on
+     * the current browser window
+     */
+    public function waitForAjaxAndAnimationsToComplete()
+    {
+        $this->waitUntil(function($testCase) {
+            $activeElements = $testCase->execute(array(
+                    'script' => 'return $.active + $(\':animated\').length > 0;',
+                    'args' => array()
+            )); //number of pending ajax calls + number of currently animating elements
+            return $activeElements > 0 ? null : true;
+        }, self::IMPLICIT_WAIT);
+    }
+
 
     /**
      * Waits for an alert to be displayed.
@@ -237,5 +256,14 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
         //restore wait interval
         $this->timeouts()->implicitWait(self::DEFAULT_WAIT_INTERVAL);
         return $displayed;
+    }
+
+    /**
+     * Performs a login operation. This is just a shortcut to avoid having to add
+     * LoginPage in tests in which it is not really necessary
+     */
+    public function doLogin($user, $password) {
+        $loginPage = new LoginPage($this);
+        $loginPage->doLogin($user, $password);
     }
 }

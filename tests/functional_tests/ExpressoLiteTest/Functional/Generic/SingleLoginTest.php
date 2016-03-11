@@ -12,8 +12,6 @@
 
 namespace ExpressoLiteTest\Functional\Generic;
 
-use ExpressoLiteTest\Functional\Login\LoginPage;
-
 class SingleLoginTest extends ExpressoLiteTest
 {
     /**
@@ -32,7 +30,7 @@ class SingleLoginTest extends ExpressoLiteTest
         $this->setClearSessionDataBetweenTests(false);
         if (!self::$isLoggedIn) {
             parent::setUpPage();
-            $this->doLogin();
+            $this->doLoginWithIniFileValues();
         } else {
             parent::setUpPage($this->getTestUrl());
             $this->waitForAjaxToComplete();
@@ -43,13 +41,12 @@ class SingleLoginTest extends ExpressoLiteTest
      * Performs the login steps in the current window. The user and password to be
      * used will be searched in a section named [login] in the test data file.
      */
-    private function doLogin()
+    private function doLoginWithIniFileValues()
     {
         $user = $this->testData->getTestValue('login', 'user');
         $password = $this->testData->getTestValue('login', 'password');
 
-        $loginPage = new LoginPage($this);
-        $loginPage->doLogin($user, $password);
+        $this->doLogin($user, $password);
         self::$isLoggedIn = true;
     }
 

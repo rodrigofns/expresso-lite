@@ -27,6 +27,17 @@ class MailPage extends GenericPage
     }
 
     /**
+     * Clicks on the Refresh button on the left of the screen
+     * and waits for the compose window to be displayed
+     */
+    public function clickRefreshButton()
+    {
+        $this->byCssSelector('#btnUpdateFolders')->click();
+        $this->testCase->waitForAjaxAndAnimationsToComplete(); //TODO: this avoids problems with testNoRecipients
+        $this->testCase->waitForAjaxToComplete();
+    }
+
+    /**
      * Clicks on a folder contained on the folder tree based on its name
      *
      * @param string $folderName The name of the folder to be clicked
@@ -149,5 +160,80 @@ class MailPage extends GenericPage
     public function getWidgetMessages()
     {
         return new WidgetMessages($this, $this->byCssSelector('#rightBody'));
+    }
+
+    /**
+     * Returns an array of <li> elements within the context menu
+     *
+     * @returns array Array of <li> elements within the context menu
+     */
+    private function getContextMenuItems()
+    {
+        return $this->byCssSelectorMultiple('.ContextMenu_liOption');
+    }
+
+    /**
+     * Clicks on a menu item within the context menu
+     *
+     * @param string $itemText The text of the item to be clicked
+     */
+    private function clickOnMenuItemByText($itemText)
+    {
+        $this->moveMouseToOptionsMenu();
+        foreach ($this->getContextMenuItems() as $menuItem) {
+            if (trim($menuItem->text()) == $itemText) {
+                $menuItem->click();
+                return;
+            }
+        }
+        throw new \Exception("Menu item with text $itemText was not found");
+    }
+
+    /**
+     * Moves the mouse over the options menu to make it show its contents
+     */
+    public function moveMouseToOptionsMenu()
+    {
+        $this->testCase->moveto($this->byCssSelector('#Layout_context'));
+    }
+
+    /**
+     * Opens the options menu and clicks on the "Apagar" option
+     */
+    public function clickMenuOptionDelete()
+    {
+        $this->clickOnMenuItemByText('Apagar');
+    }
+
+    /**
+     * Opens the options menu and clicks on the "Marcar como lida" option
+     */
+    public function clickMenuOptionMarkRead()
+    {
+        $this->clickOnMenuItemByText('Marcar como lida');
+    }
+
+    /**
+     * Opens the options menu and clicks on the "Marcar como não lida" option
+     */
+    public function clickMenuOptionMarkUnread()
+    {
+        $this->clickOnMenuItemByText('Marcar como não lida');
+    }
+
+    /**
+     * Opens the options menu and clicks on the "Alterar destaque" option
+     */
+    public function clickMenuOptionHighlight()
+    {
+        $this->clickOnMenuItemByText('Alterar destaque');
+    }
+
+    /**
+     * Opens the options menu and clicks on the Folder destination option
+     */
+    public function clickMenuOptionMove($folderName)
+    {
+        $this->clickOnMenuItemByText($folderName);
     }
 }

@@ -96,7 +96,7 @@ class WidgetCompose extends GenericPage
     public function clickSendMailButton()
     {
         $this->byCssSelector('.Compose_send')->click();
-        usleep(1000000); //TODO: FIX THIS
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
     }
 
     /**

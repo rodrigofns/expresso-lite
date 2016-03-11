@@ -87,6 +87,18 @@ class GenericPage
     }
 
     /**
+     * Returns the value of an attribute of the DOM element to which this
+     * GenericPage instance corresponds
+     *
+     * @param string The name of the attribute
+     * @returns string The value of the attribute
+     */
+    public function attribute($attrName)
+    {
+        return $this->rootContext->attribute($attrName);
+    }
+
+    /**
      * Types a string in the current browser window, just as if the user
      * was typing on the keyboard.
      *

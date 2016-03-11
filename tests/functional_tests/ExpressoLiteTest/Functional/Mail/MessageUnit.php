@@ -84,6 +84,26 @@ class MessageUnit extends GenericPage
     }
 
     /**
+     * Return the date of e-mail from header of message
+     *
+     * @return string
+     */
+    public function getWhen()
+    {
+        return $this->byCssSelector('.Messages_when')->text();
+    }
+
+    /**
+     * Check if has image of sender in header message
+     *
+     * @return string
+     */
+    public function hasMugshot()
+    {
+        return $this->byCssSelector('.Messages_mugshot')->isElementPresent('img');
+    }
+
+    /**
      * Moves the mouse over the message unit dropdown menu to make it show
      * the available options
      */
@@ -104,6 +124,24 @@ class MessageUnit extends GenericPage
     }
 
     /**
+     * Checks f and specified menu item exists within the context menu
+     *
+     * @param string $itemText The text of the item to be searched
+     *
+     * @returns boolean True if there is an item with the specified text, false otherwise
+     */
+    public function hasContextMenuItem($itemText)
+    {
+        $this->moveMouseToDropdownMenu();
+        foreach ($this->getContextMenuItems() as $menuItem) {
+            if (trim($menuItem->text()) == $itemText) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Opens the dropdown context menu and click in one the options inside it
      *
      * @param string $itemText The text of the item to be clicked
@@ -114,7 +152,7 @@ class MessageUnit extends GenericPage
     {
         $this->moveMouseToDropdownMenu();
         foreach ($this->getContextMenuItems() as $menuItem) {
-            if ($menuItem->text() == $itemText) {
+            if (trim($menuItem->text()) == $itemText) {
                 $menuItem->click();
                 return;
             }
@@ -123,12 +161,39 @@ class MessageUnit extends GenericPage
     }
 
     /**
-     * Opens the dropdown context menu and clicks in the Answer option
+     * Opens the dropdown context menu and clicks in the "Responder" option
      */
     public function clickMenuOptionReply()
     {
         $this->clickOnMenuItemByText("Responder");
-        usleep(500000); //TODO: FIX this
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Opens the dropdown context menu and clicks in the "Encaminhar" option
+     */
+    public function clickMenuOptionForward()
+    {
+        $this->clickOnMenuItemByText("Encaminhar");
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Opens the dropdown context menu and clicks in the "Apagar" option
+     */
+    public function clickMenuOptionDelete()
+    {
+        $this->clickOnMenuItemByText("Apagar");
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Opens the dropdown context menu and clicks in the folder destination option
+     */
+    public function clickMenuOptionMove($folderName)
+    {
+        $this->clickOnMenuItemByText($folderName);
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
     }
 
     /**
@@ -147,7 +212,7 @@ class MessageUnit extends GenericPage
     public function clickShowQuoteButton()
     {
         $this->byCssSelector('.Messages_showQuote')->click();
-        usleep(500000); //TODO: Fix this
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
     }
 
     /**
@@ -158,5 +223,22 @@ class MessageUnit extends GenericPage
     public function getQuoteText()
     {
         return $this->byCssSelector('.Messages_quote')->text();
+    }
+
+    /**
+     * Clicks on the message top to expand / retract the message details
+     */
+    public function clickMessageTop()
+    {
+        $this->byCssSelector('.Messages_top1')->click();
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+    }
+
+    /**
+     * Check if was message thread expanded or not
+     */
+    public function isMessageExpanded()
+    {
+        return $this->byCssSelector('.Messages_top2')->displayed();
     }
 }
