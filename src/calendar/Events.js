@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2015-2016 Serpro (http://www.serpro.gov.br)
  */
 
 define(['jquery',
@@ -128,6 +128,20 @@ return function() {
             confirmation: confirmation
         }).fail(function(resp) {
             window.alert('Erro na consulta dos eventos.\n' +
+                resp.responseText);
+            defer.reject();
+        }).done(function(resp) {
+            defer.resolve();
+        });
+        return defer.promise();
+    };
+
+    THIS.remove = function(eventId) {
+        var defer = $.Deferred();
+        App.Post('deleteEvent', {
+            id: eventId
+        }).fail(function(resp) {
+            window.alert('Erro ao remover evento.\n' +
                 resp.responseText);
             defer.reject();
         }).done(function(resp) {

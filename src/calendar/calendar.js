@@ -90,6 +90,8 @@ App.Ready(function() {
         Cache.viewWeek
             .onWeekChanged(UpdateCurrentWeekName)
             .onEventClicked(EventClicked);
+        Cache.viewEvents
+            .onRemoved(EventRemoved);
         Cache.wndEditEvent
             .onEventSaved(UpdateAfterSaving);
         $('#btnRefresh').on('click', RefreshEvents);
@@ -217,6 +219,11 @@ function CreateEvent() {
 function EventClicked(eventsOfDay, eventClicked) {
     Cache.layout.setRightPanelVisible(true);
     Cache.viewEvents.render(eventsOfDay, eventClicked);
+}
+
+function EventRemoved(event) {
+    Cache.layout.setRightPanelVisible(false);
+    $('#btnRefresh').trigger('click');
 }
 
 function UpdateAfterSaving() {

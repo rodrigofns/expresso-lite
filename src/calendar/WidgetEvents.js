@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2015-2016 Serpro (http://www.serpro.gov.br)
  */
 
 define(['jquery',
@@ -21,8 +21,9 @@ return function(options) {
         $elem: null // jQuery object for the target DIV
     }, options);
 
-    var THIS   = this;
-    var $panel = null;
+    var THIS        = this;
+    var $panel      = null;
+    var onRemovedCB = $.noop; // user callback
 
     THIS.load = function() {
         return $('#Events_template').length ? // load once
@@ -63,6 +64,11 @@ return function(options) {
         $panel.hide()
             .fadeIn(250, function() { defer.resolve(); });
         return defer.promise();
+    };
+
+    THIS.onRemoved = function(callback) {
+        onRemovedCB = callback; // onRemoved(event)
+        return THIS;
     };
 
     function _SetEvents() {
@@ -127,6 +133,9 @@ return function(options) {
         var menu = $unit.data('dropdown');
         var ev = $unit.data('event');
         menu.purge();
+
+        menu.addOption('Apagar', function() { _Remove($unit); });
+        menu.addHeader('Assinalar resposta...');
 
         if (ev.confirmation !== 'ACCEPTED') {
             menu.addOption('Confirmar participação', function() { _SetConfirmation($unit, 'ACCEPTED'); });
@@ -197,6 +206,18 @@ return function(options) {
                 $unit.find('.Events_summary .Events_userFlag, .Events_person .Events_personFlag:first')
                     .empty()
                     .append(_BuildConfirmationIcon(event)); // update confirmation icons
+            });
+        }
+    }
+
+    function _Remove($unit) {
+        var event = $unit.data('event');
+        if (window.confirm('Deseja excluir o evento\n"'+event.summary+'"?')) {
+            $unit.find('.Events_dropdown').remove();
+            $('#Events_template .Events_throbber').clone()
+                .appendTo($unit.find('.Events_summary'));
+            userOpts.events.remove(event.id).done(function() {
+                onRemovedCB(event);
             });
         }
     }
