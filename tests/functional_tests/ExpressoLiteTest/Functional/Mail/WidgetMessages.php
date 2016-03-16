@@ -138,6 +138,9 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionMarkRead()
     {
         $this->clickOnSubjectMenuItemByText('Marcar conversa como lida');
+        // we don't do a waitForAjaxAndAnimationsToComplete here because
+        // this may result in an alert message to be opened
+
     }
 
     /**
@@ -146,5 +149,7 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionMarkUnread()
     {
         $this->clickOnSubjectMenuItemByText('Marcar conversa como não lida');
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
+
     }
 }

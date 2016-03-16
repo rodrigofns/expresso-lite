@@ -172,7 +172,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
     {
         $this->waitUntil(function($testCase) {
             $activeElements = $testCase->execute(array(
-                    'script' => 'return $.active + $(\':animated\').length > 0;',
+                    'script' => 'return $.active + $(\':animated\').length;',
                     'args' => array()
             )); //number of pending ajax calls + number of currently animating elements
             return $activeElements > 0 ? null : true;
