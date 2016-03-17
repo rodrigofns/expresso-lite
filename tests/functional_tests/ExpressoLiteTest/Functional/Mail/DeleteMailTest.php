@@ -27,7 +27,7 @@ class DeleteMailTest extends ExpressoLiteTest
      * - CTV3-750
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-750
     */
-    public function testDeleteMail()
+    public function test_CTV3_750_Delete_Mail()
     {
         //load test data
         $USER_LOGIN = $this->getTestValue('user.login');
@@ -49,7 +49,7 @@ class DeleteMailTest extends ExpressoLiteTest
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
-        $headlinesEntry->markCheckbox();
+        $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionDelete();
         $this->waitForAjaxAndAnimationsToComplete();
@@ -79,7 +79,7 @@ class DeleteMailTest extends ExpressoLiteTest
      * - CTV3-751
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-751
      */
-    public function testDeleteOpenMail()
+    public function test_CTV3_751_Delete_Open_Mail()
     {
         //load test data
         $USER_LOGIN = $this->getTestValue('user.login');
@@ -132,7 +132,7 @@ class DeleteMailTest extends ExpressoLiteTest
      * - CTV3-1017
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1017
      */
-    public function testDeleteOpenThreadMail()
+    public function test_CTV3_1017_Delete_Open_Thread_Mail()
     {
         $USER_1_LOGIN = $this->getTestValue('user.1.login');
         $USER_1_PASSWORD = $this->getTestValue('user.1.password');

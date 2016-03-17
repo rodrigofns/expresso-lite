@@ -96,6 +96,16 @@ class WidgetCompose extends GenericPage
     public function clickSendMailButton()
     {
         $this->byCssSelector('.Compose_send')->click();
+        // we don't do a waitForAjaxAndAnimationsToComplete here because
+        // this may result in an alert message to be opened
+    }
+
+    /*
+     * Clicks on save to draft button
+     */
+    public function clickSaveDraftButton()
+    {
+        $this->byCssSelector('.Compose_draft')->click();
         $this->testCase->waitForAjaxAndAnimationsToComplete();
     }
 

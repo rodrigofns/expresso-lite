@@ -35,7 +35,7 @@ class ComposeMailTest extends SingleLoginTest
      *   CTV3-753
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-753
      */
-    public function testSendMail()
+    public function test_CTV3_753_Send_Mail()
     {
         $mailPage = new MailPage($this);
 
@@ -58,6 +58,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
+       $this->waitForAjaxAndAnimationsToComplete();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
 
@@ -67,7 +68,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $this->assertEquals($MAIL_SUBJECT, $widgetMessages->getHeader(), 'The header in the right body header does not match the expected mail subject: ' . $MAIL_SUBJECT);
@@ -104,11 +105,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -122,7 +124,7 @@ class ComposeMailTest extends SingleLoginTest
      * CTV3-890
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-890
      */
-    public function testSendImportant()
+    public function test_CTV3_890_Send_Important()
     {
         $mailPage = new MailPage($this);
 
@@ -144,6 +146,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->clickImportantRadio();
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
@@ -151,7 +154,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertTrue($headlinesEntry->hasImportantIcon(), 'Headline should have been listed as important, but it was not');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -165,7 +168,7 @@ class ComposeMailTest extends SingleLoginTest
      *  CTV3-1053
      *  http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1053
      */
-    public function testNoRecipient()
+    public function test_CTV3_1053_No_Recipient()
     {
         $mailPage = new MailPage($this);
 
@@ -198,7 +201,7 @@ class ComposeMailTest extends SingleLoginTest
      * CTV3-903
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-903
      */
-    public function testNoSubject()
+    public function test_CTV3_903_No_Subject()
     {
         $mailPage = new MailPage($this);
 
@@ -230,7 +233,7 @@ class ComposeMailTest extends SingleLoginTest
      *  CTV3-975
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-975
      */
-    public function testEditBadge()
+    public function test_CTV3_975_Edit_Badge()
     {
         $INITAL_MAIL_RECIPIENTS = $this->getTestValue('initial.mail.recipients');
         $INITIAL_BADGES = $this->getTestValue('initial.badges');
@@ -268,11 +271,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -286,7 +290,7 @@ class ComposeMailTest extends SingleLoginTest
      *   CTV3-977
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-977
      */
-    public function testDeleteBadge()
+    public function test_CTV3_977_Delete_Badge()
     {
         $INITAL_MAIL_RECIPIENTS = $this->getTestValue('initial.mail.recipients');
         $INITIAL_BADGES = $this->getTestValue('initial.badges');
@@ -319,11 +323,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();

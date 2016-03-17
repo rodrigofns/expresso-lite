@@ -130,7 +130,9 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($REPLY_MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
         $mailPage->clickLayoutBackButton();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $mailPage->clickLogout();
         $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
