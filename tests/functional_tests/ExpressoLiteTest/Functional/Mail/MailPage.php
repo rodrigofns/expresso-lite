@@ -55,9 +55,33 @@ class MailPage extends GenericPage
     }
 
     /**
-     * Returns a HeadlineEntry that represents the item of the headlines list that
+     * Types the text for search criteria
+     */
+    public function typeSearchText($text)
+    {
+        $this->byCssSelector('#Layout_txtSearch')->value( $text);
+    }
+
+    /**
+     * Clears the content of the text search field
+     */
+    public function clearSearchField()
+    {
+        return $this->byCssSelector('#Layout_txtSearch')->clear();
+    }
+
+    /**
+     * Clicks in the search button
+     */
+    public function clickSearchButton()
+    {
+        $this->byCssSelector('.Layout_iconSearch')->click();
+    }
+
+    /**
+     * Returns a HeadlineEntry that represents the item of the headlines list that.
      * contains a specific subject. If there are no e-mails with the specified subject,
-     * it returns nulll .
+     * it returns nulll.
      *
      * @param string $subject The subject to be searched for
      *
@@ -73,6 +97,20 @@ class MailPage extends GenericPage
             }
         }
         return null;
+    }
+
+    /**
+     * Returns an array containing all headlines entries being displayed on the screen
+     *
+     * @return array Array of HeadlineEntry objects
+     */
+    public function getArrayOfHeadlinesEntries()
+    {
+        $entries = array();
+        foreach($this->byCssSelectorMultiple('#headlinesArea > .Headlines_entry') as $headlinesEntryDiv) {
+            $entries[] = new HeadlinesEntry($this, $headlinesEntryDiv);
+        }
+        return $entries;
     }
 
     /**
