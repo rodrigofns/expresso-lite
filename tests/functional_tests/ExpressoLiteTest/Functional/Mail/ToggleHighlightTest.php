@@ -34,7 +34,7 @@ class ToggleHighlightTest extends SingleLoginTest {
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-892
      *
      */
-    public function testToggleHighlightMail()
+    public function test_CTV3_892_ToggleHighlightMail()
     {
         $mailPage = new MailPage($this);
 

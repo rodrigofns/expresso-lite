@@ -18,12 +18,15 @@ class LoginTest extends ExpressoLiteTest
     /**
      * Checks a valid login attempt
      *
+     * CTV3-954
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-954
+     *
      * Input data:
      *
      * - valid.user: a valid user login
      * - valid.password: valid password for the user
      */
-    public function testValidLogin()
+    public function test_CTV3_954_ValidLogin()
     {
         $loginPage = new LoginPage($this);
 
@@ -43,12 +46,15 @@ class LoginTest extends ExpressoLiteTest
     /**
      * Checks a login attempt with an invalid user
      *
+     * CTV3-955
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-955
+     *
      * Input data:
      *
      * - invalid.user: an invalid user login
      * - valid.password: some valid password
      */
-    public function testInvalidUser()
+    public function test_CTV3_955_InvalidUser()
     {
         $loginPage = new LoginPage($this);
 
@@ -70,12 +76,15 @@ class LoginTest extends ExpressoLiteTest
     /**
      * Checks a login attempt with a valid user, but with the wrong password
      *
+     * CTV3-955
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-955
+     *
      * Input data:
      *
      * - valid.user: a valid user login
      * - invalid.password: wrong password for the user
      */
-    public function testInvalidPassword()
+    public function test_CTV3_955_InvalidPassword()
     {
         $loginPage = new LoginPage($this);
 
@@ -98,11 +107,14 @@ class LoginTest extends ExpressoLiteTest
      * Checks a login attempt where only the password is typed,
      * but not the user login
      *
+     * CTV3-954
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-954
+     *
      * Input data:
      *
      * - valid.password: some random password
      */
-    public function testNoUser()
+    public function test_CTV3_954_NoUser()
     {
         $loginPage = new LoginPage($this);
 
@@ -122,11 +134,12 @@ class LoginTest extends ExpressoLiteTest
      * Checks a login attempt where only the user login is typed,
      * but not the password
      *
-     * Input data:
+     * CTV3-954
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-954
      *
      * - valid.user: a valid user login
      */
-    public function testNoPassword()
+    public function test_CTV3_954_NoPassword()
     {
         $loginPage = new LoginPage($this);
 

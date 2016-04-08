@@ -36,7 +36,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-754
      *
      */
-    public function testMarkReadMail()
+    public function test_CTV3_754_MarkReadMail()
     {
         $mailPage = new MailPage($this);
 
@@ -71,7 +71,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-754
      *
      */
-    public function testMarkUnreadMail()
+    public function test_CTV3_754_MarkUnreadMail()
     {
         $mailPage = new MailPage($this);
 
@@ -122,7 +122,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      * - CTV3-1057
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1057
      */
-    public function testMarkUnreadOpenMail()
+    public function test_CTV3_1057_MarkUnreadOpenMail()
     {
         $mailPage = new MailPage($this);
 
@@ -136,7 +136,6 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         $mailPage->clickRefreshButton();
 
-        $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->click();
         $this->waitForAjaxAndAnimationsToComplete();

@@ -17,7 +17,7 @@ class SingleLoginTest extends ExpressoLiteTest
     /**
      * @var boolean Indicates if the login was already performed in this test case
      */
-    protected static $isLoggedIn = false;
+    protected static $isLoggedIn;
 
     /**
      * Overrides ExpressoLiteTest::setUpPage. This method will perform login into
@@ -29,6 +29,7 @@ class SingleLoginTest extends ExpressoLiteTest
     {
         $this->setClearSessionDataBetweenTests(false);
         if (!self::$isLoggedIn) {
+            $this->prepareSession()->cookie()->clear();
             parent::setUpPage();
             $this->doLoginWithIniFileValues();
         } else {
@@ -72,5 +73,14 @@ class SingleLoginTest extends ExpressoLiteTest
     public function getTestUrl()
     {
         return LITE_URL;
+    }
+
+    /**
+     * Overrides PHPUnit's setUpPage. This method will assure that a new login
+     * will be done in the beginning of a SingleLoginTest
+     */
+    public static function setUpBeforeClass()
+    {
+        self::$isLoggedIn = false;
     }
 }
