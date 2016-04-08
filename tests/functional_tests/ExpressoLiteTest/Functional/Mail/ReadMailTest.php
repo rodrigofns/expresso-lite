@@ -26,7 +26,7 @@ class ReadMailTest extends ExpressoLiteTest
      * - CTV3-752
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-752
      */
-    public function test_CTV3_752_ReadSimpleMail()
+    public function testReadSimpleMail()
     {
         //load test data
         $USER_1_LOGIN = $this->getTestValue('user.1.login');
@@ -75,7 +75,7 @@ class ReadMailTest extends ExpressoLiteTest
      * - CTV3-1047
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1047
      */
-    public function test_CTV3_1047_ReadCitationMail()
+    public function testReadCitationMail()
     {
         //load test data
         $USER_1_LOGIN = $this->getTestValue('user.1.login');
@@ -136,7 +136,7 @@ class ReadMailTest extends ExpressoLiteTest
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1048
      *
      */
-    public function test_CTV3_1048_ReadThreadMail()
+    public function testReadThreadMail()
     {
         //load test data
         $USER_1_LOGIN = $this->getTestValue('user.1.login');

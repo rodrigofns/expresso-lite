@@ -32,10 +32,10 @@ class SaveDraftTest extends SingleLoginTest
      * In this test, the e-mail was created and saved in draft folder. Checks if
      * every field matches what was originally typed.
      *
-     * CTV3-840
-     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-840
+     * CTV3-753
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-753
      */
-    public function test_CTV3_840_Save_Draft_Mail()
+    public function test_CTV3_753_Save_Draft_Mail()
     {
         $mailPage = new MailPage($this);
 

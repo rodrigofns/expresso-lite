@@ -36,7 +36,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-754
      *
      */
-    public function test_CTV3_754_MarkReadMail()
+    public function testMarkReadMail()
     {
         $mailPage = new MailPage($this);
 
@@ -71,7 +71,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-754
      *
      */
-    public function test_CTV3_754_MarkUnreadMail()
+    public function testMarkUnreadMail()
     {
         $mailPage = new MailPage($this);
 
@@ -122,7 +122,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
      * - CTV3-1057
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1057
      */
-    public function test_CTV3_1057_MarkUnreadOpenMail()
+    public function testMarkUnreadOpenMail()
     {
         $mailPage = new MailPage($this);
 

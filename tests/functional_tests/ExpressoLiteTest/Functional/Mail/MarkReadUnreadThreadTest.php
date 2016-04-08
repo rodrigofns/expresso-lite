@@ -30,7 +30,7 @@ class MarkReadUnreadThreadTest extends ExpressoLiteTest
     * Dados de entrada:
     *
     */
-    public function test_CTV3_1018_MarkUnreadThreadMail()
+    public function testMarkUnreadThreadMail()
     {
         //load test data
         $SENDER_LOGIN = $this->getTestValue('sender.login');
@@ -76,7 +76,7 @@ class MarkReadUnreadThreadTest extends ExpressoLiteTest
      * - CTV3-1058
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1058
      */
-    public function test_CTV3_1058_MarkReadThreadMail()
+    public function testMarkReadThreadMail()
     {
         //load test data
         $SENDER_LOGIN = $this->getTestValue('sender.login');

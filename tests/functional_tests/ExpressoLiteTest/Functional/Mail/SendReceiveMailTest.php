@@ -76,10 +76,6 @@ class SendReceiveMailTest extends ExpressoLiteTest
      * Checks the reply e-mail feature. In this test, user 1 sends an e-mail
      * to user 2, who replies it back to user 1
      *
-     * CTV3-757
-     *
-     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-757
-     *
      * Input data:
      *
      * - user.1.login: user 1's login
@@ -93,7 +89,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
      * - original.mail.content: content of the first e-mail (will be suffixed with the test id)
      * - reply.mail.content: content added to the reply (will be suffixed with the test id)
      */
-    public function test_CTV3_757_SendReceiveReplySimpleMail()
+    public function testSendReceiveReplySimpleMail()
     {
         //load test data
         $USER_1_LOGIN = $this->getTestValue('user.1.login');
