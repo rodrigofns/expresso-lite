@@ -86,36 +86,4 @@ abstract class TestScenarios
 
         $mailPage->clickLogout();
     }
-
-    /**
-     * Creates a test scenario to create a message in draft folder
-     *
-     * @param ExpressoLiteTest $test The test case that will create the scenario
-     * @param stdObj $params A object containing all the necessary parameters for this scenario.
-     * This object must have the following fields.
-     *
-     * senderLogin => login of the user that will create the draft
-     * senderPassword => password of the user that will create the draft
-     * recipentMail => the draft recipent's e-mail address
-     * subject => subject of the draft
-     * content => content of the draft
-     */
-    public static function createMessageDraft(ExpressoLiteTest $test, $params)
-    {
-        $test->doLogin($params->senderLogin, $params->senderPassword);
-        $mailPage = new MailPage($test);
-
-        $mailPage->clickWriteEmailButton();
-        $widgetCompose = $mailPage->getWidgetCompose();
-        $widgetCompose->clickOnRecipientField();
-
-        $widgetCompose->type($params->recipentMail);
-        $widgetCompose->typeEnter();
-
-        $widgetCompose->typeSubject($params->subject);
-        $widgetCompose->typeMessageBodyBeforeSignature($params->content);
-        $widgetCompose->clickSaveDraftButton();
-
-        $mailPage->clickLogout();
-    }
 }

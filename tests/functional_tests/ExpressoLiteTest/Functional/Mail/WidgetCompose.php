@@ -108,14 +108,6 @@ class WidgetCompose extends GenericPage
         $this->byCssSelector('.Compose_draft')->click();
         $this->testCase->waitForAjaxAndAnimationsToComplete();
     }
-    /*
-     * Clicks on Save Draft Button
-     */
-    public function clickSaveDraftButton()
-    {
-        $this->byCssSelector('.Compose_draft')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
-    }
 
     /**
      * Clicks on the Important radio box
