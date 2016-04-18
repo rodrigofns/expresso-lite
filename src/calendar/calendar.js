@@ -80,7 +80,7 @@ App.Ready(function() {
         Cache.layout
             .onKeepAlive(function() { })
             .onHideRightPanel(function() { Cache.viewMonth.clearDaySelected(); })
-            .onSearch(function() { }); // when user performs a search
+            .onSearch(function() { alert('Busca no calendário não implementada nesta versão.'); }); // when user performs a search
         Cache.chooseViewMenu
             .addOption('Ver mês', 'month', function() { SetCalendarView('month'); })
             .addOption('Ver semana', 'week', function() { SetCalendarView('week'); });
