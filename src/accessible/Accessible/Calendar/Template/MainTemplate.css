@@ -27,3 +27,5 @@
 .adjustCol { width:220px; }
 .notYetOccurred { font-weight:600; }
 .adjustSeq { width:20px; }
+
+#monthNavigation ul { margin-left:-30px; margin-top:25px; }

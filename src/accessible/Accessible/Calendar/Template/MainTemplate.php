@@ -24,10 +24,11 @@
         <nav class="contentAlign">
             <ul>
                 <li><a href="#menu" accesskey="1">Ir para o menu [1]</a></li>
-                <?php IF($VIEW->hasTodayEvents) : ?>
+                <?php IF($VIEW->isTodayExhibition) : ?>
                     <li><a href="#dayEvents" accesskey="2">Ir para eventos de hoje [2]</a></li>
                 <?php ENDIF; ?>
                 <li><a href="#monthEvents" accesskey="3">Ir para eventos do mês [3]</a></li>
+                <li><a href="#monthNavigation" accesskey="4">Ir para navegação por mês [4]</a></li>
             </ul>
         </nav>
     </div>
@@ -53,6 +54,7 @@
     </ul>
 </div>
 
+<?php IF($VIEW->isTodayExhibition) : ?>
 <div id="dayEvents" name="dayEvents">
     <h2 class="anchorsTitle">Eventos de hoje</h2>
     <?php IF($VIEW->hasTodayEvents) : ?>
@@ -99,6 +101,7 @@
         <li><a href="#top">voltar ao topo [t]</a></li>
     </ul>
 </div>
+<?php ENDIF; ?>
 
 <div id="monthEvents" name="monthEvents">
     <h2 class="anchorsTitle">Eventos do mês</h2>
@@ -149,6 +152,23 @@
             <li><a href="#top">voltar ao topo [t]</a></li>
         </ul>
     </div>
+</div>
+
+<div id="monthNavigation" name="monthNavigation">
+    <h2 class="anchorsTitle">Navegação por mês</h2>
+    <div class="links linkAsButton alignCenter">
+        <ul>
+            <?php FOREACH ($VIEW->calendarNavigation AS $MONTH) : ?>
+                <li><a href="<?= $MONTH->lnk ?>" title="<?= $MONTH->lnkTitle ?>"><?= $MONTH->lnkText ?></a></li>
+            <?php ENDFOREACH; ?>
+        </ul>
+    </div>
+</div>
+
+<div class="backToTop links systemLinks contentAlign">
+    <ul>
+        <li><a href="#top">voltar ao topo [t]</a></li>
+    </ul>
 </div>
 
 </body>

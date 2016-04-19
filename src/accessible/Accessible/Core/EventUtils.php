@@ -73,6 +73,21 @@ class EventUtils
     const EVENTS_WITHOUT_LOCATION = 'Não foi definido um local para este evento';
 
     /**
+     * @var EVENTS_PREVIOUS_MONTH.
+     */
+    const EVENTS_PREVIOUS_MONTH = 'mês anterior';
+
+    /**
+     * @var EVENTS_CURRENT_MONTH.
+     */
+    const EVENTS_CURRENT_MONTH = 'mês exibido';
+
+    /**
+     * @var EVENTS_NEXT_MONTH.
+     */
+    const EVENTS_NEXT_MONTH = 'mês seguinte';
+
+    /**
      * This method standardize events date range commonly used in all events
      * calendar routines that needs date range information. Date representation
      * is like in the following format '2016-03-01 00:00'.
@@ -196,5 +211,37 @@ class EventUtils
             $dtEvent->dayVal ===   DateUtils::getCurrentDay() &&
             $dtEvent->monthVal === DateUtils::getCurrentMonthNumber() &&
             $dtEvent->yearVal ===  DateUtils::getCurrentYear();
+    }
+
+    /**
+     * Returns an event date range for month navigation (indicating previous, current
+     * and next both month and year information for each).
+     *
+     * @param $params Contains the initial request to calendar module
+     * @return array An array of prepared date range objects wich containing the
+     *               navigation order direction (->order), the number of the
+     *               month (->month) and the year (->year)
+     */
+    public static function getPreparedDateRangeForCalendarNavigation($params)
+    {
+        $dt = strtotime(date('Y-m-d', mktime(0,0,0, $params->month, 01 , $params->year)));
+
+        return array(
+            'previousMonth' => (object) array(
+                'order' => self::EVENTS_PREVIOUS_MONTH,
+                'month' => intval(date('m', strtotime('previous month', $dt))),
+                'year' => intval(date('Y', strtotime('previous month', $dt))),
+            ),
+            'currentMonth' => (object) array(
+                'order' => self::EVENTS_CURRENT_MONTH,
+                'month' => intval(date('m', strtotime('this month', $dt))),
+                'year' =>  intval(date('Y', strtotime('this month', $dt))),
+            ),
+            'nextMonth' => (object) array(
+                'order' => self::EVENTS_NEXT_MONTH,
+                'month' => intval(date('m', strtotime('next month', $dt))),
+                'year' =>  intval(date('Y', strtotime('next month', $dt))),
+            )
+        );
     }
 }

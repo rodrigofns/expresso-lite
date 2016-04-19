@@ -27,6 +27,10 @@ class Main extends Handler
     {
         $currCalendar  = $this->getCurrentCalendar($params);
         $currDateRange = $this->formatCurrentCalendarDateRange($params);
+        $currNavigationDateRange = EventUtils::getPreparedDateRangeForCalendarNavigation( (object) array(
+            'month' => $currDateRange->monthVal,
+            'year'  => $currDateRange->yearVal
+        ));
 
         // The complete list of events according to the current calendar date range
         $allEvents = $this->getEventListing($currCalendar->id, $currDateRange);
@@ -49,7 +53,11 @@ class Main extends Handler
             'lnkChangeCalendar' => $this->makeUrl('Calendar.OpenCalendar'),
             'lnkBack' => $this->makeUrl('Calendar.Main', array(
                 'calendarId' => $currCalendar->id,
-            ))
+            )),
+            'calendarNavigation' => $this->formatCalendarNavigationLinks(
+                $currCalendar->id,
+                $currNavigationDateRange
+            )
         ));
     }
 
@@ -204,5 +212,35 @@ class Main extends Handler
         } else {
             return array();
         }
+    }
+
+    /**
+     * Format links for calendar navigation.
+     *
+     * @param int $calendarId The id of the current calendar in use
+     * @param array $eventDateRange An array of prepared event date range objects
+     * @return array Formatted link objects to calendar navigation, each element contains
+     *               a link to navigate through calendar (->lnk), the text of the
+     *               link (->lnkText) and a title for the link (->lnkTitle)
+     */
+    private function formatCalendarNavigationLinks($calendarId, $eventDateRange)
+    {
+        $calendarNavigationLinks = array();
+
+        // Formatting links
+        foreach ($eventDateRange as $edr) {
+            $monthName = DateUtils::getMonthName($edr->month);
+
+            $calendarNavigationLinks[] = (object) array(
+                'lnk' => $this->makeUrl('Calendar.Main', array(
+                    'month' => $edr->month,
+                    'year' => $edr->year,
+                    'calendarId' => $calendarId
+                )),
+                'lnkText' => $edr->order . ' - ' . $monthName . ' de ' . $edr->year,
+                'lnkTitle' => EventUtils::EVENTS_CALENDAR_NAME . ' de ' . $monthName . ' de ' . $edr->year
+            );
+        }
+        return $calendarNavigationLinks;
     }
 }
