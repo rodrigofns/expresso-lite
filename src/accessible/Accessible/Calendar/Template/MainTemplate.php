@@ -77,7 +77,7 @@
                     <?= $EVENT->formattedFrom ?> às <?= $EVENT->formattedUntil ?>
                 </td>
                 <td headers="subject" class="alignLeft">
-                    <a href="#" title="Visualizar este evento">
+                    <a href="<?= $EVENT->lnkOpenEvent ?>" title="Visualizar este evento">
                         <span class="onlyForScreenReaders">
                             Evento de hoje <?= $SEQ; ?>,
                             Assunto: <?= $EVENT->summary; ?>,
@@ -128,7 +128,7 @@
                     <?= $EVENT->formattedFrom; ?>
                 </td>
                 <td headers="subject" class="alignLeft">
-                    <a href="#" title="Visualizar este evento">
+                    <a href="<?= $EVENT->lnkOpenEvent ?>" title="Visualizar este evento">
                         <span class="onlyForScreenReaders">
                             Evento <?= $SEQ; ?>,
                             Assunto: <?= $EVENT->summary; ?>,

@@ -43,10 +43,18 @@ class Main extends Handler
             'calendarMainTitle' => $this->prepareCalendarMainTitle($currDateRange, $currCalendar),
             'isTodayExhibition' => $showTodayEvents,
             'hasTodayEvents' => $todayEvents->hasEvents,
-            'todayEventListing' => $this->formatEventsForVisualization($todayEvents->listing),
+            'todayEventListing' => $this->formatEventsForVisualization(
+                $todayEvents->listing,
+                $currCalendar->id,
+                $currDateRange
+            ),
             'dateRangeTodayEventsSummary' => EventUtils::setTodayEventsDateRangeSummary($todayEvents->listing),
             'hasEvents' => $allEvents->hasEvents,
-            'eventListing' => $this->formatEventsForVisualization($allEvents->listing),
+            'eventListing' => $this->formatEventsForVisualization(
+                $allEvents->listing,
+                $currCalendar->id,
+                $currDateRange
+             ),
             'dateRangeEventsSummary' => EventUtils::setEventsDateRangeSummary($allEvents->listing, $currDateRange),
             'lnkEmail' => $this->makeUrl('Mail.Main'),
             'lnkLogoff' => $this->makeUrl('Login.Logoff'),
@@ -62,7 +70,7 @@ class Main extends Handler
     }
 
     /**
-     * Returns the current calendar as is passed or not a calendar id, if any id is
+     * Return the current calendar as is passed or not a calendar id, if any id is
      * provided or is invalid, so the personal calendar of the user will be used as
      * default.
      *
@@ -193,9 +201,12 @@ class Main extends Handler
      *
      * @param array $eventListing Event listing in a given date range to be
      *                            formatted for visualization
+     * @param int $currCalendarId The id of the current calendar in use
+     * @param stdClass $currDateRange Formatted date range with month and
+     *                                year values
      * @return array Formatted list of events
      */
-    private function formatEventsForVisualization($eventListing)
+    private function formatEventsForVisualization($eventListing, $currCalendarId, $currDateRange)
     {
         if (isset($eventListing) && count($eventListing) > 0) {
             foreach ($eventListing as &$event) {
@@ -207,6 +218,14 @@ class Main extends Handler
                 $event->formattedMonth =   $fromData->monthName;
                 $event->formattedWeekDay = $fromData->weekdayName;
                 $event->notYetOccurred =   DateUtils::compareToCurrentDate($event->from);
+                $event->lnkOpenEvent = $this->makeUrl('Calendar.OpenEvent', array(
+                    'from' => $event->from,
+                    'until' => $event->until,
+                    'idEvent' => $event->id,
+                    'calendarId' => $currCalendarId,
+                    'monthVal' => $currDateRange->monthVal,
+                    'yearVal' => $currDateRange->yearVal
+                ));
             }
             return $eventListing;
         } else {
@@ -219,9 +238,9 @@ class Main extends Handler
      *
      * @param int $calendarId The id of the current calendar in use
      * @param array $eventDateRange An array of prepared event date range objects
-     * @return array Formatted link objects to calendar navigation, each element contains
-     *               a link to navigate through calendar (->lnk), the text of the
-     *               link (->lnkText) and a title for the link (->lnkTitle)
+     * @return array Formatted link objects to calendar navigation, each element
+     *               contains a link to navigate through calendar (->lnk), the text
+     *               of the link (->lnkText) and a title for the link (->lnkTitle)
      */
     private function formatCalendarNavigationLinks($calendarId, $eventDateRange)
     {

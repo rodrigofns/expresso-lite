@@ -88,6 +88,38 @@ class EventUtils
     const EVENTS_NEXT_MONTH = 'mês seguinte';
 
     /**
+     * @var EVENTS_CONFIRM_ACCEPTED.
+     */
+    const EVENTS_CONFIRM_ACCEPTED = 'participação aceita';
+
+    /**
+     * @var EVENTS_CONFIRM_TENTATIVE.
+     */
+    const EVENTS_CONFIRM_TENTATIVE = 'tentará participar';
+
+    /**
+     * @var EVENTS_CONFIRM_NEEDS_ACTION.
+     */
+    const EVENTS_CONFIRM_NEEDS_ACTION = 'aguardando resposta';
+
+    /**
+     * @var EVENTS_CONFIRM_DECLINED.
+     */
+    const EVENTS_CONFIRM_DECLINED = 'participação recusada';
+
+    /**
+     * Mapping of event confirmation types and description about calendar events.
+     *
+     * @var $confirmationTypesAndDescription
+     */
+    private static $confirmationTypesAndDescription = array(
+        'ACCEPTED'     => self::EVENTS_CONFIRM_ACCEPTED,
+        'TENTATIVE'    => self::EVENTS_CONFIRM_TENTATIVE,
+        'NEEDS-ACTION' => self::EVENTS_CONFIRM_NEEDS_ACTION,
+        'DECLINED'     => self::EVENTS_CONFIRM_DECLINED,
+    );
+
+    /**
      * This method standardize events date range commonly used in all events
      * calendar routines that needs date range information. Date representation
      * is like in the following format '2016-03-01 00:00'.
@@ -243,5 +275,67 @@ class EventUtils
                 'year' =>  intval(date('Y', strtotime('next month', $dt))),
             )
         );
+    }
+
+    /**
+     * Format the current status of attendee confirmation in a particular event.
+     *
+     * @param string $confirmationType The type of the current attendee status confirmation
+     *                                 at a particular event
+     * @return array An array of formatted information about the attendee status confirmation,
+     *               wich contains the description of the status (->confirmDescription) and the
+     *               corresponding css icon class (->confirmIconCssClass)
+     */
+    public static function getConfirmationDescription($confirmationType)
+    {
+        return self::$confirmationTypesAndDescription[$confirmationType];
+    }
+
+    /**
+     * Prepare a list in which each index is a type of event attendee confirmation and it's
+     * element is an empty array to be further filled with attendees that has the same
+     * confirmation type.
+     *
+     * @return array An associative array which the indexes are the existing types of event
+     *               attendee confirmation (->ACCEPTED), (->TENTATIVE), (->NEEDS-ACTION),
+     *               (->DECLINED) and their elements are empty arrays.
+     */
+    public static function prepareListOfConfirmationTypesToGroupAttendees()
+    {
+        $confirmationTypes = array_keys(self::$confirmationTypesAndDescription);
+        $arr = array();
+        foreach ($confirmationTypes as $confirmType){
+            $arr[$confirmType] = array(); // empty array to be filled, to group by confirmation type
+        }
+
+        return $arr;
+    }
+
+    /**
+     * Sort by name a prepared list of event attendees, also grouping the current attendee by the
+     * confirmation type.
+     *
+     * @param array $attendeesList An array list indexed by type of confirmation (['ACCEPTED']),
+     *                             (['TENTATIVE']), (['NEEDS-ACTION']), (['DECLINED']) which the
+     *                             element is an UNORDERED attendee list
+     * @return array The indexed by type of confirmation array which the respective element is an
+     *               SORTED BY NAME attendee list
+     */
+    public static function sortAttendeesByName($attendeesList)
+    {
+        usort(&$attendeesList['ACCEPTED'], function($e1, $e2) {
+            return strcmp($e1->name, $e2->name);
+        });
+        usort(&$attendeesList['TENTATIVE'], function($e1, $e2) {
+            return strcmp($e1->name, $e2->name);
+        });
+        usort(&$attendeesList['NEEDS-ACTION'], function($e1, $e2) {
+            return strcmp($e1->name, $e2->name);
+        });
+        usort(&$attendeesList['DECLINED'], function($e1, $e2) {
+            return strcmp($e1->name, $e2->name);
+        });
+
+        return $attendeesList;
     }
 }
