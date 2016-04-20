@@ -170,4 +170,13 @@ class WidgetCompose extends GenericPage
     {
         return $this->byCssSelector('.Compose_body')->text();
     }
+
+    /**
+     * Checks if the compose_important is currently being selected
+     * @return boolean Returns true if the compose_important is marked, false otherwise
+     */
+    public function isImportantCheckboxChecked()
+    {
+        return $this->byCssSelector('.Compose_important')->selected();
+    }
 }

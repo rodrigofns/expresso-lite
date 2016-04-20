@@ -78,4 +78,52 @@ class SaveDraftTest extends SingleLoginTest
                             'The Message Body in the Compose Window does not match the original mail message:' . $MAIL_CONTENT);
 
     }
+
+    /**
+     * In this test, the e-mail was created and saved in draft folder. Checks if
+     * turn on the important flag.
+     *
+     * CTV3-843
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-843
+     */
+    public function test_CTV3_843_Save_Draft_Important_Flag()
+    {
+        $mailPage = new MailPage($this);
+
+        //load test data
+        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $MAIL_CONTENT = $this->getTestValue('mail.content');
+        $MAIL_NAME = $this->getTestValue('mail.name');
+
+        //testStart
+        $mailPage->clickWriteEmailButton();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+
+        $widgetCompose->clickOnRecipientField();
+        $widgetCompose->type($MAIL_RECIPIENT);
+        $widgetCompose->typeEnter();
+
+        $widgetCompose->typeSubject($MAIL_SUBJECT);
+
+        $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
+        $widgetCompose->clickImportantRadio();
+
+        $widgetCompose->clickSaveDraftButton();
+
+        $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
+
+        $mailPage->clickOnFolderByName('Rascunhos');
+
+        $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
+
+        $this->assertTrue($headlinesEntry->hasImportantIcon(), 'Headline should have been listed as important, but it was not');
+
+        $headlinesEntry->click();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+        $this->assertTrue($widgetCompose->isImportantCheckboxChecked(), 'Checkbox was marked as important, but it was not');
+    }
 }
