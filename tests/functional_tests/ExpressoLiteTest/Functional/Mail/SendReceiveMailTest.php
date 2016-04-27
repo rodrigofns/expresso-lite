@@ -149,4 +149,79 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $this->assertContains($ORIGINAL_MAIL_CONTENT, $messageUnit->getQuoteText(), 'The original message content was not found in the mail quote section');
     }
+
+    /**
+     * Checks the forward e-mail feature. In this test, user 1 sends an e-mail
+     * to user 2, who forward to user 3
+     *
+     * CTV3-758
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-758
+     *
+     */
+    public function test_CTV3_758_SendReceiveFowardOpenMail()
+    {
+        //load test data
+        $USER_1_LOGIN = $this->getTestValue('user.1.login');
+        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
+        $USER_1_MAIL = $this->getTestValue('user.1.mail');
+        $USER_1_NAME = $this->getTestValue('user.1.name');
+        $USER_2_LOGIN = $this->getTestValue('user.2.login');
+        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
+        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_3_LOGIN = $this->getTestValue('user.3.login');
+        $USER_3_PASSWORD = $this->getTestValue('user.3.password');
+        $USER_3_MAIL = $this->getTestValue('user.3.mail');
+        $USER_3_NAME = $this->getTestValue('user.3.name');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
+        $FORWARD_MAIL_CONTENT = $this->getTestValue('forward.mail.content');
+
+        //testStart
+        $loginPage = new LoginPage($this);
+
+        $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
+        $mailPage = new MailPage($this);
+
+        $mailPage->sendMail(array($USER_2_MAIL), $MAIL_SUBJECT, $ORIGINAL_MAIL_CONTENT);
+        $mailPage->clickLogout();
+
+        $loginPage->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
+
+        $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
+
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+        $messageUnit->clickMenuOptionForward();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+        $FORWARD_SUBJECT = 'Fwd: ' . $MAIL_SUBJECT;
+        $widgetCompose->clickOnRecipientField();
+        $widgetCompose->type($USER_3_MAIL);
+        $widgetCompose->typeEnter();
+        $widgetCompose->typeMessageBodyBeforeSignature($FORWARD_MAIL_CONTENT);
+
+        $this->assertEquals(array($USER_3_NAME), $widgetCompose->getArrayOfCurrentBadges(), 'Forward window did not show the expected recipient');
+        $this->assertEquals($FORWARD_SUBJECT, $widgetCompose->getSubject() , 'Forward window did not the expected subject');
+        $this->assertContains($ORIGINAL_MAIL_CONTENT, $widgetCompose->getMessageBodyText());
+
+        $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $mailPage->clickLayoutBackButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $mailPage->clickLogout();
+        $loginPage->doLogin($USER_3_LOGIN, $USER_3_PASSWORD);
+        $mailPage = new MailPage($this);
+
+        $mailPage->clickOnHeadlineBySubject($FORWARD_SUBJECT);
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+
+        $this->assertContains($FORWARD_MAIL_CONTENT, $messageUnit->getContent(), 'The forwarded message content was not found in the forward body');
+        $this->assertTrue($messageUnit->hasShowQuoteButton(), 'The forwarded message did not show the Show Quote button');
+
+        $messageUnit->clickShowQuoteButton();
+
+        $this->assertContains($ORIGINAL_MAIL_CONTENT, $messageUnit->getQuoteText(), 'The original message content was not found in the mail quote section');
+    }
 }
