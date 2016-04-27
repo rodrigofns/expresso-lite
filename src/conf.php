@@ -42,3 +42,13 @@ define('MAIL_BATCH', 50); // how many email entries loaded by default
  * -------------
  */
 
+
+/*
+ * It is possible to make Expresso Lite client to trace every AJAX call
+ * that has not yet received a response. This is specially useful when
+ * running Selenium tests, as this will provide more information when a
+ * timeout occurs. To enable tracing, set the following constant with true
+ * -------------
+ * define('TRACE_PENDING_AJAX_CALLS', true);
+ * -------------
+ */

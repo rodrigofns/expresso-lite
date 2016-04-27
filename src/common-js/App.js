@@ -17,6 +17,9 @@ function($, Cordova) {
     var App = {};
     var ajaxUrl = null; // to be cached on first getAjaxUrl() call
 
+    var pendingAjax = null;
+    var pendingAjaxIndex = null;
+
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
             navigator.userAgent.indexOf('Mozilla') !== -1 &&
@@ -63,19 +66,6 @@ function($, Cordova) {
         return defer.promise();
     }
 
-    (function _Constructor() {
-        $.ajaxSetup({ // iOS devices may cache POST requests, so make no-cache explicit
-            type: 'POST',
-            headers: { 'cache-control':'no-cache' }
-        });
-
-        _DisableRefreshOnPullDown();
-
-        $(window).on('beforeunload', function() {
-            isUnloadingPage = true;
-        });
-    })();
-
     App.loadCss = function(cssFiles) { // pass any number of files as arguments
         var head = document.getElementsByTagName('head')[0];
         for (var i = 0; i < arguments.length; ++i) {
@@ -106,10 +96,21 @@ function($, Cordova) {
 
         var defer = $.Deferred();
 
+        var ajaxCall = $.extend({r:requestName}, params);
+
+        var thisAjaxIndex = pendingAjaxIndex++;
+        if (pendingAjax != null) {
+            pendingAjax[thisAjaxIndex] = ajaxCall;
+        }
+
         $.post(
             App.getAjaxUrl(),
-            $.extend({r:requestName}, params)
-        ).done(function (data) {
+            ajaxCall
+        ).always(function() {
+            if (pendingAjax !== null) {
+                pendingAjax[thisAjaxIndex] = null;
+            }
+        }).done(function (data) {
             defer.resolve(data);
         }).fail(function (data) {
             if (isUnloadingPage) {
@@ -213,6 +214,40 @@ function($, Cordova) {
     App.goToFolder = function(folderName) {
         document.location.href = folderName + (Cordova ? '/index.html' : '/');
     };
+
+    App.getPendingAjax = function() {
+        if (pendingAjax === null) {
+            return {error: 'Pending ajax calls tracing is not enabled. Add TRACE_PENDING_AJAX_CALLS=true in conf.php to enable it.'};
+        }
+
+        var pendingAjaxWithoutNulls = [];
+
+        for (var i=0; i < pendingAjax.length; i++) {
+            if (pendingAjax[i] !== null) {
+                pendingAjaxWithoutNulls.push(pendingAjax[i]);
+            }
+        }
+
+        return pendingAjaxWithoutNulls;
+    };
+
+    (function _Constructor() {
+        $.ajaxSetup({ // iOS devices may cache POST requests, so make no-cache explicit
+            type: 'POST',
+            headers: { 'cache-control':'no-cache' }
+        });
+
+        _DisableRefreshOnPullDown();
+
+        $(window).on('beforeunload', function() {
+            isUnloadingPage = true;
+        });
+
+        if (App.getUserInfo('tracePendingAjaxCalls') == 'yes') {
+            pendingAjax = [];
+            pendingAjaxIndex = 0;
+        }
+    })();
 
     return App;
 });

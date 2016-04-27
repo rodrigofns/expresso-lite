@@ -144,6 +144,7 @@ class MailPage extends GenericPage
     public function sendMail($recipients, $subject, $content)
     {
         $this->clickWriteEmailButton();
+        $this->testCase->waitForAjaxAndAnimationsToComplete();
         $widgetCompose = $this->getWidgetCompose();
         $widgetCompose->clickOnRecipientField();
 

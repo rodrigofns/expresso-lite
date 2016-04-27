@@ -25,7 +25,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
      * this is the max number of milliseconds that selenium will wait for the element to be present
      * before throwing an exception
      */
-    const IMPLICIT_WAIT = 10000;
+    const IMPLICIT_WAIT = 30000;
 
     /**
      * @var int DEFAULT_WAIT_INTERVAL The interval to be waited between attempts to check if an
@@ -170,15 +170,40 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
      */
     public function waitForAjaxAndAnimationsToComplete()
     {
-        $this->waitUntil(function($testCase) {
-            $activeElements = $testCase->execute(array(
-                    'script' => 'return $.active + $(\':animated\').length;',
+        try {
+            $this->waitUntil(function($testCase) {
+                $activeElements = $testCase->execute(array(
+                        'script' =>
+                            'return $.active + ' . //number of pending ajax calls
+                            '$(\'.velocity-animating\').length + ' . //number of currently animating elements
+                            '$(\'*[id*="hrobber"]:visible, *[class*="hrobber"]:visible, img[src $= "chromiumthrobber.svg"]:visible\');', //number of visible thobbers
+                        'args' => array()
+                )); //number of pending ajax calls + number of currently animating elements
+                return $activeElements > 0 ? null : true;
+            }, self::IMPLICIT_WAIT);
+        } catch (\Exception $exc) {
+            $pendingAjax = $this->execute(array(
+                    'script' => 'return JSON.stringify(require("common-js/App").getPendingAjax());',
                     'args' => array()
-            )); //number of pending ajax calls + number of currently animating elements
-            return $activeElements > 0 ? null : true;
-        }, self::IMPLICIT_WAIT);
-    }
+            ));
 
+            $animated = $this->execute(array(
+                    'script' => 'return JSON.stringify($(".velocity-animating"));',
+                    'args' => array()
+            ));
+
+            $thobber = $this->execute(array(
+                    'script' => 'return JSON.stringify($(\'*[id*="hrobber"]:visible, *[class*="hrobber"]:visible, img[src $= "chromiumthrobber.svg"]:visible\'));',
+                    'args' => array()
+            ));
+
+            throw new \Exception("waitForAjaxAndAnimationsToComplete failed.\n" .
+                                 "Pending Ajax: $pendingAjax\n" .
+                                 "Animated elements: ' .  $animated\n" .
+                                 "Thobbers: " . $thobber,
+                                 0, $exc);
+        }
+    }
 
     /**
      * Waits for an alert to be displayed.

@@ -85,9 +85,10 @@ class WidgetCompose extends GenericPage
      */
     public function typeMessageBodyBeforeSignature($messageBody)
     {
-        $this->byCssSelector('.Compose_body')->click();
-        $this->typeCtrlHome();
-        $this->type($messageBody);
+        $this->testCase->execute(array(
+                'script' => "$('.Compose_body:visible').focus().prepend(document.createTextNode('$messageBody'));",
+                'args' => array()
+        ));
     }
 
     /**
