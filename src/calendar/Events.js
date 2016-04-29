@@ -60,7 +60,7 @@ return function() {
         if (period === null) {
             defer.resolve(); // period already cached
         } else {
-            App.Post('searchEvents', {
+            App.post('searchEvents', {
                 from: DateCalc.makeQueryStr(period.from),
                 until: DateCalc.makeQueryStr(period.pastUntil),
                 calendarId: calendarId
@@ -123,7 +123,7 @@ return function() {
 
     THIS.setConfirmation = function(eventId, confirmation) {
         var defer = $.Deferred();
-        App.Post('setEventConfirmation', {
+        App.post('setEventConfirmation', {
             id: eventId,
             confirmation: confirmation
         }).fail(function(resp) {
@@ -138,7 +138,7 @@ return function() {
 
     THIS.remove = function(eventId) {
         var defer = $.Deferred();
-        App.Post('deleteEvent', {
+        App.post('deleteEvent', {
             id: eventId
         }).fail(function(resp) {
             window.alert('Erro ao remover evento.\n' +
@@ -217,7 +217,7 @@ return function() {
         event.attendees.sort(function(a, b) { // alphabetically
             return a.name.localeCompare(b.name);
         });
-        var ourMail = App.GetUserInfo('mailAddress');
+        var ourMail = App.getUserInfo('mailAddress');
         var curUserAttendee = null;
         var bucket = {
             'ACCEPTED': [],

@@ -28,7 +28,7 @@ require(['jquery',
 function($, App, UrlStack, Layout, ContextMenu, Contacts, ThreadMail,
     WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
-    MAILBATCH: App.GetUserInfo('mailBatch'),
+    MAILBATCH: App.getUserInfo('mailBatch'),
     folders: [], // all folder objects
     layout: null, // renders the main page layout
     treeFolders: null, // folder rendering widget
@@ -38,17 +38,17 @@ window.Cache = {
     wndCompose: null // compose modeless popup
 };
 
-App.Ready(function() {
+App.ready(function() {
     // Initialize page objects.
     Cache.layout = new Layout({
-        userMail: App.GetUserInfo('mailAddress'),
+        userMail: App.getUserInfo('mailAddress'),
         $menu: $('#leftColumn'),
         $middle: $('#middleBody'),
         $right: $('#rightBody')
     });
     Cache.wndCompose = new WidgetCompose({
-        address: App.GetUserInfo('mailAddress'),
-        signature: App.GetUserInfo('mailSignature'),
+        address: App.getUserInfo('mailAddress'),
+        signature: App.getUserInfo('mailSignature'),
         folderCache: Cache.folders
     });
     Cache.treeFolders = new WidgetFolders({ $elem:$('#foldersArea'), folderCache:Cache.folders });
@@ -111,7 +111,7 @@ App.Ready(function() {
 function UpdatePageTitle() {
     var folder = Cache.treeFolders.getCurrent();
     var counter = (folder.unreadMails > 0) ? '('+folder.unreadMails+') ' : '';
-    document.title = counter+folder.localName+' - '+App.GetUserInfo('mailAddress')+' - ExpressoBr';
+    document.title = counter+folder.localName+' - '+App.getUserInfo('mailAddress')+' - ExpressoBr';
     Cache.layout.setTitle(Cache.layout.isRightPanelVisible() ?
         'voltar' :
         folder.localName+(folder.unreadMails ? ' ('+folder.unreadMails+')' : '')

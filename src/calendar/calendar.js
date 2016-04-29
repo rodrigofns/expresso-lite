@@ -41,10 +41,10 @@ window.Cache = {
     curDate: DateCalc.today() // current date being displayed
 };
 
-App.Ready(function() {
+App.ready(function() {
     // Initialize page objects.
     Cache.layout = new Layout({
-        userMail: App.GetUserInfo('mailAddress'),
+        userMail: App.getUserInfo('mailAddress'),
         $menu: $('#leftColumn'),
         $middle: $('#middleBody'),
         $right: $('#rightBody')
@@ -102,7 +102,7 @@ App.Ready(function() {
 function LoadUserCalendars() {
     var defer = $.Deferred();
     $('#chooseViewMenu,#chooseCalendarMenu').hide();
-    App.Post('getCalendars')
+    App.post('getCalendars')
         .fail(function(resp) {
             window.alert('Erro ao carregar calendários pessoais.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);

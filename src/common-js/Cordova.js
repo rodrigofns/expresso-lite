@@ -25,10 +25,10 @@ function($, CordovaConfig, AccountManager, App) {
         var App = require('common-js/App');
         //this is needed to avoid a circular dependence in requireJs
 
-        App.Post('checkSessionStatus')
+        App.post('checkSessionStatus')
         .done(function(result) {
             if (result.status !== 'active') {
-                App.ReturnToLoginScreen();
+                App.returnToLoginScreen();
             }
         });
     };

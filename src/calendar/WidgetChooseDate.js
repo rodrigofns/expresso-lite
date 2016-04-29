@@ -14,7 +14,7 @@ define(['jquery',
     'calendar/DateCalc'
 ],
 function($, App, UrlStack, DateCalc) {
-App.LoadCss('calendar/WidgetChooseDate.css');
+App.loadCss('calendar/WidgetChooseDate.css');
 var WidgetChooseDate = function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
@@ -116,7 +116,7 @@ var WidgetChooseDate = function(options) {
             renderDate = curDate;
             _RenderCells();
             var css = { };
-            if (App.IsPhone()) { // as a modal popup
+            if (App.isPhone()) { // as a modal popup
                 $(document.createElement('div'))
                     .addClass('ChooseDate_darkCover') // dark background cover on screen
                     .appendTo(document.body)
@@ -192,7 +192,7 @@ WidgetChooseDate.Load = function() {
     // Static method, since this class can be instantiated ad-hoc.
     return $('#ChooseDate_template').length ?
         $.Deferred().resolve().promise() :
-        App.LoadTemplate('WidgetChooseDate.html');
+        App.loadTemplate('WidgetChooseDate.html');
 };
 
 return WidgetChooseDate;

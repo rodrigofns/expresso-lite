@@ -12,11 +12,11 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
-App.LoadCss('common-js/TextBadges.css');
+App.loadCss('common-js/TextBadges.css');
 var TextBadges = function(options) {
     var userOpts = $.extend({
         $target: null, // DIV where our field will be rendered
-        animationTime: (App.IsPhone() ? 250 : 200),
+        animationTime: (App.isPhone() ? 250 : 200),
         inputType: 'text',
         inputSize: 20
     }, options);
@@ -131,7 +131,7 @@ TextBadges.Load = function() {
     // Static method, since this class can be instantiated ad-hoc.
     return $('#TextBadges_template').length ?
         $.Deferred().resolve().promise() :
-        App.LoadTemplate('../common-js/TextBadges.html');
+        App.loadTemplate('../common-js/TextBadges.html');
 };
 
 return TextBadges;

@@ -13,7 +13,7 @@ define(['jquery',
     'common-js/Contacts'
 ],
 function($, App,Contacts) {
-    App.LoadCss('addressbook/WidgetContactDetails.css');
+    App.loadCss('addressbook/WidgetContactDetails.css');
     return function(options) {
         var userOpts = $.extend({
             $parentContainer: null
@@ -84,7 +84,7 @@ function($, App,Contacts) {
         function createTelLink(number) {
             if (!number) {
                 return '';
-            } else if (App.IsPhone()) {
+            } else if (App.isPhone()) {
                 return number ? '<a class="phoneNumber" href="tel:' + number + '">' + number + '</a>' : '';
             } else {
                 return number;
@@ -117,7 +117,7 @@ function($, App,Contacts) {
         THIS.showDetails = function (contact) {
             $mainDiv.show();
             showContactDetailsFormTopInfo(contact);
-            App.Post('getContact', {id: contact.id})
+            App.post('getContact', {id: contact.id})
             .done(function(fullContact) {
                 showContactDetailsFormAdditionalInfo(fullContact);
             });

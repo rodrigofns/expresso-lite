@@ -16,7 +16,7 @@ define(['jquery',
     'common-js/Cordova'
 ],
 function($, App, UrlStack, ContextMenu, Cordova) {
-App.LoadCss('common-js/Layout.css');
+App.loadCss('common-js/Layout.css');
 return function(options) {
     var userOpts = $.extend({
         userMail: '',   // string with user email, for displaying purposes
@@ -36,7 +36,7 @@ return function(options) {
 
     THIS.load = function() {
         var defer = $.Deferred();
-        App.LoadTemplate('../common-js/Layout.html').done(function() {
+        App.loadTemplate('../common-js/Layout.html').done(function() {
             $('#Layout_userMail').text(userOpts.userMail);
             userOpts.$menu.appendTo('#Layout_leftContent'); // detach from page, attach to DIV
             userOpts.$middle.appendTo('#Layout_middleContent');
@@ -48,7 +48,7 @@ return function(options) {
             contextMenu = new ContextMenu({ $btn:$('#Layout_context') });
             THIS.setContextMenuVisible(false); // initially hidden
 
-            if (App.GetUserInfo('showDebuggerModule') === 'show') {
+            if (App.getUserInfo('showDebuggerModule') === 'show') {
                 $('#Layout_module_debugger').show();
             }
 
@@ -94,7 +94,7 @@ return function(options) {
         var defer = $.Deferred();
         var $leftSec = $('#Layout_left');
 
-        if (!App.IsPhone()) {
+        if (!App.isPhone()) {
             window.setTimeout(function() { defer.resolve(); }, 10);
         } else if (isVisible) { // show left menu on phones, does nothing on desktops
             _DarkBackground(true);
@@ -170,7 +170,7 @@ return function(options) {
 
         $('#Layout_btnSearch').on('click', function() {
             if (onSearchCB !== null) {
-                var searchTerm = App.IsPhone() ?
+                var searchTerm = App.isPhone() ?
                     window.prompt('Busca') : $('#Layout_txtSearch').val();
                 if (searchTerm !== null) {
                     onSearchCB(searchTerm);
@@ -187,12 +187,12 @@ return function(options) {
             $('#Layout_logoffScreen').show();
 
             function DoLogoff() {
-                App.Post('logoff')
+                App.post('logoff')
                 .done(function(data) {
                     $('body').css('overflow', 'hidden');
                     $('#Layout_logoffText').animate({ top:$(window).height() / 4 }, 200, function() {
                         $('#Layout_logoffText').animate({ top:$(window).height() }, 300, function() {
-                            App.ReturnToLoginScreen();
+                            App.returnToLoginScreen();
                         });
                     });
                 }).fail(function(error) {
@@ -222,7 +222,7 @@ return function(options) {
             ev.stopImmediatePropagation();
             var href = $(this).attr('href') !== undefined ?
                 $(this).attr('href') : $(this).find('a').attr('href');
-            App.GoToFolder(href);
+            App.goToFolder(href);
         });
 
         $(document).ajaxComplete(function AjaxComplete() {

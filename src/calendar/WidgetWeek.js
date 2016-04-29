@@ -13,7 +13,7 @@ define(['jquery',
     'calendar/DateCalc'
 ],
 function($, App, DateCalc) {
-App.LoadCss('calendar/WidgetWeek.css');
+App.loadCss('calendar/WidgetWeek.css');
 return function(options) {
     var userOpts = $.extend({
         events: null, // Events cache object
@@ -31,7 +31,7 @@ return function(options) {
     THIS.load = function() {
         return $('#Week_template').length ? // load once
             $.Deferred().resolve().promise() :
-            App.LoadTemplate('WidgetWeek.html');
+            App.loadTemplate('WidgetWeek.html');
     };
 
     THIS.hide = function() {

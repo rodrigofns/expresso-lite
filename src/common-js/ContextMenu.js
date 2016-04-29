@@ -13,7 +13,7 @@ define(['jquery',
     'common-js/UrlStack'
 ],
 function($, App, UrlStack) {
-App.LoadCss('common-js/ContextMenu.css');
+App.loadCss('common-js/ContextMenu.css');
 return function(options) {
     var userOpts = $.extend({
         $btn: null // jQuery object for the target button
@@ -86,7 +86,7 @@ return function(options) {
 
     $btn.add($ul).on('mouseenter.ContextMenu', function() {
         var szPage = { cx:$(window).width(), cy:$(window).height() };
-        if (App.IsPhone()) {
+        if (App.isPhone()) {
             return; // we're in phone, no mouseover event
         }
 
@@ -112,7 +112,7 @@ return function(options) {
     });
 
     $btn.add($ul).on('mouseleave.ContextMenu', function() {
-        if (!App.IsPhone()) {
+        if (!App.isPhone()) {
             _HidePopup();
         }
     });
@@ -120,7 +120,7 @@ return function(options) {
     $btn.on('click.ContextMenu', function(ev) {
         ev.stopImmediatePropagation();
         var szPage = { cx:$(window).width(), cy:$(window).height() };
-        if (!App.IsPhone()) {
+        if (!App.isPhone()) {
             return; // we're in desktop, no click event
         }
 

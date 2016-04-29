@@ -13,8 +13,7 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
-App.LoadCss('debugger/WidgetComponentTest.css');
-
+App.loadCss('debugger/WidgetComponentTest.css');
 return function(options) {
     var userOpts = $.extend({
         $parentContainer: null
@@ -65,7 +64,7 @@ return function(options) {
     }
 
     function initComponentSelect() {
-        App.Post('getJSComponentList')
+        App.post('getJSComponentList')
         .done(function(result) {
             for (var i=0; i < result.components.length; ++i) {
                 var compName = result.components[i];
@@ -170,7 +169,7 @@ return function(options) {
 
     THIS.Load = function () {
         var defer = $.Deferred();
-        App.LoadTemplate('WidgetComponentTest.html')
+        App.loadTemplate('WidgetComponentTest.html')
         .done(function () {
             userOpts.$parentContainer.append($('#WidgetComponentTest_div'));
             initEventListeners();

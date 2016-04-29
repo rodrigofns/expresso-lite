@@ -17,7 +17,7 @@ require(['jquery',
     'common-js/Cordova'
 ],
 function($, App, Cordova) {
-    App.Ready(function() {
+    App.ready(function() {
         if (Cordova) {
             $('#splash-screen').appendTo($('body'));
         } else {
@@ -34,10 +34,10 @@ function($, App, Cordova) {
             }
         }
 
-        App.Post('checkSessionStatus')
+        App.post('checkSessionStatus')
         .done(function(response) {
             if (response.status == 'active') {
-                App.GoToFolder('./mail'); // there is an active session, go to mail module
+                App.goToFolder('./mail'); // there is an active session, go to mail module
             } else if (Cordova) {
                 // no active session, but since we have Cordova
                 // we may have the credentials to start a new session
@@ -67,7 +67,7 @@ function($, App, Cordova) {
                 // Use the credential to perform a new login.
                 // This will be transparent to the user,
                 // since no fields are yet being displayed on screen
-                App.Post('login', {
+                App.post('login', {
                     user: account.login,
                     pwd: account.password
                 })
@@ -78,7 +78,7 @@ function($, App, Cordova) {
                     } else {
                         //since the only visible thing right now is the splash screen,
                         //just go straight to the mail module, without any fancy animations
-                        App.GoToFolder('./mail');
+                        App.goToFolder('./mail');
                     }
                 });
             }
@@ -111,7 +111,7 @@ function($, App, Cordova) {
                 complete: ShowScreen
             });
         } else {
-            var user = App.GetCookie('user');
+            var user = App.getCookie('user');
             if (user !== null) {
                 $('#user').val(user);
             }
@@ -157,7 +157,7 @@ function($, App, Cordova) {
     }
 
     function LoadServerStatus() {
-        App.Post('getAllRegistryData')
+        App.post('getAllRegistryData')
         .fail(function(resp) {
             window.alert('Erro ao consultar a versão atual do Expresso.\n'+
                 'É possível que o Expresso esteja fora do ar.');
@@ -207,7 +207,7 @@ function($, App, Cordova) {
         $('#frmLogin .throbber').show().children('span').text('Efetuando login...');
 
         function RestoreLoginState() {
-            if (!App.IsPhone()) $('#universalAccess').show();
+            if (!App.isPhone()) $('#universalAccess').show();
             $('#externalLinks').show();
             $('#btnLogin').show();
             $('#frmLogin input').prop('disabled', false);
@@ -215,7 +215,7 @@ function($, App, Cordova) {
             $('#user').focus();
         }
 
-        App.Post('login', {
+        App.post('login', {
             user:$('#user').val(),
             pwd:$('#pwd').val(),
             captcha: $('#captcha').val()
@@ -243,9 +243,9 @@ function($, App, Cordova) {
                 RestoreLoginState();
             } else {
                 for (var i in response.userInfo) {
-                    App.SetUserInfo(i, response.userInfo[i]);
+                    App.setUserInfo(i, response.userInfo[i]);
                 }
-                App.SetCookie('user', $('#user').val(), 30); // store for 30 days
+                App.setCookie('user', $('#user').val(), 30); // store for 30 days
 
                 if (Cordova) {
                     Cordova.SaveAccount($('#user').val(), $('#pwd').val())
@@ -288,7 +288,7 @@ function($, App, Cordova) {
                 $('#cpNewPwd').focus();
             }
 
-            App.Post('changeExpiredPassword', {
+            App.post('changeExpiredPassword', {
                 userName: $('#user').val(), // from login form
                 oldPassword: $('#cpOldPwd').val(),
                 newPassword: $('#cpNewPwd').val()
@@ -307,7 +307,7 @@ function($, App, Cordova) {
         $(document.body).css('overflow', 'hidden');
         $('#versionInfo, #frmLogin .throbber').hide();
 
-        if (App.IsPhone()) {
+        if (App.isPhone()) {
             var animTime = 300;
             $('#credent').css({
                     position: 'fixed',
@@ -327,7 +327,7 @@ function($, App, Cordova) {
                     duration: animTime,
                     queue: false,
                     complete: function() {
-                        App.GoToFolder('./mail');
+                        App.goToFolder('./mail');
                     }
                 });
         } else {
@@ -338,7 +338,7 @@ function($, App, Cordova) {
                 duration: animTime,
                 queue: false,
                 complete: function() {
-                    App.GoToFolder('./mail');
+                    App.goToFolder('./mail');
                 }
             });
         }

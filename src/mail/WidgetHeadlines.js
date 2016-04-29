@@ -15,7 +15,7 @@ define(['jquery',
     'mail/ThreadMail'
 ],
 function($, App, DateFormat, Contacts, ThreadMail) {
-App.LoadCss('mail/WidgetHeadlines.css');
+App.loadCss('mail/WidgetHeadlines.css');
 return function(options) {
     var userOpts = $.extend({
         $elem: null,    // jQuery object for the target DIV
@@ -226,9 +226,9 @@ return function(options) {
             $div.find('.Headlines_check > [class^=icoCheck]').replaceWith(
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
 
-            App.Post('getMessage', {
+            App.post('getMessage', {
                 id: headline.id,
-                ajaxUrl: App.GetAjaxUrl()
+                ajaxUrl: App.getAjaxUrl()
             }).always(function() {
                 $div.find('.throbber').replaceWith($check); // restore checkbox
             }).fail(function(resp) {
@@ -245,7 +245,7 @@ return function(options) {
     }
 
     THIS.load = function() {
-        return App.LoadTemplate('WidgetHeadlines.html');
+        return App.loadTemplate('WidgetHeadlines.html');
     };
 
     THIS.markRead = function(asRead) {
@@ -274,7 +274,7 @@ return function(options) {
                 $('#icons .throbber').clone().css('padding', '8px') ); // replace checkbox with throbber
             var relevantIds = $.map(relevantHeadlines, function(elem) { return elem.id; });
 
-            App.Post('markAsRead', { asRead:(asRead?1:0), ids:relevantIds.join(',') })
+            App.post('markAsRead', { asRead:(asRead?1:0), ids:relevantIds.join(',') })
             .always(function() {
                 $checkedDivs.find('.throbber').replaceWith($check); // restore checkbox
                 THIS.clearChecked();
@@ -323,7 +323,7 @@ return function(options) {
         destFolder.messages.length = 0; // force cache rebuild
         destFolder.threads.length = 0;
 
-        App.Post('moveMessages', { messages:msgIds.join(','), folder:destFolder.id })
+        App.post('moveMessages', { messages:msgIds.join(','), folder:destFolder.id })
         .fail(function(resp) {
             window.alert('Erro ao mover email.\n' +
                 'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -361,7 +361,7 @@ return function(options) {
             headlines[i].flagged = willStar; // update cache
         }
 
-        App.Post('markAsHighlighted', { ids:msgIds.join(','), asHighlighted:(willStar?'1':'0') })
+        App.post('markAsHighlighted', { ids:msgIds.join(','), asHighlighted:(willStar?'1':'0') })
         .always(function() {
             $checkedDivs.find('.Headlines_loading').replaceWith(
                 (willStar ? $('#icons .icoHigh1') : $('#icons .icoHigh0')).clone() );
@@ -403,7 +403,7 @@ return function(options) {
             var msgIds = $.map(headlines, function(elem) { return elem.id; });
             ThreadMail.RemoveHeadlinesFromFolder(msgIds, curFolder);
 
-            App.Post('deleteMessages', { messages:msgIds.join(','), forever:1 })
+            App.post('deleteMessages', { messages:msgIds.join(','), forever:1 })
             .fail(function(resp) {
                 window.alert('Erro ao apagar email.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
@@ -432,7 +432,7 @@ return function(options) {
             $targetDiv.css('height', '100%'); // important for _AnimateFirstHeadlines()
             var $loading = _CreateDivLoading('Carregando mensagens...').appendTo($targetDiv);
             if (!curFolder.messages.length) { // not cached yet
-                App.Post('searchHeadlines', {
+                App.post('searchHeadlines', {
                     folderIds: curFolder.id,
                     start: 0,
                     limit: howMany
@@ -471,7 +471,7 @@ return function(options) {
 
         var theCurFolderId = isSearchAfterSearch ?
             curFolder.searchedFolder.id : curFolder.id;
-        App.Post('searchHeadlines', {
+        App.post('searchHeadlines', {
             what: text,
             folderIds: theCurFolderId, // multiple folder IDs separated by commas
             start: 0,
@@ -508,7 +508,7 @@ return function(options) {
 
         var thisIsASearch = (curFolder.searchedFolder !== undefined); // actually a search result?
 
-        App.Post('searchHeadlines', {
+        App.post('searchHeadlines', {
             what: thisIsASearch ? curFolder.searchedText : '',
             folderIds: thisIsASearch ? curFolder.searchedFolder.id : curFolder.id,
             start: curFolder.messages.length,
@@ -549,7 +549,7 @@ return function(options) {
             headl0 = $current.data('thread')[0]; // 1st headline of thread being read
         }
 
-        App.Post('searchHeadlines', { folderIds:curFolder.id, start:0, limit:howMany })
+        App.post('searchHeadlines', { folderIds:curFolder.id, start:0, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+curFolder.localName+'".\n' +

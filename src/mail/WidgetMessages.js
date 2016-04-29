@@ -16,7 +16,7 @@ define(['jquery',
     'mail/ThreadMail'
 ],
 function($, App, DateFormat, ContextMenu, Contacts, ThreadMail) {
-App.LoadCss('mail/WidgetMessages.css');
+App.loadCss('mail/WidgetMessages.css');
 return function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
@@ -174,7 +174,7 @@ return function(options) {
             if (!asRead && $elem.find('.Messages_content').is(':visible'))
                     $elem.children('.Messages_top1').trigger('click'); // collapse if expanded
 
-            App.Post('markAsRead', { asRead:(asRead?1:0), ids:headline.id })
+            App.post('markAsRead', { asRead:(asRead?1:0), ids:headline.id })
             .always(function() { $elem.find('.Messages_throbber').remove(); })
             .fail(function(resp) {
                 window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
@@ -207,7 +207,7 @@ return function(options) {
             $elem.find('.Messages_from').append($('#icons .throbber').clone());
             $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
-            App.Post('moveMessages', { messages:headline.id, folder:destFolder.id })
+            App.post('moveMessages', { messages:headline.id, folder:destFolder.id })
             .always(function() { $elem.find('.throbber').remove(); })
             .fail(function(resp) {
                 window.alert('Erro ao mover mensagem.\n' +
@@ -258,7 +258,7 @@ return function(options) {
                 $elem.find('.Messages_from').append($('#icons .throbber').clone());
                 $elem.children('.Messages_top2,.Messages_attachs,.Messages_content').remove(); // won't expand anymore
 
-                App.Post('deleteMessages', { messages:headline.id, forever:1 })
+                App.post('deleteMessages', { messages:headline.id, forever:1 })
                 .always(function() { $elem.find('.throbber').remove(); })
                 .fail(function(resp) {
                     window.alert('Erro ao apagar email.\n' +
@@ -315,7 +315,7 @@ return function(options) {
     }
 
     THIS.load = function() {
-        return App.LoadTemplate('WidgetMessages.html');
+        return App.loadTemplate('WidgetMessages.html');
     };
 
     THIS.empty = function() {
@@ -419,9 +419,9 @@ return function(options) {
                         .append($('#icons .throbber').clone())
                 );
 
-                App.Post('getMessage', {
+                App.post('getMessage', {
                     id: headline.id,
-                    ajaxUrl: App.GetAjaxUrl()
+                    ajaxUrl: App.getAjaxUrl()
                 }).always(function() {
                     $divUnit.find('.Messages_loading').remove();
                 }).fail(function(resp) {
@@ -455,7 +455,7 @@ return function(options) {
         var idx = $lnk.parent('span').index(); // child index; 0 is "<b>Anexo</b>", others are the link spans
         var headline = $lnk.closest('.Messages_unit').data('headline');
         var attach = headline.attachments[idx - 1];
-        window.open(App.GetAjaxUrl() +
+        window.open(App.getAjaxUrl() +
             '?r=downloadAttachment&' +
             'fileName='+encodeURIComponent(attach.filename)+'&' +
             'messageId='+headline.id+'&' +
@@ -469,17 +469,17 @@ return function(options) {
     });
 
     $targetDiv.on('mouseenter', '.Messages_mugshot > img', function() {
-        if (!App.IsPhone()) {
+        if (!App.isPhone()) {
             _EnlargeMugshot($(this), true);
         }
     }).on('mouseleave', '.Messages_mugshot > img', function() {
-        if (!App.IsPhone()) {
+        if (!App.isPhone()) {
             _EnlargeMugshot($(this), false);
         }
     });
 
     $targetDiv.on('click', '.Messages_mugshot > img', function(ev) {
-        if (App.IsPhone()) {
+        if (App.isPhone()) {
             ev.stopImmediatePropagation();
             var $img = $(this);
             _EnlargeMugshot($img, true).done(function() {

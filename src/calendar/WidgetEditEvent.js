@@ -17,7 +17,7 @@ define(['jquery',
     'calendar/WidgetChooseDate'
 ],
 function($, App, Dialog, TextBadges, ContactsAutocomplete, DateCalc, WidgetChooseDate) {
-App.LoadCss('calendar/WidgetEditEvent.css');
+App.loadCss('calendar/WidgetEditEvent.css');
 return function(options) {
     var userOpts = $.extend({
     }, options);
@@ -142,7 +142,7 @@ return function(options) {
                 $tpl.empty();
                 $tpl.append($('#EditEvent_template .EditEvent_savingThrobber').clone());
 
-                App.Post('saveEvent',
+                App.post('saveEvent',
                     fields
                 ).fail(function(resp) {
                     window.alert('Erro ao salvar o evento.\n' +
@@ -162,7 +162,7 @@ return function(options) {
         var defer = $.Deferred();
         ( $('#EditEvent_template').length ? // load once
             $.Deferred().resolve().promise() :
-            App.LoadTemplate('WidgetEditEvent.html')
+            App.loadTemplate('WidgetEditEvent.html')
         ).done(function() {
             $.when(
                 Dialog.Load(),

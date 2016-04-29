@@ -14,7 +14,7 @@ define(['jquery',
 function($, Cordova) {
     var isUnloadingPage = false;
     var App = {};
-    var ajaxUrl = null; // to be cached on first GetAjaxUrl() call
+    var ajaxUrl = null; // to be cached on first getAjaxUrl() call
 
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
@@ -49,10 +49,10 @@ function($, Cordova) {
 
     function _CheckUserInfoAvailability() {
         var defer = $.Deferred();
-        if (App.GetUserInfo('mailAddress') === null) { // can happen when storage expires and session is still valid
-            App.Post('GetUserInfo').done(function(response) {
+        if (App.getUserInfo('mailAddress') === null) { // can happen when storage expires and session is still valid
+            App.post('getUserInfo').done(function(response) {
                 for (var i in response) {
-                    App.SetUserInfo(i, response[i]);
+                    App.setUserInfo(i, response[i]);
                 }
                 defer.resolve();
             });
@@ -75,7 +75,7 @@ function($, Cordova) {
         });
     })();
 
-    App.LoadCss = function(cssFiles) { // pass any number of files as arguments
+    App.loadCss = function(cssFiles) { // pass any number of files as arguments
         var head = document.getElementsByTagName('head')[0];
         for (var i = 0; i < arguments.length; ++i) {
             var link = document.createElement('link');
@@ -86,7 +86,7 @@ function($, Cordova) {
         }
     };
 
-    App.GetAjaxUrl = function() {
+    App.getAjaxUrl = function() {
         if (ajaxUrl === null) {
             ajaxUrl = Cordova ?
                 Cordova.getLiteBackendUrl() :
@@ -99,14 +99,14 @@ function($, Cordova) {
         return ajaxUrl;
     }
 
-    App.Post = function(requestName, params) {
-        // Usage: App.Post('searchFolders', { parentFolder:'1234' });
+    App.post = function(requestName, params) {
+        // Usage: App.post('searchFolders', { parentFolder:'1234' });
         // Returns a promise object.
 
         var defer = $.Deferred();
 
         $.post(
-            App.GetAjaxUrl(),
+            App.getAjaxUrl(),
             $.extend({r:requestName}, params)
         ).done(function (data) {
             defer.resolve(data);
@@ -119,12 +119,12 @@ function($, Cordova) {
                 isUnloadingPage = true; //this avoids duplicated session expired alerts
 
                 window.alert('Sua sessão expirou, é necessário realizar o login novamente.');
-                App.ReturnToLoginScreen();
+                App.returnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
             } else if (data.status === 500 && data.responseText == 'UserMismatchException') {
                 window.alert('Ocorreu um problema durante a execução desta operação. É necessário realizar o login novamente.');
-                App.ReturnToLoginScreen();
+                App.returnToLoginScreen();
                 // as this will leave the current screen, we
                 // won't neither resolve or reject
             } else if (data.status === 500 && data.responseText == 'CurlNotInstalledException') {
@@ -137,7 +137,7 @@ function($, Cordova) {
         return defer.promise();
      };
 
-    App.LoadTemplate = function(htmlFileName) {
+    App.loadTemplate = function(htmlFileName) {
         // HTML file can be a relative path.
         // Pure HTML files are cached by the browser.
         var defer = $.Deferred();
@@ -148,26 +148,26 @@ function($, Cordova) {
         return defer.promise();
     };
 
-    App.IsPhone = function() {
+    App.isPhone = function() {
         return $(window).width() <= 1024; // should be consistent with all CSS media queries
     };
 
-    App.SetUserInfo = function(entryIndex, entryValue) {
+    App.setUserInfo = function(entryIndex, entryValue) {
         localStorage.setItem('user_info_'+entryIndex, entryValue);
     };
 
-    App.GetUserInfo = function(entryIndex) {
+    App.getUserInfo = function(entryIndex) {
         return localStorage.getItem('user_info_'+entryIndex);
     };
 
-    App.SetCookie = function(cookieName, cookieValue, expireDays) {
+    App.setCookie = function(cookieName, cookieValue, expireDays) {
         var d = new Date();
         d.setTime(d.getTime() + (expireDays * 24 * 60 * 60 * 1000));
         var expires = 'expires='+d.toUTCString();
         document.cookie = cookieName+'='+cookieValue+'; '+expires;
     };
 
-    App.GetCookie = function(cookieName) {
+    App.getCookie = function(cookieName) {
         var name = cookieName+'=';
         var allCookies = document.cookie.split(';');
         for(var i=0; i < allCookies.length; i++) {
@@ -179,7 +179,7 @@ function($, Cordova) {
         return null;
     };
 
-    App.ReturnToLoginScreen = function() {
+    App.returnToLoginScreen = function() {
         var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
         var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar|\/debugger)(\/index.html)?\b/gi, ''); //removes /module from the URL address
 
@@ -194,7 +194,7 @@ function($, Cordova) {
         document.location.href = destHref;
     };
 
-    App.Ready = function(callback) {
+    App.ready = function(callback) {
         _CheckUserInfoAvailability().done(function() {
             if (Cordova) {
                 $(document).ready(function() {
@@ -209,7 +209,7 @@ function($, Cordova) {
         });
     };
 
-    App.GoToFolder = function(folderName) {
+    App.goToFolder = function(folderName) {
         document.location.href = folderName + (Cordova ? '/index.html' : '/');
     };
 

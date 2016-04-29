@@ -12,7 +12,7 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
-App.LoadCss('mail/WidgetFolders.css');
+App.loadCss('mail/WidgetFolders.css');
 return function(options) {
     var userOpts = $.extend({
         $elem: null, // jQuery object for the target DIV
@@ -77,7 +77,7 @@ return function(options) {
         var folder = $li.data('folder');
         var $counter = $li.find('.Folders_counter:first').replaceWith($('#icons .throbber').clone());
 
-        App.Post('updateMessageCache', { folderId:folder.id })
+        App.post('updateMessageCache', { folderId:folder.id })
         .always(function() { $li.find('.throbber:first').replaceWith($counter); })
         .fail(function(resp) {
             window.alert('Erro na consulta dos emails de "'+folder.localName+'".\n' +
@@ -132,7 +132,7 @@ return function(options) {
         if (parentFolder === null) { // root folder
             $divLoading.appendTo($targetDiv);
 
-            App.Post('searchFolders')
+            App.post('searchFolders')
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
                 window.alert('Erro na primeira consulta das pastas.\n' +
@@ -148,7 +148,7 @@ return function(options) {
             var $li = _FindFolderLi(parentFolder);
             $divLoading.appendTo($li);
 
-            App.Post('searchFolders', { parentFolder:parentFolder.globalName })
+            App.post('searchFolders', { parentFolder:parentFolder.globalName })
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
                 window.alert('Erro na consulta das subpastas de '+parentFolder.localName+'\n' +
@@ -259,7 +259,7 @@ return function(options) {
                 var $counter = $li.find('.Folders_counter:first')
                     .replaceWith($('#icons .throbber').clone());
 
-                App.Post('updateMessageCache', { folderId:curFolder.id })
+                App.post('updateMessageCache', { folderId:curFolder.id })
                 .always(function() { $li.find('.throbber:first').replaceWith($counter); })
                 .fail(function(resp) {
                     window.alert('Erro ao atualizar a pasta "'+curFolder.localName+'".\n' +

@@ -12,7 +12,7 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
-App.LoadCss('common-js/SimpleMenu.css');
+App.loadCss('common-js/SimpleMenu.css');
 return function(options) {
     var userOpts = $.extend({
         $parentContainer: null

@@ -14,7 +14,7 @@ define(['jquery',
     'calendar/DateCalc'
 ],
 function($, App, ContextMenu, DateCalc) {
-App.LoadCss('calendar/WidgetEvents.css');
+App.loadCss('calendar/WidgetEvents.css');
 return function(options) {
     var userOpts = $.extend({
         events: null, // Events cache object
@@ -28,7 +28,7 @@ return function(options) {
     THIS.load = function() {
         return $('#Events_template').length ? // load once
             $.Deferred().resolve().promise() :
-            App.LoadTemplate('WidgetEvents.html');
+            App.loadTemplate('WidgetEvents.html');
     };
 
     THIS.clear = function() {

@@ -13,8 +13,7 @@ define(['jquery',
     'common-js/App'
 ],
 function($, App) {
-App.LoadCss('debugger/WidgetTineCookies.css');
-
+App.loadCss('debugger/WidgetTineCookies.css');
 return function(options) {
     var userOpts = $.extend({
         $parentContainer: null
@@ -35,7 +34,7 @@ return function(options) {
         $(this).parent().append($throbber);
         $button.attr('disabled','disabled');
 
-        App.Post('replaceCookieValue', {
+        App.post('replaceCookieValue', {
             cookieName: $(this).siblings('.WidgetTineCookies_cookieName').text(),
             newValue: $(this).siblings('.WidgetTineCookies_cookieValue').val()
         }).done(function(result) {
@@ -78,7 +77,7 @@ return function(options) {
         $('#WidgetTineCookies_cookieList').empty();
         $('#WidgetTineCookies_throbberDiv').show();
 
-        App.Post('getTineCookies').
+        App.post('getTineCookies').
         done(function(result) {
             $('#WidgetTineCookies_throbberDiv').hide();
             for (var i in result.cookies) {
@@ -94,7 +93,7 @@ return function(options) {
        THIS.Load = function () {
         var defer = $.Deferred();
 
-        App.LoadTemplate('WidgetTineCookies.html')
+        App.loadTemplate('WidgetTineCookies.html')
         .done(function () {
             userOpts.$parentContainer.append($('#WidgetTineCookies_div'));
             initEventListeners();

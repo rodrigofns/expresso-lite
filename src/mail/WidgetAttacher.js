@@ -14,7 +14,7 @@ define(['jquery',
     'mail/ThreadMail'
 ],
 function($, App, UploadFile, ThreadMail) {
-App.LoadCss('mail/WidgetAttacher.css');
+App.loadCss('mail/WidgetAttacher.css');
 var WidgetAttacher = function(options) {
     var userOpts = $.extend({
         $elem: null // jQuery object for the target DIV
@@ -65,7 +65,7 @@ var WidgetAttacher = function(options) {
         var tempFiles = [];
 
         var up = new UploadFile({
-            url: App.GetAjaxUrl() + '?r=uploadTempFile',
+            url: App.getAjaxUrl() + '?r=uploadTempFile',
             chunkSize: 1024 * 200 // file sliced into 200 KB chunks
         });
         up.onProgress(function(pct, xhr) {
@@ -85,7 +85,7 @@ var WidgetAttacher = function(options) {
                 onContentChangeCB(); // invoke user callback
             }
             if (xhr.responseJSON.status === 'success') {
-                App.Post('joinTempFiles', { tempFiles:JSON.stringify(tempFiles) })
+                App.post('joinTempFiles', { tempFiles:JSON.stringify(tempFiles) })
                 .done(function(tmpf) {
                     $divSlot.data('file', { // keep attachment object into DIV
                         name: file.name,
@@ -126,7 +126,7 @@ var WidgetAttacher = function(options) {
 
 WidgetAttacher.Load = function() {
     // Static method, since this class can be instantied ad-hoc.
-    return App.LoadTemplate('WidgetAttacher.html');
+    return App.loadTemplate('WidgetAttacher.html');
 };
 
 return WidgetAttacher;

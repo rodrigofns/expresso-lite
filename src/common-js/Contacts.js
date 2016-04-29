@@ -57,7 +57,7 @@ function($, App) {
 
     Contacts.loadPersonal = function() {
         var defer = $.Deferred();
-        App.Post('getPersonalContacts').done(function(contacts) {
+        App.post('getPersonalContacts').done(function(contacts) {
             _WriteContactsList(contacts);
             defer.resolve();
         });
@@ -75,7 +75,7 @@ function($, App) {
         }
 
         if (addrs.length) {
-            App.Post('searchContactsByEmail', {
+            App.post('searchContactsByEmail', {
                 emails: addrs.join(','),
                 getPicture: '1'
             }).fail(function(resp) {

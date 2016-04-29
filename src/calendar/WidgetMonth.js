@@ -13,7 +13,7 @@ define(['jquery',
     'calendar/DateCalc'
 ],
 function($, App, DateCalc) {
-App.LoadCss('calendar/WidgetMonth.css');
+App.loadCss('calendar/WidgetMonth.css');
 return function(options) {
     var userOpts = $.extend({
         events: null, // Events cache object
@@ -31,7 +31,7 @@ return function(options) {
     THIS.load = function() {
         return $('#Month_template').length ? // load once
             $.Deferred().resolve().promise() :
-            App.LoadTemplate('WidgetMonth.html');
+            App.loadTemplate('WidgetMonth.html');
     };
 
     THIS.hide = function() {
@@ -89,7 +89,7 @@ return function(options) {
         });
 
         $templateView.on('click', '.Month_event', function() {
-            if (!App.IsPhone()) { // single event click works only on desktop
+            if (!App.isPhone()) { // single event click works only on desktop
                 THIS.clearDaySelected();
                 var $ev = $(this);
                 var $day = $ev.parents('.Month_day');
@@ -99,7 +99,7 @@ return function(options) {
         });
 
         $templateView.on('click', '.Month_day', function() {
-            if (App.IsPhone()) { // whole day click works only on phones
+            if (App.isPhone()) { // whole day click works only on phones
                 THIS.clearDaySelected();
                 var $day = $(this);
                 $day.addClass('Month_daySelected');
