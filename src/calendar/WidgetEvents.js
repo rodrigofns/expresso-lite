@@ -106,13 +106,24 @@ return function(options) {
                 .addClass('Events_headerEcho');
         }
 
-        $unit.find('.Events_description .Events_text').html(objEv.description.replace(/\n/g, '<br/>'));
+        if (objEv.description) {
+            $unit.find('.Events_description .Events_text').html(objEv.description.replace(/\n/g, '<br/>'));
+        } else {
+            $unit.find('.Events_description .Events_text').append($('.Events_noDescription').clone());
+        }
+
         $unit.find('.Events_when .Events_text').text(
             DateCalc.makeHourMinuteStr(event.from) +
             ' - ' +
             DateCalc.makeHourMinuteStr(objEv.until)
         );
-        $unit.find('.Events_location .Events_text').text(objEv.location);
+
+        if (objEv.location) {
+            $unit.find('.Events_location .Events_text').text(objEv.location);
+        } else {
+            $unit.find('.Events_location .Events_text').append($('.Events_noLocation').clone());
+        }
+
         $unit.find('.Events_organizer .Events_text').text(objEv.organizer.name);
         $unit.find('.Events_personOrg').text(_FormatUserOrg(objEv.organizer));
 
