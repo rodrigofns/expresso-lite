@@ -98,9 +98,12 @@ var WidgetChooseDate = function(options) {
             UrlStack.pop('#monthPopup');
             $panel.detach();
             if ($('.ChooseDate_darkCover').length) { // shown on phone only
-                $('.ChooseDate_darkCover').fadeOut(200, function() {
-                    $('.ChooseDate_darkCover').remove();
-                    defer.resolve();
+                $('.ChooseDate_darkCover').velocity('fadeOut', {
+                    duration: 200,
+                    complete: function() {
+                        $('.ChooseDate_darkCover').remove();
+                        defer.resolve();
+                    }
                 });
             } else {
                 defer.resolve();

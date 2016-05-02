@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'addressbook/WidgetLetterIndex'
 ],
@@ -135,7 +136,7 @@ function($, App, WidgetLetterIndex) {
                         if (currentSearchFilter.pageStart < result.totalCount) {
                             showPagingFooter(result.totalCount);
                         }
-                        $mainSection.fadeIn(150);
+                        $mainSection.velocity('fadeIn', { duration:150 });
                     });
                 } else {
                     if (currentSearchFilter.pageStart == 0) {
@@ -210,7 +211,7 @@ function($, App, WidgetLetterIndex) {
 
             var $message = $mainSection.find('.message');
 
-            $message.animate(
+            $message.velocity(
                 {'margin-top': (userOpts.$parentContainer.height() - 20)+'px'},
                 200,
                 function() {

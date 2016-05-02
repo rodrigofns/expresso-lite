@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2016 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/Dialog',
     'common-js/TextBadges',

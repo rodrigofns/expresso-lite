@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/UrlStack'
 ],
@@ -37,9 +38,12 @@ return function(options) {
             $btn.removeClass('ContextMenu_hoverBtn');
 
             if ($('.ContextMenu_darkCover').length) { // shown on phone only
-                $('.ContextMenu_darkCover').fadeOut(200, function() {
-                    $('.ContextMenu_darkCover').remove();
-                    defer.resolve();
+                $('.ContextMenu_darkCover').velocity('fadeOut', {
+                    duration: 200,
+                    complete: function() {
+                        $('.ContextMenu_darkCover').remove();
+                        defer.resolve();
+                    }
                 });
             } else {
                 defer.resolve();
@@ -150,8 +154,11 @@ return function(options) {
             height: szUl.cy+'px',
             display: 'none',
             'box-shadow': 'none' // fadeIn renders better
-        }).fadeIn(200, function() {
-            $ul.css('box-shadow', '');
+        }).velocity('fadeIn', {
+            duration: 200,
+            complete: function() {
+                $ul.css('box-shadow', '');
+            }
         });
 
         $btn.addClass('ContextMenu_hoverBtn');

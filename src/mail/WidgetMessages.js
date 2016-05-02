@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/DateFormat',
     'common-js/ContextMenu',
@@ -39,11 +40,11 @@ return function(options) {
         if (src.substr(0, 5) === 'data:') { // apply effect only to real pictures
             if (bEnlarge) {
                 $img.css('box-shadow', '3px 3px 3px #888')
-                    .animate({ width:'90px' }, { duration:70, queue:false, complete:function() {
+                    .velocity({ width:'90px' }, { duration:70, queue:false, complete:function() {
                         defer.resolve();
                     } });
             } else {
-                $img.animate({ width:'20px' }, { duration:70, queue:false, complete:function() {
+                $img.velocity({ width:'20px' }, { duration:70, queue:false, complete:function() {
                     $img.css('box-shadow', '');
                     defer.resolve();
                 } });
@@ -213,24 +214,27 @@ return function(options) {
                 window.alert('Erro ao mover mensagem.\n' +
                     'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
             }).done(function() {
-                $elem.slideUp(200, function() {
-                    $elem.remove();
-                    var origThread = ThreadMail.FindThread(curFolder.threads, headline);
-                    --curFolder.totalMails; // update cache
-                    ++destFolder.totalMails;
-                    if (headline.unread) {
-                        if (curFolder.id !== null) --curFolder.unreadMails;
-                        ++destFolder.unreadMails;
+                $elem.velocity('slideUp', {
+                    duration: 200,
+                    complete: function() {
+                        $elem.remove();
+                        var origThread = ThreadMail.FindThread(curFolder.threads, headline);
+                        --curFolder.totalMails; // update cache
+                        ++destFolder.totalMails;
+                        if (headline.unread) {
+                            if (curFolder.id !== null) --curFolder.unreadMails;
+                            ++destFolder.unreadMails;
+                        }
+                        ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
+                        if (curFolder.id === null) { // if a search result
+                            curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                            curFolder.searchedFolder.threads.length = 0;
+                        } else {
+                            destFolder.messages.length = 0; // force cache rebuild
+                            destFolder.threads.length = 0;
+                        }
+                        onMoveCB(destFolder, origThread);
                     }
-                    ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
-                    if (curFolder.id === null) { // if a search result
-                        curFolder.searchedFolder.messages.length = 0; // force cache rebuild
-                        curFolder.searchedFolder.threads.length = 0;
-                    } else {
-                        destFolder.messages.length = 0; // force cache rebuild
-                        destFolder.threads.length = 0;
-                    }
-                    onMoveCB(destFolder, origThread);
                 });
             });
         }
@@ -264,19 +268,22 @@ return function(options) {
                     window.alert('Erro ao apagar email.\n' +
                         'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
                 }).done(function(status) {
-                    $elem.slideUp(200, function() {
-                        $elem.remove();
-                        var origThread = ThreadMail.FindThread(curFolder.threads, headline);
-                        --curFolder.totalMails; // update cache
-                        if (headline.unread && curFolder.id !== null) {
-                            --curFolder.unreadMails;
+                    $elem.velocity('slideUp', {
+                        duration: 200,
+                        complete: function() {
+                            $elem.remove();
+                            var origThread = ThreadMail.FindThread(curFolder.threads, headline);
+                            --curFolder.totalMails; // update cache
+                            if (headline.unread && curFolder.id !== null) {
+                                --curFolder.unreadMails;
+                            }
+                            ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
+                            if (curFolder.id === null) { // if a search result
+                                curFolder.searchedFolder.messages.length = 0; // force cache rebuild
+                                curFolder.searchedFolder.threads.length = 0;
+                            }
+                            onMoveCB(null, origThread);
                         }
-                        ThreadMail.RemoveHeadlinesFromFolder([ headline.id ], curFolder);
-                        if (curFolder.id === null) { // if a search result
-                            curFolder.searchedFolder.messages.length = 0; // force cache rebuild
-                            curFolder.searchedFolder.threads.length = 0;
-                        }
-                        onMoveCB(null, origThread);
                     });
                 });
             }
@@ -306,7 +313,7 @@ return function(options) {
                         unitDivs[i].find('.Messages_mugshot > img')
                             .attr('src', imgsrc)
                             .hide()
-                            .fadeIn(500);
+                            .velocity('fadeIn', { duration:500 });
                     }
                 }
             }
@@ -398,7 +405,7 @@ return function(options) {
                 var toSlide = headline.attachments.length ?
                     '.Messages_top2,.Messages_attachs,.Messages_content' :
                     '.Messages_top2,.Messages_content';
-                $divUnit.find(toSlide).slideDown(200).promise('fx').done(function() {
+                $divUnit.find(toSlide).velocity('slideDown', { duration:200 }).promise('fx').done(function() {
                     $divUnit.children('.Messages_top1,.Messages_top2')
                         .removeClass('Messages_unread').addClass('Messages_read');
 
@@ -440,7 +447,7 @@ return function(options) {
             var toGo = (headline.attachments !== null && headline.attachments.length) ?
                 '.Messages_top2,.Messages_attachs,.Messages_content' :
                 '.Messages_top2,.Messages_content';
-            $divUnit.find(toGo).slideUp(200).promise('fx').done(function() {
+            $divUnit.find(toGo).velocity('slideUp', { duration:200 }).promise('fx').done(function() {
                 if (onDone !== undefined) {
                     onDone();
                 }
@@ -465,7 +472,8 @@ return function(options) {
     });
 
     $targetDiv.on('click', '.Messages_showQuote', function() {
-        $(this).next('.Messages_quote').slideToggle(200);
+        var $qblock = $(this).next('.Messages_quote');
+        $qblock.velocity($qblock.is(':visible') ? 'slideUp' : 'slideDown', { duration:200 });
     });
 
     $targetDiv.on('mouseenter', '.Messages_mugshot > img', function() {

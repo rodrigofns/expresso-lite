@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015-2016 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/ContextMenu',
     'calendar/DateCalc'
@@ -61,8 +62,12 @@ return function(options) {
                 }
             }
         }
-        $panel.hide()
-            .fadeIn(250, function() { defer.resolve(); });
+        $panel.velocity('fadeIn', {
+            duration: 250,
+            complete: function() {
+                defer.resolve();
+            }
+        });
         return defer.promise();
     };
 
@@ -73,13 +78,17 @@ return function(options) {
 
     function _SetEvents() {
         $panel.on('click', '.Events_showPeople', function() {
-            $(this).parent().nextAll('.Events_peopleList').slideToggle(200);
+            var $ppl = $(this).parent().nextAll('.Events_peopleList');
+            $ppl.velocity($ppl.is(':visible') ? 'slideUp' : 'slideDown', { duration:200 });
         });
 
         $panel.on('click', '.Events_topContainer', function() {
             var $evContent = $(this).next();
-            $evContent.slideToggle(200, function() {
-                $evContent.find('.Events_peopleList').hide();
+            $evContent.velocity($evContent.is(':visible') ? 'slideUp' : 'slideDown', {
+                duration: 200,
+                complete: function() {
+                    $evContent.find('.Events_peopleList').hide();
+                }
             });
         });
     }

@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App'
 ],
 function($, App) {
@@ -47,10 +48,13 @@ var TextBadges = function(options) {
 
         $ul.on('click', '.TextBadges_badgeLi', function() {
             var $badge = $(this);
-            $badge.slideUp(userOpts.animationTime, function() {
-                $badge.remove();
-                $input.focus();
-                onRemoveCB(); // invoke user callback
+            $badge.velocity('slideUp', {
+                duration: userOpts.animationTime,
+                complete: function() {
+                    $badge.remove();
+                    $input.focus();
+                    onRemoveCB(); // invoke user callback
+                }
             });
         });
 
@@ -75,9 +79,12 @@ var TextBadges = function(options) {
             .text(text)
             .attr('title', fullVal)
             .insertBefore($input.parent())
-            .hide()
-            .slideDown(userOpts.animationTime, function() {
-                defer.resolve();
+            .velocity('slideDown', {
+                display: 'inline-block',
+                duration: userOpts.animationTime,
+                complete: function() {
+                    defer.resolve();
+                }
             });
         return defer.promise();
     };

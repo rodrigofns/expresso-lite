@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/UrlStack'
 ],
@@ -166,7 +167,7 @@ var Dialog = function(options) {
             });
 
             $tpl.offset({ left:$(window).outerWidth() }) // slide from right
-                .animate({ left:'0px' }, 300, function() { defer.resolve(); });
+                .velocity({ left:'0px' }, 300, function() { defer.resolve(); });
         } else {
             $tpl.css({
                 'min-width': userOpts.minWidth+'px',
@@ -184,7 +185,7 @@ var Dialog = function(options) {
 
             var yOff = $tpl.offset().top;
             $tpl.offset({ top:-$tpl.outerHeight() }) // slide from above
-                .animate({ top:yOff+'px' }, 200, function() {
+                .velocity({ top:yOff+'px' }, 200, function() {
                     if (userOpts.modal) {
                         $('#Dialog_template .Dialog_coverAllScreen')
                             .clone().insertBefore($tpl);
@@ -214,7 +215,7 @@ var Dialog = function(options) {
         var animMove = App.isPhone() || THIS.isMinimized() ?
             { left: $(window).outerWidth()+'px' } : // slide to right
             { top: $(window).outerHeight()+'px' }; // slide to bottom
-        $tpl.animate(animMove, 200, function() {
+        $tpl.velocity(animMove, 200, function() {
             $targetDiv.detach(); // element is up to user
             $tpl.remove();
             $tpl = null;

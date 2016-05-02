@@ -8,11 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-require.config({
-    paths: { jquery: 'common-js/jquery.min' }
-});
-
-require(['jquery',
+require([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/Cordova'
 ],
@@ -94,18 +91,21 @@ function($, App, Cordova) {
 
     function Init() {
         function ShowScreen() {
-            $('#main-screen').fadeIn(300, function() {
-                $('#splash-screen').hide();
-                LoadServerStatus(); // async
-                $('#user').focus();
-                $('#frmLogin').submit(DoLogin);
-                $('#frmChangePwd').submit(DoChangePassword);
+            $('#main-screen').velocity('fadeIn', {
+                duration: 300,
+                complete: function() {
+                    $('#splash-screen').hide();
+                    LoadServerStatus(); // async
+                    $('#user').focus();
+                    $('#frmLogin').submit(DoLogin);
+                    $('#frmChangePwd').submit(DoChangePassword);
+                }
             });
         }
 
         if (Cordova) {
             $('#splash-screen')
-            .animate({ top: '16px' }, {
+            .velocity({ top: '16px' }, {
                 duration: 300,
                 queue: false,
                 complete: ShowScreen
@@ -182,7 +182,7 @@ function($, App, Cordova) {
                 $('#iosBadge').attr('href', data.liteConfig.iosUrl);
             }
 
-            $('#externalLinks,#versionInfo').fadeIn(400);
+            $('#externalLinks,#versionInfo').velocity('fadeIn', { duration:400 });
         });
     }
 
@@ -201,7 +201,7 @@ function($, App, Cordova) {
         }
 
         if (!ValidateLogin()) return false;
-        $('#universalAccess,#externalLinks').fadeOut(200);
+        $('#universalAccess,#externalLinks').velocity('fadeOut', { duration:200 });
         $('#btnLogin').hide();
         $('#frmLogin input').prop('disabled', true);
         $('#frmLogin .throbber').show().children('span').text('Efetuando login...');
@@ -315,7 +315,7 @@ function($, App, Cordova) {
                     top: $('#credent').offset().top
                 })
                 .appendTo(document.body)
-                .animate({ left:-$(window).width() }, { duration:animTime, queue:false });
+                .velocity({ left:-$(window).width() }, { duration:animTime, queue:false });
             $('#frmLogin').css({
                     position: 'fixed',
                     display: 'block',
@@ -323,7 +323,7 @@ function($, App, Cordova) {
                     top: $('#frmLogin').offset().top
                 })
                 .appendTo(document.body)
-                .animate({ left:$(window).width() }, {
+                .velocity({ left:$(window).width() }, {
                     duration: animTime,
                     queue: false,
                     complete: function() {
@@ -332,9 +332,9 @@ function($, App, Cordova) {
                 });
         } else {
             var animTime = 600;
-            $('#topgray').animate({ opacity:0 }, { duration:animTime, queue:false });
-            $('#thebg').animate({ left:-$(window).width(), opacity:0 }, { duration:animTime, queue:false });
-            $('#credent').animate({ top:$(window).height() }, {
+            $('#topgray').velocity({ opacity:0 }, { duration:animTime, queue:false });
+            $('#thebg').velocity({ left:-$(window).width(), opacity:0 }, { duration:animTime, queue:false });
+            $('#credent').velocity({ top:$(window).height() }, {
                 duration: animTime,
                 queue: false,
                 complete: function() {

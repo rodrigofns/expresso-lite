@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'calendar/DateCalc'
 ],
@@ -128,8 +129,11 @@ return function(options) {
             $loading.remove();
         }).done(function() {
             _RenderCells();
-            $templateView.fadeIn(userOpts.animationTime, function() {
-                defer.resolve();
+            $templateView.velocity('fadeIn', {
+                duration: userOpts.animationTime,
+                complete: function() {
+                    defer.resolve();
+                }
             });
         }).fail(function() {
             defer.reject();

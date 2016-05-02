@@ -8,12 +8,10 @@
  * @copyright Copyright (c) 2015-2016 Serpro (http://www.serpro.gov.br)
  */
 
-require.config({
-    baseUrl: '..',
-    paths: { jquery: 'common-js/jquery.min' }
-});
+require.config({ baseUrl:'..', });
 
-require(['jquery',
+require([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/UrlStack',
     'common-js/Layout',

@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/DateFormat',
     'common-js/Contacts',
@@ -181,7 +182,7 @@ return function(options) {
     function _AnimateFirstHeadlines($divs, $loading) {
         var defer = $.Deferred();
         window.setTimeout(function() {
-            $loading.animate({
+            $loading.velocity({
                 'margin-top': ($targetDiv.height() - 20)+'px'
             }, 200, function() {
                 $loading.remove();
@@ -195,10 +196,13 @@ return function(options) {
                         break;
                     }
                 }
-                $targetDiv.css('display', 'none').fadeIn(150, function() {
-                    $targetDiv.css('height', '')
-                        .append($divs.slice(iLast + 1)); // append remaning
-                    defer.resolve(); // finally resolve deferred
+                $targetDiv.css('display', 'none').velocity('fadeIn', {
+                    duration: 150,
+                    complete: function() {
+                        $targetDiv.css('height', '')
+                            .append($divs.slice(iLast + 1)); // append remaning
+                        defer.resolve(); // finally resolve deferred
+                    }
                 });
             });
         }, 50);
@@ -207,8 +211,6 @@ return function(options) {
 
     function _RedrawDiv($div) {
         var $newDiv = _BuildDiv($div.data('thread'), curFolder.globalName === 'INBOX/Sent');
-        //~ if (!$div.children('.Headlines_check').is(':visible'))
-            //~ $newDiv.find('.Headlines_check').hide();
         if ($div.hasClass('Headlines_entryCurrent')) {
             $newDiv.addClass('Headlines_entryCurrent');
         }
@@ -332,7 +334,7 @@ return function(options) {
                 curFolder.searchedFolder.messages.length = 0; // force cache rebuild
                 curFolder.searchedFolder.threads.length = 0;
             }
-            $checkedDivs.slideUp(200).promise('fx').done(function() {
+            $checkedDivs.velocity('slideUp', { duration:200 }).promise('fx').done(function() {
                 $checkedDivs.remove();
                 onMoveCB(destFolder);
             });
@@ -412,7 +414,7 @@ return function(options) {
                     curFolder.searchedFolder.messages.length = 0; // force cache rebuild
                     curFolder.searchedFolder.threads.length = 0;
                 }
-                $checkedDivs.slideUp(200).promise('fx').done(function() {
+                $checkedDivs.velocity('slideUp', { duration:200 }).promise('fx').done(function() {
                     $checkedDivs.remove();
                     onMoveCB(null);
                 });
@@ -634,10 +636,13 @@ return function(options) {
             var $div = $(div);
             if ($div.data('thread') === thread) { // compare references
                 if (!thread.length) { // headline entry will be deleted
-                    $div.slideUp(200, function() {
-                        $div.remove();
-                        if (onDone !== undefined && onDone !== null) {
-                            onDone();
+                    $div.velocity('slideUp', {
+                        duration: 200,
+                        complete: function() {
+                            $div.remove();
+                            if (onDone !== undefined && onDone !== null) {
+                                onDone();
+                            }
                         }
                     });
                 } else { // headline entry will be just updated

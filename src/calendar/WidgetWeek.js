@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'calendar/DateCalc'
 ],
@@ -100,8 +101,11 @@ return function(options) {
             $templateView.show();
             $templateView.find('.Week_grid').scrollTop( // scroll so that 8:00 is first row shown
                 $templateView.find('.Week_eachHour:first').outerHeight() * 8);
-            $templateView.hide().fadeIn(userOpts.animationTime, function() {
-                defer.resolve();
+            $templateView.velocity('fadeIn', {
+                duration: userOpts.animationTime,
+                complete: function() {
+                    defer.resolve();
+                }
             });
         }).fail(function() {
             defer.reject();

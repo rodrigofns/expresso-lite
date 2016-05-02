@@ -8,7 +8,8 @@
  * @copyright Copyright (c) 2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/Contacts'
 ],
@@ -61,7 +62,7 @@ function($, App,Contacts) {
                 $mainDiv.find('#WidgetContactDetails_mugshot').attr('src', 'data:image/jpeg;base64,' + hex2bin(fullContact.mugshot));
             }
             $mainDiv.find('#WidgetContactDetails_mugshotThrobber').hide();
-            $mainDiv.find('#WidgetContactDetails_mugshot').css('visibility', '').hide().fadeIn(200);
+            $mainDiv.find('#WidgetContactDetails_mugshot').css('visibility', '').velocity('fadeIn', { duration:200 });
 
             $throbber.hide();
 
@@ -78,7 +79,7 @@ function($, App,Contacts) {
                     $newField.appendTo($otherFieldsDiv);
                 }
             }
-            $otherFieldsDiv.fadeIn(200);
+            $otherFieldsDiv.velocity('fadeIn', { duration:200 });
         }
 
         function createTelLink(number) {

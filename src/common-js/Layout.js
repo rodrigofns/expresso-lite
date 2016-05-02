@@ -9,7 +9,8 @@
  * @copyright Copyright (c) 2014-2015 Serpro (http://www.serpro.gov.br)
  */
 
-define(['jquery',
+define([
+    'common-js/jQuery',
     'common-js/App',
     'common-js/UrlStack',
     'common-js/ContextMenu',
@@ -54,7 +55,17 @@ return function(options) {
 
             THIS.setRightPanelVisible(false);
             _SetCurrentModuleAsBold();
-            defer.resolve();
+
+            $(document.body).css('overflow', 'hidden');
+            $('#Layout_template').css('top','-'+$(document).height()+'px');
+            $('#Layout_template').velocity({ top:0 }, {
+                duration: 250,
+                queue: false,
+                complete: function() {
+                    $(document.body).css('overflow', '');
+                    defer.resolve();
+                }
+            });
         });
         return defer.promise();
     };
@@ -104,7 +115,7 @@ return function(options) {
                 display: 'block'
             });
             $leftSec.scrollTop(0);
-            $leftSec.animate({ left:'0' }, userOpts.showMenuTime, function() {
+            $leftSec.velocity({ left:'0' }, userOpts.showMenuTime, function() {
                 UrlStack.push('#leftMenu', function() { THIS.setLeftMenuVisibleOnPhone(false); });
                 defer.resolve();
             });
@@ -113,7 +124,7 @@ return function(options) {
             UrlStack.pop('#leftMenu');
             var cx = $leftSec.outerWidth();
             $leftSec.css('left', '0');
-            $leftSec.animate({ left:'-'+cx+'px' }, userOpts.hideMenuTime, function() {
+            $leftSec.velocity({ left:'-'+cx+'px' }, userOpts.hideMenuTime, function() {
                 $leftSec.css({
                     left: '',
                     display: '' // reverting from "block"
@@ -190,8 +201,8 @@ return function(options) {
                 App.post('logoff')
                 .done(function(data) {
                     $('body').css('overflow', 'hidden');
-                    $('#Layout_logoffText').animate({ top:$(window).height() / 4 }, 200, function() {
-                        $('#Layout_logoffText').animate({ top:$(window).height() }, 300, function() {
+                    $('#Layout_logoffText').velocity({ top:$(window).height() / 4 }, 200, function() {
+                        $('#Layout_logoffText').velocity({ top:$(window).height() }, 300, function() {
                             App.returnToLoginScreen();
                         });
                     });
@@ -220,9 +231,21 @@ return function(options) {
         $('#Layout_modules li,#Layout_modules a').on('click', function(ev) { // click on a module
             ev.preventDefault();
             ev.stopImmediatePropagation();
-            var href = $(this).attr('href') !== undefined ?
-                $(this).attr('href') : $(this).find('a').attr('href');
-            App.goToFolder(href);
+            var $elem = $(this);
+            var dur = 350; // ms
+            $(document.body).css('overflow', 'hidden');
+            _DarkBackground(false);
+            $('#Layout_left').velocity({ left:-$('#Layout_left').outerWidth() }, { duration:dur, queue:false });
+            $('#Layout_top').velocity({ left:$(document).width() }, { duration:dur, queue:false });
+            $('#Layout_center').velocity({ top:$(document).height() }, {
+                duration: dur,
+                queue: false,
+                complete: function() {
+                    var href = $elem.attr('href') !== undefined ?
+                        $elem.attr('href') : $elem.find('a').attr('href');
+                    App.goToFolder(href);
+                }
+            });
         });
 
         $(document).ajaxComplete(function AjaxComplete() {
