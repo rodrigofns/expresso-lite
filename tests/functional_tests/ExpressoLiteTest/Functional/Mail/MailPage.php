@@ -191,6 +191,19 @@ class MailPage extends GenericPage
     }
 
     /**
+     * Returns a ContactsAutoComplete Page Object that represents the
+     * contacts list currently being displayed the recipient autocomplete box
+     *
+     * @return ContactsAutoComplete
+     */
+    public function getContactsAutoComplete()
+    {
+        return new ContactsAutoComplete(
+                $this,
+                $this->byCssSelector('body > .ContactsAutocomplete_frame'));
+    }
+
+    /**
      * Returns the WidgetMessages Page Object that represents the message details
      * currently being displayed in the mail module
      *

@@ -31,7 +31,7 @@ class ComposeMailTest extends SingleLoginTest
     /**
      * Tests sending a simple e-mail, checking if the e-mail composition screen opens and
      * close as expected. Also checks if the sent e-mail data match what was originally typed
-     * 
+     *
      *   CTV3-753
      *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-753
      */
@@ -58,7 +58,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-       $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimationsToComplete();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
 
@@ -116,6 +116,68 @@ class ComposeMailTest extends SingleLoginTest
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
 
         $this->assertEquals($MAIL_RECIPIENTS, $messageUnit->getToAddresses(), 'Could not find one of the recipients in the message');
+    }
+
+    /**
+     * Tests sending a simple e-mail, checking if the e-mail composition screen opens and
+     * close as expected. Also checks the search in the catalog.
+     *
+     *   CTV3-759
+     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-759
+     */
+    public function test_CTV3_759_Search_Recipient()
+    {
+        $mailPage = new MailPage($this);
+        //load test data
+        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $MAIL_CONTENT = $this->getTestValue('mail.content');
+        $PART_NAME_SEARCH = $this->getTestValue('part.name.search');
+        $NAME_SEARCH = $this->getTestValue('name.search');
+        $NAME2_SEARCH = $this->getTestValue('name.2.search');
+
+        //testStart
+        $mailPage->clickWriteEmailButton();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+        $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
+
+        $widgetCompose->clickOnRecipientField();
+        $widgetCompose->type($PART_NAME_SEARCH);
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $contactsAutoComplete = $mailPage->getContactsAutoComplete();
+        $this->assertTrue($contactsAutoComplete->hasContactsListed(), 'The contacts list is visible, but it is not');
+        $contactsAutoComplete->clickOnContactsListByName($NAME_SEARCH);
+
+        $widgetCompose->clickOnRecipientField();
+        $widgetCompose->type($PART_NAME_SEARCH);
+        $this->waitForAjaxAndAnimationsToComplete();
+        $contactsAutoComplete->clickMoreResults();
+
+        $this->assertTrue($contactsAutoComplete->hasContactscounted(), 'The counter is visible, but it is not');
+
+        $contactsAutoComplete->clickOnContactsListByName($NAME2_SEARCH);
+        $widgetCompose->typeSubject($MAIL_SUBJECT);
+        $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
+        $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
+
+        $mailPage->clickOnFolderByName('Enviados');
+
+        $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
+        $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
+
+        $headlinesEntry->click();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $this->assertEquals($MAIL_SUBJECT, $widgetMessages->getHeader(), 'The header in the right body header does not match the expected mail subject: ' . $MAIL_SUBJECT);
+
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+        $this->assertContains($MAIL_CONTENT, $messageUnit->getContent(), 'The message content differs from the expected');
     }
 
     /**
