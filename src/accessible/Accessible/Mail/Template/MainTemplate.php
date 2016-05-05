@@ -74,9 +74,9 @@
             </caption>
             <thead>
                 <tr>
-                    <th id="id">Número</th>
+                    <th id="id" aria-hidden="true">Número</th>
                     <th id="senderSubject">Remetente / Assunto</th>
-                    <th id="date">Data</th>
+                    <th id="date" aria-hidden="true">Data</th>
                     <th id="observations">Observações</th>
                     <th id="mark" aria-hidden="true">Marcar</th>
                 </tr>
@@ -87,20 +87,27 @@
                 FOREACH ($VIEW->headlines AS $HEADLINE) :
                 ?>
                 <tr class="<?= $HEADLINE->unread ? 'markUnread' : '' ?>">
-                    <td headers="id" class="alignCenter">
+                    <td headers="id" class="alignCenter" aria-hidden="true">
                         <span><?= $SEQ ?></span>
                     </td>
                     <td headers="senderSubject" class="alignLeft">
                         <a href="<?= $HEADLINE->lnkOpen ?>" title="Abrir mensagem <?= $SEQ ?>">
-                            De: <span> <?= $HEADLINE->from->name ?></span>
-                            <br />
-                            <span ><?= $HEADLINE->subject ?></span>
+                            <span aria-hidden="true"> <!-- NOT READ BY SCREEN READER -->
+                                De: <span> <?= $HEADLINE->from->name ?></span><br />
+                                <?= $HEADLINE->subject ?>
+                            </span>
+                            <span class="onlyForScreenReaders"> <!-- THIS IS NOT VISIBLE -->
+                                 Assunto: <?= $HEADLINE->subject ?>,
+                                 Enviado por:<?= $HEADLINE->from->name ?>,
+                                 <?= $HEADLINE->received ?>,
+                                 Abrir mensagem <?= $SEQ; ?>
+                            </span>
                         </a>
                     </td>
-                    <td headers="date" class="alignCenter">
+                    <td headers="date" class="alignCenter" aria-hidden="true">
                         <span><?= $HEADLINE->received ?></span>
                     </td>
-                    <td headers="observations" class="alignLeft">
+                    <td headers="observations" class="alignLeft" aria-hidden="true"> <!-- NOT READ BY SCREEN READER -->
                         <?php IF ($HEADLINE->hasAttachment) : ?>
                         <div class="flags flag-attach" title="Este email contém anexo">&nbsp;</div>
                         <?php ENDIF; ?>
