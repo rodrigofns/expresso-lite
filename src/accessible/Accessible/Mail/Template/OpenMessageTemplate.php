@@ -123,8 +123,8 @@
             <li><a href="<?= $VIEW->lnkReplyAll ?>">Responder a todos</a></li>
             <li><a href="<?= $VIEW->lnkForward ?>">Encaminhar</a></li>
             <li><a href="<?= $VIEW->lnkMark ?>">Marcar como não lida</a></li>
-            <li><a href="<?= $VIEW->lnkDelete ?>">Apagar</a></li>
             <li><a href="<?= $VIEW->lnkMoveMsgToFolder ?>">Mover mensagem</a></li>
+            <li><a href="<?= $VIEW->lnkDelete ?>" title="apagar essa mensagem">Apagar</a></li>
         </ul>
     </div>
 </div>
