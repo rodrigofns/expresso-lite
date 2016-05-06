@@ -38,6 +38,16 @@ class MailPage extends GenericPage
     }
 
     /**
+     * Clicks on the Addressbook link on the left of the screen
+     * and waits for the Addressbook window to be displayed
+     */
+    public function clickAddressbook()
+    {
+        $this->byCssSelector('.Layout_iconAddress')->click();
+        $this->testCase->waitForAjaxAndAnimationsToComplete(); //TODO: this avoids problems with testNoRecipients
+    }
+
+    /**
      * Clicks on a folder contained on the folder tree based on its name
      *
      * @param string $folderName The name of the folder to be clicked

@@ -77,7 +77,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
             $this->prepareSession()->cookie()->clear();
         }
 
-        $this->uniqueId = uniqid('#');
+        $this->uniqueId = uniqid();
         $this->timeouts()->implicitWait(self::IMPLICIT_WAIT);
         $this->url($initialUrl);
 

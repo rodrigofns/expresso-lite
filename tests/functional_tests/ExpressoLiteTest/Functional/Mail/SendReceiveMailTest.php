@@ -13,6 +13,7 @@ namespace ExpressoLiteTest\Functional\Mail;
 
 use ExpressoLiteTest\Functional\Generic\ExpressoLiteTest;
 use ExpressoLiteTest\Functional\Login\LoginPage;
+use ExpressoLiteTest\Functional\Addressbook\AddressbookPage;
 
 class SendReceiveMailTest extends ExpressoLiteTest
 {
@@ -223,5 +224,48 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $messageUnit->clickShowQuoteButton();
 
         $this->assertContains($ORIGINAL_MAIL_CONTENT, $messageUnit->getQuoteText(), 'The original message content was not found in the mail quote section');
+    }
+
+    /**
+     * Checks the reply e-mail feature. In this test, user 1 sends an e-mail
+     * to new user and this recipient is saved in the personal catalog
+     *
+     * CTV3-1015
+     * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1015
+     *
+     * - user.1.login: user 1's login
+     * - user.1.password: user 1's password
+     * - user.1.mail: user 1's e-mail address
+     * - user.1.name: user 1's display name
+     * - user.2.mail: user 2's e-mail address
+     * - mail.subject: e-mail subject (will be suffixed with the test id)
+     * - mail.content: content oef the first e-mail (will be suffixed with the test id)
+     */
+    public function test_CTV3_1015_Send_Mail_Saved_Recipient()
+    {
+        //load test data
+        $USER_1_LOGIN = $this->getTestValue('user.1.login');
+        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
+        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_2_NAME = $this->getTestValue('user.2.name');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $MAIL_CONTENT = $this->getTestValue('mail.content');
+
+        //testStart
+        $loginPage = new LoginPage($this);
+
+        $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
+        $mailPage = new MailPage($this);
+
+        $mailPage->sendMail(array($USER_2_MAIL), $MAIL_SUBJECT, $MAIL_CONTENT);
+        $mailPage->clickAddressbook();
+        $addressbookPage = new AddressbookPage($this);
+
+        $addressbookPage->clickPersonalCatalog();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $contactListItem = $addressbookPage->getCatalogEntryByName($USER_2_NAME);
+
+        $this->assertEquals($USER_2_NAME, $contactListItem->getNameFromContact(),
+                'Mail was send but, the new recipient is not created in personal catalog ');
     }
 }
