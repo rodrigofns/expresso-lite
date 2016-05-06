@@ -87,7 +87,8 @@ class Main extends Handler
                 'folderName' => $curFolder->localName,
                 'page' => $params->page,
             )),
-            'lnkCalendar' => $this->makeUrl('Calendar.Main')
+            'lnkCalendar' => $this->makeUrl('Calendar.Main'),
+            'action_delete' => ProcessMessageAction::ACTION_DELETE
         ));
     }
 

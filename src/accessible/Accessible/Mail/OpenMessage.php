@@ -51,7 +51,7 @@ class OpenMessage extends Handler
             )),
             'lnkDelete' => $this->makeUrl('Mail.DeleteMessage', array(
                 'folderName' => $params->folderName,
-                'messageId' => $params->messageId,
+                'messageIds' => $params->messageId,
                 'folderId' => $params->folderId
             )),
             'lnkMark' => $this->makeUrl('Mail.MarkMessageAsUnread', array(

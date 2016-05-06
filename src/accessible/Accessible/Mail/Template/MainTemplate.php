@@ -139,6 +139,7 @@
     <h2 class="anchorsTitle">Ações</h2>
     <div class="contentAlign">
         <button type="submit" name="actionProcess" value="<?= $VIEW->action_mark_unread ?>">Marcar como não lido</button>
+        <button type="submit" name="actionProcess" value="<?= $VIEW->action_delete ?>">Apagar marcados</button>
     </div>
 </div>
 
