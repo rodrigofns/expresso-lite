@@ -27,6 +27,9 @@
                 <li><a href="#eventInfo" accesskey="1">Ir para informações do evento [1]</a></li>
                 <li><a href="#eventDescription" accesskey="2">Ir para descrição do evento [2]</a></li>
                 <li><a href="#eventPartners" accesskey="3">Ir para participantes do evento [3]</a></li>
+                <?php IF($VIEW->isUserAllowedToConfirm) : ?>
+                    <li><a href="#eventActions" accesskey="4">Ir para ações de evento [4]</a></li>
+                <?php ENDIF; ?>
                 <li><a href="<?= $VIEW->lnkBackToCalendar ?>" accesskey="v">Voltar para o calendário [v]</a></li>
             </ul>
         </nav>
@@ -88,6 +91,26 @@
         <li><a href="#top">voltar ao topo [t]</a></li>
     </ul>
 </div>
+
+<?php IF($VIEW->isUserAllowedToConfirm) : ?>
+<div id="eventActions" name="eventActions">
+    <h2 class="anchorsTitle">Ações de evento</h2>
+    <div class="links linkAsButton">
+        <ul>
+            <li><a href="<?= $VIEW->lnkTentative ?>">Tentar comparecer</a></li>
+            <li><a href="<?= $VIEW->lnkAccepted ?>">Confirmar participação</a></li>
+            <li><a href="<?= $VIEW->lnkDeclined ?>">Rejeitar</a></li>
+            <li><a href="<?= $VIEW->lnkNeedsAction ?>">Responder depois</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="backToTop links systemLinks contentAlign">
+    <ul>
+        <li><a href="#top">voltar ao topo [t]</a></li>
+    </ul>
+</div>
+<?php ENDIF; ?>
 
 </body>
 </html>

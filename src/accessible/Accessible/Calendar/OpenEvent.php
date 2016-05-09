@@ -31,6 +31,13 @@ class OpenEvent extends Handler
 
         if ($isParamsOkToOpenEvent && !is_null($event)) {
             $formtEvInfo = $this->formatEventInformation($event);
+            $currentEmailUser = TineSessionRepository::getTineSession()->getAttribute('Expressomail.email');
+            $eventHasNotOccurred = EventUtils::checkEventHasNotOccurred($event->from);
+            $userAllowedToConfirm = EventUtils::isUserAllowedToConfirmEvent( (object) array(
+                    'currentEmailUser' => $currentEmailUser,
+                    'attendees'        => (object) $event->attendees,
+            ));
+
             $this->showTemplate('OpenEventTemplate', (object) array(
                 'lnkBackToCalendar' => $this->makeUrl('Calendar.Main', array(
                     'month' => $params->monthVal,
@@ -47,7 +54,44 @@ class OpenEvent extends Handler
                 'countAttendees'         => count($formtEvInfo->attendees),
                 'attendeesInformation'   => $this->formatAttendeesInformation(
                     $formtEvInfo->attendees
-                )
+                ),
+                'lnkAccepted' => $this->makeUrl('Calendar.EventConfirmation', array(
+                    'idEvent'      => $params->idEvent,
+                    'confirmation' => EventUtils::EVENTS_CONFIRM_ACCEPTED,
+                    'month'        => $params->monthVal,
+                    'year'         => $params->yearVal,
+                    'calendarId'   => $params->calendarId,
+                    'from'         => $params->from,
+                    'until'        => $params->until
+                )),
+                'lnkDeclined' => $this->makeUrl('Calendar.EventConfirmation', array(
+                    'idEvent'      => $params->idEvent,
+                    'confirmation' => EventUtils::EVENTS_CONFIRM_DECLINED,
+                    'month'        => $params->monthVal,
+                    'year'         => $params->yearVal,
+                    'calendarId'   => $params->calendarId,
+                    'from'         => $params->from,
+                    'until'        => $params->until
+                )),
+                'lnkTentative' => $this->makeUrl('Calendar.EventConfirmation', array(
+                    'idEvent'      => $params->idEvent,
+                    'confirmation' => EventUtils::EVENTS_CONFIRM_TENTATIVE,
+                    'month'        => $params->monthVal,
+                    'year'         => $params->yearVal,
+                    'calendarId'   => $params->calendarId,
+                    'from'         => $params->from,
+                    'until'        => $params->until
+                )),
+                'lnkNeedsAction'   => $this->makeUrl('Calendar.EventConfirmation', array(
+                    'idEvent'      => $params->idEvent,
+                    'confirmation' => EventUtils::EVENTS_CONFIRM_NEEDS_ACTION,
+                    'month'        => $params->monthVal,
+                    'year'         => $params->yearVal,
+                    'calendarId'   => $params->calendarId,
+                    'from'         => $params->from,
+                    'until'        => $params->until
+                )),
+                'isUserAllowedToConfirm' => $eventHasNotOccurred && $userAllowedToConfirm
             ));
         } else { // At this point something was not properly correct to open the event
             Dispatcher::processRequest('Core.ShowFeedback', (object) array (

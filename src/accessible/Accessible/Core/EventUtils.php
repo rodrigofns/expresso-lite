@@ -88,24 +88,44 @@ class EventUtils
     const EVENTS_NEXT_MONTH = 'mês seguinte';
 
     /**
-     * @var EVENTS_CONFIRM_ACCEPTED.
+     * @var EVENTS_CONFIRM_ACCEPTED
      */
-    const EVENTS_CONFIRM_ACCEPTED = 'participação aceita';
+    const EVENTS_CONFIRM_ACCEPTED = 'ACCEPTED';
 
     /**
-     * @var EVENTS_CONFIRM_TENTATIVE.
+     * @var EVENTS_CONFIRM_ACCEPTED_STATUS.
      */
-    const EVENTS_CONFIRM_TENTATIVE = 'tentará participar';
+    const EVENTS_CONFIRM_ACCEPTED_STATUS = 'participação aceita';
 
     /**
-     * @var EVENTS_CONFIRM_NEEDS_ACTION.
+     * @var EVENTS_CONFIRM_TENTATIVE
      */
-    const EVENTS_CONFIRM_NEEDS_ACTION = 'aguardando resposta';
+    const EVENTS_CONFIRM_TENTATIVE = 'TENTATIVE';
 
     /**
-     * @var EVENTS_CONFIRM_DECLINED.
+     * @var EVENTS_CONFIRM_TENTATIVE_STATUS.
      */
-    const EVENTS_CONFIRM_DECLINED = 'participação recusada';
+    const EVENTS_CONFIRM_TENTATIVE_STATUS = 'tentará participar';
+
+    /**
+     * @var EVENTS_CONFIRM_NEEDS_ACTION
+     */
+    const EVENTS_CONFIRM_NEEDS_ACTION = 'NEEDS-ACTION';
+
+    /**
+     * @var EVENTS_CONFIRM_NEEDS_ACTION_STATUS.
+     */
+    const EVENTS_CONFIRM_NEEDS_ACTION_STATUS = 'aguardando resposta';
+
+    /**
+     * @var EVENTS_CONFIRM_DECLINED
+     */
+    const EVENTS_CONFIRM_DECLINED = 'DECLINED';
+
+    /**
+     * @var EVENTS_CONFIRM_DECLINED_STATUS.
+     */
+    const EVENTS_CONFIRM_DECLINED_STATUS = 'participação recusada';
 
     /**
      * Mapping of event confirmation types and description about calendar events.
@@ -113,10 +133,10 @@ class EventUtils
      * @var $confirmationTypesAndDescription
      */
     private static $confirmationTypesAndDescription = array(
-        'ACCEPTED'     => self::EVENTS_CONFIRM_ACCEPTED,
-        'TENTATIVE'    => self::EVENTS_CONFIRM_TENTATIVE,
-        'NEEDS-ACTION' => self::EVENTS_CONFIRM_NEEDS_ACTION,
-        'DECLINED'     => self::EVENTS_CONFIRM_DECLINED,
+        self::EVENTS_CONFIRM_ACCEPTED     => self::EVENTS_CONFIRM_ACCEPTED_STATUS,
+        self::EVENTS_CONFIRM_TENTATIVE    => self::EVENTS_CONFIRM_TENTATIVE_STATUS,
+        self::EVENTS_CONFIRM_NEEDS_ACTION => self::EVENTS_CONFIRM_NEEDS_ACTION_STATUS,
+        self::EVENTS_CONFIRM_DECLINED     => self::EVENTS_CONFIRM_DECLINED_STATUS,
     );
 
     /**
@@ -323,19 +343,54 @@ class EventUtils
      */
     public static function sortAttendeesByName($attendeesList)
     {
-        usort(&$attendeesList['ACCEPTED'], function($e1, $e2) {
+        usort(&$attendeesList[self::EVENTS_CONFIRM_ACCEPTED], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList['TENTATIVE'], function($e1, $e2) {
+        usort(&$attendeesList[self::EVENTS_CONFIRM_TENTATIVE], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList['NEEDS-ACTION'], function($e1, $e2) {
+        usort(&$attendeesList[self::EVENTS_CONFIRM_NEEDS_ACTION], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList['DECLINED'], function($e1, $e2) {
+        usort(&$attendeesList[self::EVENTS_CONFIRM_DECLINED], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
 
         return $attendeesList;
+    }
+
+    /**
+     * Check whether an event has not occurred.
+     *
+     * @param string $strTime Information about date and time in the following
+     *                        format '2016-01-30 01:50'
+     * @return boolean True if the event has not occurred, false otherwise
+     */
+    public static function checkEventHasNotOccurred($strTime)
+    {
+        return DateUtils::compareToCurrentDate($strTime);
+    }
+
+    /**
+     * Check whether the current user belongs to an event attendees list.
+     *
+     * @param stdclass $attendeesInformation An object that contains formatted information about
+     *                                calendar event, like the email of the current user
+     *                                (->currentEmailUser) and the event's attendees list
+     *                                (->attendees)
+     * @return boolean True if the object corresponding to the current user is found,
+     *                 false otherwise
+     */
+    public static function isUserAllowedToConfirmEvent($attendeesInformation)
+    {
+        $item = null;
+        foreach($attendeesInformation->attendees as $attende) {
+            if ($attendeesInformation->currentEmailUser === $attende->email) {
+                $item = $attende;
+                break;
+            }
+        }
+
+        return isset($item);
     }
 }
