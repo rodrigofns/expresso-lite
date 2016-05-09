@@ -39,6 +39,7 @@
     <div class="links systemLinks">
         <ul>
             <li><a href="<?= $VIEW->lnkEmail ?>" accesskey="e">Módulo Email [e]</a></li>
+            <li><a href="<?= $VIEW->lnkChangeCalendar ?>" accesskey="q">Selecionar calendário [q]</a></li>
             <li><a href="<?= $VIEW->lnkLogoff ?>" title="Sair do expressobr acessível" accesskey="s">Sair do sistema [s]</a></li>
         </ul>
     </div>

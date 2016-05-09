@@ -65,7 +65,12 @@ class Main extends Handler
             'calendarNavigation' => $this->formatCalendarNavigationLinks(
                 $currCalendar->id,
                 $currNavigationDateRange
-            )
+            ),
+            'lnkChangeCalendar' => $this->makeUrl('Calendar.OpenCalendar', array(
+                'calendarId' => $currCalendar->id,
+                'month' => $currDateRange->monthVal,
+                'year' => $currDateRange->yearVal
+            ))
         ));
     }
 
