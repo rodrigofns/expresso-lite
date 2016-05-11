@@ -45,6 +45,9 @@
             <li><a href="<?= $VIEW->lnkRefreshFolder ?>" accesskey="a">Atualizar lista de emails da pasta <?= $VIEW->curFolder->localName ?> [a]</a></li>
             <li><a href="<?= $VIEW->lnkChangeFolder ?>" accesskey="p">Selecionar outra pasta [p]</a></li>
             <li><a href="<?= $VIEW->lnkComposeMessage ?>" accesskey="n">Escrever novo email [n]</a></li>
+            <?php IF($VIEW->isTrashCurrentFolder) : ?>
+                <li><a href="<?= $VIEW->lnkEmptyTrash ?>" accesskey="x">Esvaziar pasta lixeira [x]</span></a></li>
+            <?php ENDIF; ?>
             <li><a href="<?= $VIEW->lnkLogoff ?>" title="Sair do expressobr acessível" accesskey="s">Sair do sistema [s]</a></li>
         </ul>
     </div>

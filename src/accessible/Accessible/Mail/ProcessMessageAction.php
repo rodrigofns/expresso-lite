@@ -31,6 +31,11 @@ class ProcessMessageAction extends Handler
     const ACTION_DELETE = 'Apagar selecionados';
 
     /**
+     * @var ACTION_EMPTY_TRASH
+     */
+    const ACTION_EMPTY_TRASH = 'Esvaziar pasta lixeira';
+
+    /**
      * @see Accessible\Handler::execute
      */
     public function execute($params)
