@@ -69,6 +69,22 @@ class WidgetCompose extends GenericPage
     }
 
     /**
+     * Clicks on cc toggle button
+     */
+    public function clickOnCcToggleButton()
+    {
+        $this->byCssSelector('.Compose_ccToggle')->click();
+    }
+
+    /**
+     * Clicks on bcc toggle button
+     */
+    public function clickOnBccToggleButton()
+    {
+        $this->byCssSelector('.Compose_bccToggle')->click();
+    }
+
+    /**
      * Types a value in the Subject field
      *
      * @param string $subject The subject to be typed into the field

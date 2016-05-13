@@ -54,6 +54,34 @@ class MessageUnit extends GenericPage
     }
 
     /**
+     * Returns an array of strings with all addresses in the Cc field
+     *
+     *  @return array
+     */
+    public function getCcAddresses()
+    {
+        return explode(', ', $this->byCssSelector('.Messages_addrCc')->text());
+    }
+
+    /**
+     * Returns an array of strings with all addresses in the Bcc field
+     *
+     *  @return array
+     */
+    public function getBccAddresses()
+    {
+        return explode(', ', $this->byCssSelector('.Messages_addrBcc')->text());
+    }
+
+    /**
+     * Checks if the Bcc field is displayed in the message
+     */
+    public function isBccAddressesDisplayed()
+    {
+        return count($this->byCssSelectorMultiple('.Messages_addrBcc')) > 0;
+    }
+
+    /**
      * Checks if the Important icon is displayed in this message unit
      *
      * @return boolean

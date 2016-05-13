@@ -397,4 +397,122 @@ class ComposeMailTest extends SingleLoginTest
 
         $this->assertEquals(array($FINAL_MAIL_RECIPIENT), $messageUnit->getToAddresses(), 'Recipients in mail do not match what was expected');
     }
+
+    /**
+     * Tests sending a simple e-mail,with bcc and bcc cecking if the e-mail composition
+     * screen opens and close as expected. Also checks if the recipients copy receives
+     * the e-mail.
+     *
+     *   CTV3-1051
+     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1051
+     */
+    public function test_CTV3_1051_Send_Cc_Mail()
+    {
+        $mailPage = new MailPage($this);
+
+        //load test data
+        $MAIL_CC_RECIPIENT = $this->getTestValue('mail.cc.recipient');
+        $MAIL_SENDER = $this->getTestValue('mail.sender');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $MAIL_CONTENT = $this->getTestValue('mail.content');
+
+        //testStart
+        $mailPage->clickWriteEmailButton();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+        $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
+
+        $widgetCompose->clickOnCcToggleButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $widgetCompose->type($MAIL_CC_RECIPIENT);
+        $widgetCompose->typeEnter();
+
+        $widgetCompose->typeSubject($MAIL_SUBJECT);
+
+        $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
+        $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $mailPage->clickOnFolderByName('Enviados');
+
+        $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
+        $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
+
+        $headlinesEntry->click();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+        $this->assertContains('(ninguém)', $messageUnit->getToAddresses(), 'The to address content differs from the expected');
+        $this->assertEquals("($MAIL_SENDER)", $messageUnit->getFromMail(), 'Message sender mail does not match');
+        $this->assertContains("$MAIL_SENDER", $messageUnit->getCcAddresses(), 'Message cc recipient mail does not match');
+    }
+
+    /**
+     * Tests sending a simple e-mail,with cc and checking if the e-mail composition
+     * screen opens and close as expected. Also checks if the recipients copy receives
+     * the e-mail.
+     *
+     *   CTV3-1052
+     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1052
+     */
+    public function test_CTV3_1052_Send_Bcc_Mail()
+    {
+        $mailPage = new MailPage($this);
+
+        //load test data
+        $MAIL_BCC_RECIPIENT = $this->getTestValue('mail.bcc.recipient');
+        $MAIL_SENDER = $this->getTestValue('mail.sender');
+        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
+        $MAIL_CONTENT = $this->getTestValue('mail.content');
+
+        //testStart
+        $mailPage->clickWriteEmailButton();
+
+        $widgetCompose = $mailPage->getWidgetCompose();
+        $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
+
+        $widgetCompose->clickOnBccToggleButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $widgetCompose->type($MAIL_BCC_RECIPIENT);
+        $widgetCompose->typeEnter();
+
+        $widgetCompose->typeSubject($MAIL_SUBJECT);
+
+        $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
+        $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
+
+        $mailPage->clickRefreshButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+
+        $this->assertContains('(ninguém)', $messageUnit->getToAddresses(), 'The to address content differs from the expected');
+        $this->assertFalse($messageUnit->isBccAddressesDisplayed(), 'Bcc tag should not have been displayed, but it was');
+
+        $mailPage->clickLayoutBackButton();
+        $this->waitForAjaxAndAnimationsToComplete();
+        $mailPage->clickOnFolderByName('Enviados');
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
+        $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
+
+        $headlinesEntry->click();
+        $this->waitForAjaxAndAnimationsToComplete();
+
+        $widgetMessages = $mailPage->getWidgetMessages();
+        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
+
+        $this->assertContains('(ninguém)', $messageUnit->getToAddresses(), 'The to address content differs from the expected');
+        $this->assertEquals("($MAIL_SENDER)", $messageUnit->getFromMail(), 'Message sender mail does not match');
+        $this->assertContains("$MAIL_SENDER", $messageUnit->getBccAddresses(), 'Message bcc recipient mail does not match');
+    }
 }
