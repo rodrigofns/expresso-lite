@@ -120,7 +120,7 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionDelete()
     {
         $this->clickOnSubjectMenuItemByText("Apagar conversa");
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -129,7 +129,7 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionMove($folderName)
     {
         $this->clickOnSubjectMenuItemByText($folderName);
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -138,7 +138,7 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionMarkRead()
     {
         $this->clickOnSubjectMenuItemByText('Marcar conversa como lida');
-        // we don't do a waitForAjaxAndAnimationsToComplete here because
+        // we don't do a waitForAjaxAndAnimations here because
         // this may result in an alert message to be opened
 
     }
@@ -149,7 +149,7 @@ class WidgetMessages extends GenericPage
     public function clickSubjectMenuOptionMarkUnread()
     {
         $this->clickOnSubjectMenuItemByText('Marcar conversa como não lida');
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
     }
 }

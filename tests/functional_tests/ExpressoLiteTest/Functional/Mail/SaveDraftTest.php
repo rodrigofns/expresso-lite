@@ -67,7 +67,7 @@ class SaveDraftTest extends SingleLoginTest
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was saved, but it could not be found on Rascunhos folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
         $badges = $widgetCompose->getArrayOfCurrentBadges();
@@ -121,7 +121,7 @@ class SaveDraftTest extends SingleLoginTest
         $this->assertTrue($headlinesEntry->hasImportantIcon(), 'Headline should have been listed as important, but it was not');
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
         $this->assertTrue($widgetCompose->isImportantCheckboxChecked(), 'Checkbox was marked as important, but it was not');

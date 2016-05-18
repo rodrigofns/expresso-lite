@@ -61,7 +61,7 @@ class WidgetCompose extends GenericPage
         foreach ($this->byCssSelectorMultiple('ul.TextBadges_ul > li.TextBadges_badgeLi') as $badgeLi) {
             if ($badgeLi->text() == $name) {
                 $badgeLi->click();
-                usleep(500000); //TODO: this is a bad way to wait for the animation
+                $this->waitForAjaxAndAnimations();
                 return;
             }
         }
@@ -113,7 +113,7 @@ class WidgetCompose extends GenericPage
     public function clickSendMailButton()
     {
         $this->byCssSelector('.Compose_send')->click();
-        // we don't do a waitForAjaxAndAnimationsToComplete here because
+        // we don't do a waitForAjaxAndAnimations here because
         // this may result in an alert message to be opened
     }
 
@@ -123,7 +123,7 @@ class WidgetCompose extends GenericPage
     public function clickSaveDraftButton()
     {
         $this->byCssSelector('.Compose_draft')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**

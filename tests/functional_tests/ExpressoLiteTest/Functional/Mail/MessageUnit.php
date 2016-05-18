@@ -194,7 +194,7 @@ class MessageUnit extends GenericPage
     public function clickMenuOptionReply()
     {
         $this->clickOnMenuItemByText("Responder");
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -203,7 +203,7 @@ class MessageUnit extends GenericPage
     public function clickMenuOptionForward()
     {
         $this->clickOnMenuItemByText("Encaminhar");
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -212,7 +212,7 @@ class MessageUnit extends GenericPage
     public function clickMenuOptionDelete()
     {
         $this->clickOnMenuItemByText("Apagar");
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -221,7 +221,7 @@ class MessageUnit extends GenericPage
     public function clickMenuOptionMove($folderName)
     {
         $this->clickOnMenuItemByText($folderName);
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -240,7 +240,7 @@ class MessageUnit extends GenericPage
     public function clickShowQuoteButton()
     {
         $this->byCssSelector('.Messages_showQuote')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -259,7 +259,7 @@ class MessageUnit extends GenericPage
     public function clickMessageTop()
     {
         $this->byCssSelector('.Messages_top1')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**

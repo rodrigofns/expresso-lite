@@ -49,11 +49,11 @@ class UpdateDraftTest extends ExpressoLiteTest
 
         $mailPage->clickOnFolderByName('Rascunhos');
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
         $widgetCompose->clickOnBadgeByName($BADGE1);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertCount(0, $widgetCompose->getArrayOfCurrentBadges(),
                 'The recipient field is not null');
@@ -79,9 +79,10 @@ class UpdateDraftTest extends ExpressoLiteTest
                 'The displayed body message do not match what was expected (original content)');
 
         $widgetCompose->clickSaveDraftButton();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT . ' CHANGED');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
 
@@ -93,6 +94,7 @@ class UpdateDraftTest extends ExpressoLiteTest
                 'The displayed body message do not match what was expected after open message second time');
 
         $widgetCompose->clickSaveDraftButton();
+        $this->waitForAjaxAndAnimations();
     }
 
     /*
@@ -125,11 +127,11 @@ class UpdateDraftTest extends ExpressoLiteTest
 
         $mailPage->clickOnFolderByName('Rascunhos');
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertFalse($widgetCompose->isDisplayed(),
                 'Compose draft window should have been closed, but it is still visible');
@@ -179,7 +181,7 @@ class UpdateDraftTest extends ExpressoLiteTest
         $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionDelete();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull(
@@ -187,7 +189,7 @@ class UpdateDraftTest extends ExpressoLiteTest
                 'Mail was deleted, but it was not removed from headlines listing in Draft Folder');
 
         $mailPage->clickOnFolderByName('Lixeira');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(

@@ -132,9 +132,9 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($REPLY_MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->clickLayoutBackButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickLogout();
         $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
@@ -206,9 +206,9 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $this->assertContains($ORIGINAL_MAIL_CONTENT, $widgetCompose->getMessageBodyText());
 
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->clickLayoutBackButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickLogout();
         $loginPage->doLogin($USER_3_LOGIN, $USER_3_PASSWORD);
@@ -262,7 +262,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $addressbookPage = new AddressbookPage($this);
 
         $addressbookPage->clickPersonalCatalog();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $contactListItem = $addressbookPage->getCatalogEntryByName($USER_2_NAME);
 
         $this->assertEquals($USER_2_NAME, $contactListItem->getNameFromContact(),

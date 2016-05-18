@@ -55,7 +55,7 @@ class MarkReadUnreadThreadTest extends ExpressoLiteTest
 
         $mailPage = new MailPage($this);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
 
@@ -101,16 +101,16 @@ class MarkReadUnreadThreadTest extends ExpressoLiteTest
 
         $mailPage = new MailPage($this);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $widgetMessages->clickSubjectMenuOptionMarkUnread();
 
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $widgetMessages = $mailPage->getWidgetMessages();
         $widgetMessages->clickSubjectMenuOptionMarkRead();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);

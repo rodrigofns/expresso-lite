@@ -58,7 +58,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
 
@@ -68,7 +68,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $this->assertEquals($MAIL_SUBJECT, $widgetMessages->getHeader(), 'The header in the right body header does not match the expected mail subject: ' . $MAIL_SUBJECT);
@@ -105,12 +105,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -144,7 +144,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->clickOnRecipientField();
         $widgetCompose->type($PART_NAME_SEARCH);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $contactsAutoComplete = $mailPage->getContactsAutoComplete();
         $this->assertTrue($contactsAutoComplete->hasContactsListed(), 'The contacts list is visible, but it is not');
@@ -152,7 +152,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->clickOnRecipientField();
         $widgetCompose->type($PART_NAME_SEARCH);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $contactsAutoComplete->clickMoreResults();
 
         $this->assertTrue($contactsAutoComplete->hasContactscounted(), 'The counter is visible, but it is not');
@@ -161,7 +161,7 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeSubject($MAIL_SUBJECT);
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
 
@@ -171,7 +171,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $this->assertEquals($MAIL_SUBJECT, $widgetMessages->getHeader(), 'The header in the right body header does not match the expected mail subject: ' . $MAIL_SUBJECT);
@@ -208,7 +208,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->clickImportantRadio();
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
@@ -216,7 +216,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertTrue($headlinesEntry->hasImportantIcon(), 'Headline should have been listed as important, but it was not');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -333,12 +333,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -385,12 +385,12 @@ class ComposeMailTest extends SingleLoginTest
         $widgetCompose->typeMessageBodyBeforeSignature('placeholder');
 
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnFolderByName('Enviados');
 
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -423,7 +423,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
 
         $widgetCompose->clickOnCcToggleButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $widgetCompose->type($MAIL_CC_RECIPIENT);
         $widgetCompose->typeEnter();
 
@@ -431,10 +431,10 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnFolderByName('Enviados');
 
@@ -442,7 +442,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -476,7 +476,7 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
 
         $widgetCompose->clickOnBccToggleButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $widgetCompose->type($MAIL_BCC_RECIPIENT);
         $widgetCompose->typeEnter();
 
@@ -484,12 +484,12 @@ class ComposeMailTest extends SingleLoginTest
 
         $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
 
         $mailPage->clickRefreshButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -498,15 +498,15 @@ class ComposeMailTest extends SingleLoginTest
         $this->assertFalse($messageUnit->isBccAddressesDisplayed(), 'Bcc tag should not have been displayed, but it was');
 
         $mailPage->clickLayoutBackButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->clickOnFolderByName('Enviados');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
 
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();

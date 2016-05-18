@@ -44,14 +44,14 @@ class ToggleHighlightTest extends SingleLoginTest {
 
        //testStart
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL_SUBJECT, 'Changes its highlight');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
         $headlinesEntry->toggleCheckbox();
         $mailPage->clickMenuOptionHighlight();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertTrue(
                 $headlinesEntry->hasHighlightIcon(),
@@ -66,7 +66,7 @@ class ToggleHighlightTest extends SingleLoginTest {
 
         $headlinesEntry->toggleCheckbox();
         $mailPage->clickMenuOptionHighlight();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertFalse(
                 $headlinesEntry->hasHighlightIcon(),

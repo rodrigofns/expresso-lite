@@ -22,8 +22,7 @@ class MailPage extends GenericPage
     public function clickWriteEmailButton()
     {
         $this->byCssSelector('#btnCompose')->click();
-        sleep(1); //TODO: this avoids problems with testNoRecipients, but a more elegant solution should be used
-        $this->testCase->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -33,8 +32,7 @@ class MailPage extends GenericPage
     public function clickRefreshButton()
     {
         $this->byCssSelector('#btnUpdateFolders')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete(); //TODO: this avoids problems with testNoRecipients
-        $this->testCase->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -44,7 +42,7 @@ class MailPage extends GenericPage
     public function clickAddressbook()
     {
         $this->byCssSelector('.Layout_iconAddress')->click();
-        $this->testCase->waitForAjaxAndAnimationsToComplete(); //TODO: this avoids problems with testNoRecipients
+        $this->testCase->waitForAjaxAndAnimations();
     }
 
     /**
@@ -61,7 +59,7 @@ class MailPage extends GenericPage
                 break;
             }
         }
-        $this->testCase->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -137,7 +135,7 @@ class MailPage extends GenericPage
             throw new \Exception('Could not find a headline with subject ' . $subject);
         } else {
             $headline->click();
-            $this->testCase->waitForAjaxToComplete();
+            $this->waitForAjaxAndAnimations();
         }
     }
 
@@ -154,7 +152,7 @@ class MailPage extends GenericPage
     public function sendMail($recipients, $subject, $content)
     {
         $this->clickWriteEmailButton();
-        $this->testCase->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $widgetCompose = $this->getWidgetCompose();
         $widgetCompose->clickOnRecipientField();
 
@@ -167,6 +165,7 @@ class MailPage extends GenericPage
 
         $widgetCompose->typeMessageBodyBeforeSignature($content);
         $widgetCompose->clickSendMailButton();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**
@@ -176,7 +175,7 @@ class MailPage extends GenericPage
     {
         $this->byCssSelector('#Layout_logoff')->click();
         $this->testCase->waitForUrl(LITE_URL . '/');
-        $this->testCase->waitForAjaxToComplete();
+        $this->waitForAjaxAndAnimations();
     }
 
     /**

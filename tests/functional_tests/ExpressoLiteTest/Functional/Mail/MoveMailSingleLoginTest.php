@@ -47,7 +47,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
 
        //testStart
         $mailPage->sendMail(array($MAIL_RECIPIENT), $MAIL_SUBJECT, 'Move email to Modelos folder');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
 
@@ -56,14 +56,14 @@ class MoveMailSingleLoginTest extends SingleLoginTest
         $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionMove('Modelos');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull($headlinesEntry,
                 'A mail with subject $MAIL_SUBJECT was moved, it could still be found in the inbox folder');
 
         $mailPage->clickOnFolderByName('Modelos');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(
@@ -92,18 +92,18 @@ class MoveMailSingleLoginTest extends SingleLoginTest
 
        //testStart
         $mailPage->sendMail(array($MAIL_RECIPIENT), $MAIL_SUBJECT, 'Move open email to Modelos folder');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
 
         $messageUnit->clickMenuOptionMove('Modelos');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
@@ -111,7 +111,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
                 'A mail with subject $MAIL_SUBJECT was moved, it could still be found in the inbox folder');
 
         $mailPage->clickOnFolderByName('Modelos');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(

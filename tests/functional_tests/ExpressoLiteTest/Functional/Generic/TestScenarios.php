@@ -64,6 +64,8 @@ abstract class TestScenarios
 
         $widgetCompose->typeMessageBodyBeforeSignature('Reply Content: ' . $params->content);
         $widgetCompose->clickSendMailButton();
+        $widgetCompose->waitForAjaxAndAnimations();
+
         $mailPage->clickLayoutBackButton();
 
         $mailPage->clickLogout();
@@ -82,6 +84,8 @@ abstract class TestScenarios
 
         $widgetCompose->typeMessageBodyBeforeSignature('Reply of Reply Content: ' . $params->content);
         $widgetCompose->clickSendMailButton();
+        $widgetCompose->waitForAjaxAndAnimations();
+
         $mailPage->clickLayoutBackButton();
 
         $mailPage->clickLogout();
@@ -115,6 +119,7 @@ abstract class TestScenarios
         $widgetCompose->typeSubject($params->subject);
         $widgetCompose->typeMessageBodyBeforeSignature($params->content);
         $widgetCompose->clickSaveDraftButton();
+        $widgetCompose->waitForAjaxAndAnimations();
 
         $mailPage->clickLogout();
     }

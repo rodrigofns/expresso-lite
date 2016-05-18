@@ -34,7 +34,7 @@ class SingleLoginTest extends ExpressoLiteTest
             $this->doLoginWithIniFileValues();
         } else {
             parent::setUpPage($this->getTestUrl());
-            $this->waitForAjaxToComplete();
+            $this->waitForAjaxAndAnimations();
         }
     }
 

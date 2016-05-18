@@ -58,6 +58,6 @@ class LoginPage extends GenericPage
         $this->typePassword($pwd);
         $this->clickLogin();
         $this->testCase->waitForUrl(LITE_URL . '/mail/');
-        $this->testCase->waitForAjaxToComplete();
+        $this->testCase->waitForAjaxAndAnimations();
     }
 }

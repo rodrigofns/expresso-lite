@@ -51,17 +51,17 @@ class SearchTextMessageTest extends SingleLoginTest {
 
         //testStart
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL1_SUBJECT, $MAIL1_CONTENT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL2_SUBJECT, $MAIL2_CONTENT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL2_SUBJECT, $MAIL2_CONTENT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL3_SUBJECT, $MAIL3_CONTENT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->typeSearchText($COMMON_TEXT_FRAGMENT);
         $mailPage->clickSearchButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $messages = $mailPage->getArrayOfHeadlinesEntries();
         $this->assertEquals(3, count($messages),
@@ -69,19 +69,11 @@ class SearchTextMessageTest extends SingleLoginTest {
 
         $mailPage->clearSearchField();
         $mailPage->clickSearchButton();
-        $this->waitForAjaxAndAnimationsToComplete();
-
-        //For some reason, waitForAjaxAndAnimationsToComplete does not
-        //work in this case, so we add an additional sleep to make it work
-        usleep(500000);
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->typeSearchText($INEXISTENT_TEXT_FRAGMENT);
         $mailPage->clickSearchButton();
-        $this->waitForAjaxAndAnimationsToComplete();
-
-        //For some reason, waitForAjaxAndAnimationsToComplete does not
-        //work in this case, so we add an additional sleep to make it work
-        usleep(500000);
+        $this->waitForAjaxAndAnimations();
 
         $messages = $mailPage->getArrayOfHeadlinesEntries();
         $this->assertEquals(0, count($messages),

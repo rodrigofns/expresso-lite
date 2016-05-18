@@ -55,11 +55,11 @@ class MoveMailTest extends ExpressoLiteTest
 
         $mailPage = new MailPage($this);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $widgetMessages->clickSubjectMenuOptionMove("Modelos");
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull(
@@ -67,7 +67,7 @@ class MoveMailTest extends ExpressoLiteTest
                'Mail was moved, but it was not removed from headlines listing');
 
         $mailPage->clickOnFolderByName('Modelos');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(

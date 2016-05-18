@@ -46,14 +46,14 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         //testStart
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL_SUBJECT, 'Marcando como lido');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionMarkRead();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
         $this->assertEquals(HeadlinesEntry::READ_STATUS,$headlinesEntry->getReadStatus(),
@@ -81,7 +81,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         //testStart
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL_SUBJECT, 'Marcando como não lido');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
 
@@ -90,14 +90,14 @@ class MarkReadUnreadTest extends SingleLoginTest {
         $widgetMessages = $mailPage->getWidgetMessages();
         $widgetMessages->getSingleMessageUnitInConversation();
         $mailPage->clickLayoutBackButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionMarkUnread();
 
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertEquals(HeadlinesEntry::UNREAD_STATUS,$headlinesEntry->getReadStatus(),
@@ -132,18 +132,18 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         //testStart
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL_SUBJECT, 'Marcando como não lido');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->click();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
         $messageUnit->clickMenuOptionMove('Marcar como não lida');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 

@@ -105,7 +105,7 @@ class ReadMailTest extends ExpressoLiteTest
         $REPLY_SUBJECT = 'Re: ' . $MAIL_SUBJECT;
         $widgetCompose->typeMessageBodyBeforeSignature($REPLY_MAIL_CONTENT);
         $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickLayoutBackButton();
         $mailPage->clickLogout();
@@ -115,7 +115,7 @@ class ReadMailTest extends ExpressoLiteTest
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $this->assertContains($REPLY_MAIL_CONTENT, $messageUnit->getContent(), 'The replied message content was not found in the reply body');
         $this->assertTrue($messageUnit->hasShowQuoteButton(), 'The replied message did not show the Show Quote button');

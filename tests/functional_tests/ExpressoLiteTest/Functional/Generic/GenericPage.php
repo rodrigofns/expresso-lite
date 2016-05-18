@@ -159,4 +159,13 @@ class GenericPage
 
         return $isPresent;
     }
+
+    /**
+     * This will make the test wait for any pending ajax calls, animations or throbbers.
+     * It is just a shortcut for $this->testCase->waitForAjaxAndAnimations
+     */
+    public function waitForAjaxAndAnimations()
+    {
+        $this->testCase->waitForAjaxAndAnimations();
+    }
 }

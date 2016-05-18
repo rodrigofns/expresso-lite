@@ -17,8 +17,7 @@ function($, Cordova) {
     var App = {};
     var ajaxUrl = null; // to be cached on first getAjaxUrl() call
 
-    var pendingAjax = null;
-    var pendingAjaxIndex = null;
+    var numberOfPendingAjax = 0;
 
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
@@ -96,20 +95,12 @@ function($, Cordova) {
 
         var defer = $.Deferred();
 
-        var ajaxCall = $.extend({r:requestName}, params);
-
-        var thisAjaxIndex = pendingAjaxIndex++;
-        if (pendingAjax != null) {
-            pendingAjax[thisAjaxIndex] = ajaxCall;
-        }
-
+        numberOfPendingAjax++;
         $.post(
             App.getAjaxUrl(),
-            ajaxCall
+            $.extend({r:requestName}, params)
         ).always(function() {
-            if (pendingAjax !== null) {
-                pendingAjax[thisAjaxIndex] = null;
-            }
+            numberOfPendingAjax--;
         }).done(function (data) {
             defer.resolve(data);
         }).fail(function (data) {
@@ -215,20 +206,8 @@ function($, Cordova) {
         document.location.href = folderName + (Cordova ? '/index.html' : '/');
     };
 
-    App.getPendingAjax = function() {
-        if (pendingAjax === null) {
-            return {error: 'Pending ajax calls tracing is not enabled. Add TRACE_PENDING_AJAX_CALLS=true in conf.php to enable it.'};
-        }
-
-        var pendingAjaxWithoutNulls = [];
-
-        for (var i=0; i < pendingAjax.length; i++) {
-            if (pendingAjax[i] !== null) {
-                pendingAjaxWithoutNulls.push(pendingAjax[i]);
-            }
-        }
-
-        return pendingAjaxWithoutNulls;
+    App.getNumberOfPendingAjax = function() {
+        return numberOfPendingAjax;
     };
 
     (function _Constructor() {
@@ -242,11 +221,6 @@ function($, Cordova) {
         $(window).on('beforeunload', function() {
             isUnloadingPage = true;
         });
-
-        if (App.getUserInfo('tracePendingAjaxCalls') == 'yes') {
-            pendingAjax = [];
-            pendingAjaxIndex = 0;
-        }
     })();
 
     return App;

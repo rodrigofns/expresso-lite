@@ -66,7 +66,7 @@ class ContactsAutoComplete extends GenericPage
             throw new \Exception('Could not find a contact entry with name ' . $nameContacts);
         } else {
             $contactDiv->click();
-            $this->testCase->waitForAjaxToComplete();
+            $this->waitForAjaxAndAnimations();
         }
     }
 

@@ -42,17 +42,17 @@ class DeleteMailTest extends ExpressoLiteTest
         $mailPage->sendMail(array($USER_MAIL), $MAIL_SUBJECT, $MAIL_CONTENT);
         //testStart
 
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $mailPage->clickOnFolderByName('Enviados');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
         $headlinesEntry->toggleCheckbox();
 
         $mailPage->clickMenuOptionDelete();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull(
@@ -60,7 +60,7 @@ class DeleteMailTest extends ExpressoLiteTest
                 'Mail was deleted, but it was not removed from headlines listing');
 
         $mailPage->clickOnFolderByName('Lixeira');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(
@@ -94,18 +94,18 @@ class DeleteMailTest extends ExpressoLiteTest
 
         $mailPage->sendMail(array($USER_MAIL), $MAIL_SUBJECT, $MAIL_CONTENT);
         //testStart
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
         $mailPage->clickRefreshButton();
 
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
 
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $messageUnit->clickMenuOptionDelete();
 
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull(
@@ -113,7 +113,7 @@ class DeleteMailTest extends ExpressoLiteTest
                'Mail was deleted, but it was not removed from headlines listing');
 
         $mailPage->clickOnFolderByName('Lixeira');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(
@@ -159,7 +159,7 @@ class DeleteMailTest extends ExpressoLiteTest
         $widgetMessages = $mailPage->getWidgetMessages();
 
         $widgetMessages->clickSubjectMenuOptionDelete();
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNull(
@@ -167,7 +167,7 @@ class DeleteMailTest extends ExpressoLiteTest
                'Mail was deleted, but it was not removed from headlines listing');
 
         $mailPage->clickOnFolderByName('Lixeira');
-        $this->waitForAjaxAndAnimationsToComplete();
+        $this->waitForAjaxAndAnimations();
 
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertNotNull(

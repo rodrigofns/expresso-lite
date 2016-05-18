@@ -78,12 +78,12 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
         }
 
         $this->uniqueId = uniqid();
-        $this->timeouts()->implicitWait(self::IMPLICIT_WAIT);
+        $this->restoreImplicitWaitTime();
         $this->url($initialUrl);
 
         usleep(500000);
         //This is used to wait for the initial animation on the login screen,
-        //but should be replaced by a more reliable mechanism
+        //and has shown to be more reliable than other tested alternatives
     }
 
     /**
@@ -149,41 +149,45 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
     }
 
     /**
-     * This function will wait for any pending AJAX calls still being run on
-     * the current browser window
+     * This function will make the test wait for any pending operations
+     * (animations, ajax calls or visible throbbers). Two verifications
+     * are performed: one as soon this method is called and a second one
+     * after a small interval. This is done to ensure that the browser
+     * has time to do any processing in between user interaction and the
+     * operation (ajax, etc...) itself.
      */
-    public function waitForAjaxToComplete()
+    public function waitForAjaxAndAnimations()
     {
-        usleep(200000);
-        $this->waitUntil(function($testCase) {
-            $activeAjaxCalls = $testCase->execute(array(
-                    'script' => 'return $.active;',
-                    'args' => array()
-            ));
-            return $activeAjaxCalls > 0 ? null : true;
-        }, self::IMPLICIT_WAIT);
+        $this->doSingleWait();
+        usleep(250000);
+        $this->doSingleWait();
     }
 
     /**
-     * This function will wait for any pending AJAX calls still being run on
-     * the current browser window
+     * This function will make the test wait for the following conditions:
+     *   a) There are AJAX call waiting for response;
+     *   b) There are no animations being executed
+     *   c) There are no throbbers visible on screen
+     *
+     * This wait will timeout after self::IMPLICIT_WAIT seconds. In this case,
+     * an exception is thrown indicating what condition was not met.
      */
-    public function waitForAjaxAndAnimationsToComplete()
+    private function doSingleWait()
     {
         try {
             $this->waitUntil(function($testCase) {
                 $activeElements = $testCase->execute(array(
                         'script' =>
-                            'return $.active + ' . //number of pending ajax calls
-                            '$(\'.velocity-animating\').length + ' . //number of currently animating elements
-                            '$(\'*[id*="hrobber"]:visible, *[class*="hrobber"]:visible, img[src $= "chromiumthrobber.svg"]:visible\');', //number of visible thobbers
+                        'return require("common-js/App").getNumberOfPendingAjax() + ' . //number of pending ajax calls
+                        '$(\'.velocity-animating\').length + ' . //number of currently animating elements
+                        '$(\'*[id*="hrobber"]:visible, *[class*="hrobber"]:visible, img[src $= "chromiumthrobber.svg"]:visible\').length;', //number of visible thobbers
                         'args' => array()
                 )); //number of pending ajax calls + number of currently animating elements
                 return $activeElements > 0 ? null : true;
             }, self::IMPLICIT_WAIT);
         } catch (\Exception $exc) {
             $pendingAjax = $this->execute(array(
-                    'script' => 'return JSON.stringify(require("common-js/App").getPendingAjax());',
+                    'script' => 'return require("common-js/App").getNumberOfPendingAjax();',
                     'args' => array()
             ));
 
@@ -197,11 +201,11 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
                     'args' => array()
             ));
 
-            throw new \Exception("waitForAjaxAndAnimationsToComplete failed.\n" .
-                                 "Pending Ajax: $pendingAjax\n" .
-                                 "Animated elements: ' .  $animated\n" .
-                                 "Thobbers: " . $thobber,
-                                 0, $exc);
+            throw new \Exception("waitForAjaxAndAnimations failed.\n" .
+                    "Number of pending Ajax: $pendingAjax\n" .
+                    "Animated elements: ' .  $animated\n" .
+                    "Thobbers: " . $thobber,
+                    0, $exc);
         }
     }
 
@@ -266,9 +270,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
      */
     public function isElementDisplayed($element)
     {
-        $this->timeouts()->implicitWait(1000);
-        // temporarily decrease implicit wait time so we don't have to wait too long
-        // to find out that the component is no longer present in the page
+        $this->reduceImplicitWait();
 
         $displayed = false;
         try {
@@ -278,8 +280,7 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
             // This often happens because of element staleness
         }
 
-        //restore wait interval
-        $this->timeouts()->implicitWait(self::DEFAULT_WAIT_INTERVAL);
+        $this->restoreImplicitWaitTime();
         return $displayed;
     }
 
@@ -290,5 +291,24 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
     public function doLogin($user, $password) {
         $loginPage = new LoginPage($this);
         $loginPage->doLogin($user, $password);
+    }
+
+    /**
+     * Temporarily reduces implicit wait time. This is useful when we want ensure some element
+     * is NOT present in the screen, because, by default, the test will wait for all the the
+     * implicit wait time to be sure that the elements is really no there.
+     */
+    public function reduceImplicitWait($waitTime = 1000)
+    {
+        $this->timeouts()->implicitWait($waitTime);
+    }
+
+    /**
+     * Restores implicit wait time to it default value. This should usually used after
+     * reduceImplicitWait.
+     */
+    public function restoreImplicitWaitTime()
+    {
+        $this->timeouts()->implicitWait(self::DEFAULT_WAIT_INTERVAL);
     }
 }
