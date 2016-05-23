@@ -29,6 +29,16 @@ class SaveDraftTest extends SingleLoginTest
     }
 
     /**
+     * Overwrites superclass getUserNumber.
+     *
+     * @see \ExpressoLiteTest\Functional\Generic\SingleLoginTest::getUserNumber()
+     */
+    public function getUserNumber()
+    {
+        return 2;
+    }
+
+    /**
      * In this test, the e-mail was created and saved in draft folder. Checks if
      * every field matches what was originally typed.
      *
@@ -40,10 +50,10 @@ class SaveDraftTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
+        $MAIL_BADGE = $this->getGlobalValue('user.1.badge');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
-        $MAIL_NAME = $this->getTestValue('mail.name');
 
         //testStart
         $mailPage->clickWriteEmailButton();
@@ -73,7 +83,7 @@ class SaveDraftTest extends SingleLoginTest
         $badges = $widgetCompose->getArrayOfCurrentBadges();
 
         $this->assertEquals($MAIL_SUBJECT, $widgetCompose->getSubject(), 'The subject in windows compose does not match the original mail subject: ' . $MAIL_SUBJECT);
-        $this->assertEquals(array($MAIL_NAME), $badges, 'The mail name in the Compose Window does not match the original mail name:' . $badges[0]);
+        $this->assertEquals(array($MAIL_BADGE), $badges, 'The mail name in the Compose Window does not match the original mail name:' . $badges[0]);
         $this->assertContains($MAIL_CONTENT, $widgetCompose->getMessageBodyText(),
                             'The Message Body in the Compose Window does not match the original mail message:' . $MAIL_CONTENT);
 
@@ -91,10 +101,9 @@ class SaveDraftTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
-        $MAIL_NAME = $this->getTestValue('mail.name');
 
         //testStart
         $mailPage->clickWriteEmailButton();

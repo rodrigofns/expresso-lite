@@ -6,3 +6,6 @@
 .settings
 .DS_Store
 nbproject
+src/conf.php
+tests/functional_tests/test_conf.php
+

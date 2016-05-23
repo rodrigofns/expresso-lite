@@ -30,9 +30,9 @@ class DeleteMailTest extends ExpressoLiteTest
     public function test_CTV3_750_Delete_Mail()
     {
         //load test data
-        $USER_LOGIN = $this->getTestValue('user.login');
-        $USER_PASSWORD = $this->getTestValue('user.password');
-        $USER_MAIL = $this->getTestValue('user.mail');
+        $USER_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_MAIL = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -82,9 +82,9 @@ class DeleteMailTest extends ExpressoLiteTest
     public function test_CTV3_751_Delete_Open_Mail()
     {
         //load test data
-        $USER_LOGIN = $this->getTestValue('user.login');
-        $USER_PASSWORD = $this->getTestValue('user.password');
-        $USER_MAIL = $this->getTestValue('user.mail');
+        $USER_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_MAIL = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -96,6 +96,8 @@ class DeleteMailTest extends ExpressoLiteTest
         //testStart
         $this->waitForAjaxAndAnimations();
         $mailPage->clickRefreshButton();
+
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
 
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -134,11 +136,11 @@ class DeleteMailTest extends ExpressoLiteTest
      */
     public function test_CTV3_1017_Delete_Open_Thread_Mail()
     {
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -154,6 +156,7 @@ class DeleteMailTest extends ExpressoLiteTest
         $this->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
 
         $mailPage = new MailPage($this);
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();

@@ -31,8 +31,8 @@ class LoginTest extends ExpressoLiteTest
         $loginPage = new LoginPage($this);
 
         //load test data
-        $VALID_USER = $this->getTestValue('valid.user');
-        $VALID_PASSWORD = $this->getTestValue('valid.password');
+        $VALID_USER = $this->getGlobalValue('user.1.login');
+        $VALID_PASSWORD = $this->getGlobalValue('user.1.password');
 
         $loginPage->typeUser($VALID_USER);
         $loginPage->typePassword($VALID_PASSWORD);
@@ -60,7 +60,7 @@ class LoginTest extends ExpressoLiteTest
 
         //load test data
         $INVALID_USER = $this->getTestValue('invalid.user');
-        $VALID_PASSWORD = $this->getTestValue('valid.password');
+        $VALID_PASSWORD = $this->getGlobalValue('user.1.password');
 
         $loginPage->typeUser($INVALID_USER);
         $loginPage->typePassword($VALID_PASSWORD);
@@ -89,7 +89,7 @@ class LoginTest extends ExpressoLiteTest
         $loginPage = new LoginPage($this);
 
         //load test data
-        $VALID_USER = $this->getTestValue('valid.user');
+        $VALID_USER = $this->getGlobalValue('user.1.login');
         $INVALID_PASSWORD = $this->getTestValue('invalid.password');
 
         $loginPage->typeUser($VALID_USER);
@@ -119,7 +119,7 @@ class LoginTest extends ExpressoLiteTest
         $loginPage = new LoginPage($this);
 
         //load test data
-        $VALID_PASSWORD = $this->getTestValue('valid.password');
+        $VALID_PASSWORD = $this->getGlobalValue('user.1.password');
 
         $loginPage->typePassword($VALID_PASSWORD);
 
@@ -144,7 +144,7 @@ class LoginTest extends ExpressoLiteTest
         $loginPage = new LoginPage($this);
 
         //load test data
-        $VALID_USER = $this->getTestValue('valid.user');
+        $VALID_USER = $this->getGlobalValue('user.1.login');
 
         $loginPage->typeUser($VALID_USER);
 

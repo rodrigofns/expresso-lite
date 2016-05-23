@@ -20,29 +20,17 @@ class SendReceiveMailTest extends ExpressoLiteTest
     /**
      * Tests sending and receiving a simple e-mail, checking if the
      * data received by the recipient matches the originally sent data
-     *
-     * Input data:
-     *
-     * - sender.login: sender's login
-     * - sender.password: sender's password
-     * - sender.mail: sender's e-mail address
-     * - sender.name: sender's exhibition name
-     * - recipient.login: recipient's login
-     * - recipient.password: recipient's password
-     * - recipient.mail: recipient's e-mail address
-     * - mail.subject: e-mail subject (will be suffixed with the test id)
-     * - mail.content: e-mail content (will be suffixed with the test id)
      */
     public function testSendReceiveSimpleMail()
     {
         //load test data
-        $SENDER_LOGIN = $this->getTestValue('sender.login');
-        $SENDER_PASSWORD = $this->getTestValue('sender.password');
-        $SENDER_MAIL = $this->getTestValue('sender.mail');
-        $SENDER_NAME = $this->getTestValue('sender.name');
-        $RECIPIENT_LOGIN = $this->getTestValue('recipient.login');
-        $RECIPIENT_PASSWORD = $this->getTestValue('recipient.password');
-        $RECIPIENT_MAIL = $this->getTestValue('recipient.mail');
+        $SENDER_LOGIN = $this->getGlobalValue('user.1.login');
+        $SENDER_PASSWORD = $this->getGlobalValue('user.1.password');
+        $SENDER_MAIL = $this->getGlobalValue('user.1.email');
+        $SENDER_NAME = $this->getGlobalValue('user.1.name');
+        $RECIPIENT_LOGIN = $this->getGlobalValue('user.2.login');
+        $RECIPIENT_PASSWORD = $this->getGlobalValue('user.2.password');
+        $RECIPIENT_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -57,6 +45,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $loginPage->doLogin($RECIPIENT_LOGIN, $RECIPIENT_PASSWORD);
         $mailPage = new MailPage($this);
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $this->assertEquals($SENDER_NAME, $headlinesEntry->getSender() , 'Headline sender name does not match what was expected');
 
@@ -79,28 +68,17 @@ class SendReceiveMailTest extends ExpressoLiteTest
      *
      * CTV3-757
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-757
-     *
-     * - user.1.login: user 1's login
-     * - user.1.password: user 1's password
-     * - user.1.mail: user 1's e-mail address
-     * - user.1.name: user 1's display name
-     * - user.2.login: user 2's login
-     * - user.2.password: user 2's password
-     * - user.2.mail: user 2's e-mail address
-     * - mail.subject: e-mail subject (will be suffixed with the test id)
-     * - original.mail.content: content of the first e-mail (will be suffixed with the test id)
-     * - reply.mail.content: content added to the reply (will be suffixed with the test id)
      */
     public function test_CTV3_757_SendReceiveReplySimpleMail()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_1_MAIL = $this->getTestValue('user.1.mail');
-        $USER_1_NAME = $this->getTestValue('user.1.name');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_1_MAIL = $this->getGlobalValue('user.1.email');
+        $USER_1_BADGE = $this->getGlobalValue('user.1.badge');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
         $REPLY_MAIL_CONTENT = $this->getTestValue('reply.mail.content');
@@ -116,6 +94,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $loginPage->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -126,7 +105,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $REPLY_SUBJECT = 'Re: ' . $MAIL_SUBJECT;
 
-        $this->assertEquals(array($USER_1_NAME), $widgetCompose->getArrayOfCurrentBadges(), 'Reply window did not show the expected recipient');
+        $this->assertEquals(array($USER_1_BADGE), $widgetCompose->getArrayOfCurrentBadges(), 'Reply window did not show the expected recipient');
         $this->assertEquals($REPLY_SUBJECT, $widgetCompose->getSubject() , 'Reply window did not the expected subject');
         $this->assertContains($ORIGINAL_MAIL_CONTENT, $widgetCompose->getMessageBodyText());
 
@@ -139,6 +118,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $mailPage->clickLogout();
         $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
 
+        $mailPage->waitForEmailToArrive($REPLY_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($REPLY_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -157,22 +137,19 @@ class SendReceiveMailTest extends ExpressoLiteTest
      *
      * CTV3-758
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-758
-     *
      */
     public function test_CTV3_758_SendReceiveFowardOpenMail()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_1_MAIL = $this->getTestValue('user.1.mail');
-        $USER_1_NAME = $this->getTestValue('user.1.name');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
-        $USER_3_LOGIN = $this->getTestValue('user.3.login');
-        $USER_3_PASSWORD = $this->getTestValue('user.3.password');
-        $USER_3_MAIL = $this->getTestValue('user.3.mail');
-        $USER_3_NAME = $this->getTestValue('user.3.name');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
+        $USER_3_LOGIN = $this->getGlobalValue('user.3.login');
+        $USER_3_PASSWORD = $this->getGlobalValue('user.3.password');
+        $USER_3_MAIL = $this->getGlobalValue('user.3.email');
+        $USER_3_BADGE = $this->getGlobalValue('user.3.badge');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
         $FORWARD_MAIL_CONTENT = $this->getTestValue('forward.mail.content');
@@ -188,6 +165,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
 
         $loginPage->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -201,7 +179,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $widgetCompose->typeEnter();
         $widgetCompose->typeMessageBodyBeforeSignature($FORWARD_MAIL_CONTENT);
 
-        $this->assertEquals(array($USER_3_NAME), $widgetCompose->getArrayOfCurrentBadges(), 'Forward window did not show the expected recipient');
+        $this->assertEquals(array($USER_3_BADGE), $widgetCompose->getArrayOfCurrentBadges(), 'Forward window did not show the expected recipient');
         $this->assertEquals($FORWARD_SUBJECT, $widgetCompose->getSubject() , 'Forward window did not the expected subject');
         $this->assertContains($ORIGINAL_MAIL_CONTENT, $widgetCompose->getMessageBodyText());
 
@@ -214,6 +192,7 @@ class SendReceiveMailTest extends ExpressoLiteTest
         $loginPage->doLogin($USER_3_LOGIN, $USER_3_PASSWORD);
         $mailPage = new MailPage($this);
 
+        $mailPage->waitForEmailToArrive($FORWARD_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($FORWARD_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -232,40 +211,32 @@ class SendReceiveMailTest extends ExpressoLiteTest
      *
      * CTV3-1015
      * http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-1015
-     *
-     * - user.1.login: user 1's login
-     * - user.1.password: user 1's password
-     * - user.1.mail: user 1's e-mail address
-     * - user.1.name: user 1's display name
-     * - user.2.mail: user 2's e-mail address
-     * - mail.subject: e-mail subject (will be suffixed with the test id)
-     * - mail.content: content oef the first e-mail (will be suffixed with the test id)
      */
     public function test_CTV3_1015_Send_Mail_Saved_Recipient()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
-        $USER_2_NAME = $this->getTestValue('user.2.name');
+        $SENDER_LOGIN = $this->getGlobalValue('user.1.login');
+        $SENDER_PASSWORD = $this->getGlobalValue('user.1.password');
+        $RECIPIENT_MAIL = $this->getTestValue('recipient.mail');
+        $RECIPIENT_NAME = $this->getTestValue('recipient.name');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
         //testStart
         $loginPage = new LoginPage($this);
 
-        $loginPage->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
+        $loginPage->doLogin($SENDER_LOGIN, $SENDER_PASSWORD);
         $mailPage = new MailPage($this);
 
-        $mailPage->sendMail(array($USER_2_MAIL), $MAIL_SUBJECT, $MAIL_CONTENT);
+        $mailPage->sendMail(array($RECIPIENT_MAIL), $MAIL_SUBJECT, $MAIL_CONTENT);
         $mailPage->clickAddressbook();
         $addressbookPage = new AddressbookPage($this);
 
         $addressbookPage->clickPersonalCatalog();
         $this->waitForAjaxAndAnimations();
-        $contactListItem = $addressbookPage->getCatalogEntryByName($USER_2_NAME);
+        $contactListItem = $addressbookPage->getCatalogEntryByName($RECIPIENT_NAME);
 
-        $this->assertEquals($USER_2_NAME, $contactListItem->getNameFromContact(),
+        $this->assertEquals($RECIPIENT_NAME, $contactListItem->getNameFromContact(),
                 'Mail was send but, the new recipient is not created in personal catalog ');
     }
 }

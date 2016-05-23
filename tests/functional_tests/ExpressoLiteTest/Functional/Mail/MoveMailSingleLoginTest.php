@@ -42,7 +42,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
        //testStart
@@ -51,6 +51,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
 
         $mailPage->clickRefreshButton();
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
         $headlinesEntry->toggleCheckbox();
@@ -87,7 +88,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
        //testStart
@@ -95,6 +96,7 @@ class MoveMailSingleLoginTest extends SingleLoginTest
         $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->click();
         $this->waitForAjaxAndAnimations();

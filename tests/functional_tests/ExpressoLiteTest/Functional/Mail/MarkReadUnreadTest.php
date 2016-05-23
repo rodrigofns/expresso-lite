@@ -41,7 +41,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         //testStart
@@ -49,6 +49,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
         $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->toggleCheckbox();
 
@@ -76,7 +77,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         //testStart
@@ -85,6 +86,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         $mailPage->clickRefreshButton();
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -127,7 +129,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         //testStart
@@ -136,6 +138,7 @@ class MarkReadUnreadTest extends SingleLoginTest {
 
         $mailPage->clickRefreshButton();
 
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
         $headlinesEntry->click();
         $this->waitForAjaxAndAnimations();
