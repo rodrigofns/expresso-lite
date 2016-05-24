@@ -341,18 +341,18 @@ class EventUtils
      * @return array The indexed by type of confirmation array which the respective element is an
      *               SORTED BY NAME attendee list
      */
-    public static function sortAttendeesByName($attendeesList)
+    public static function sortAttendeesByName(&$attendeesList)
     {
-        usort(&$attendeesList[self::EVENTS_CONFIRM_ACCEPTED], function($e1, $e2) {
+        usort($attendeesList[self::EVENTS_CONFIRM_ACCEPTED], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList[self::EVENTS_CONFIRM_TENTATIVE], function($e1, $e2) {
+        usort($attendeesList[self::EVENTS_CONFIRM_TENTATIVE], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList[self::EVENTS_CONFIRM_NEEDS_ACTION], function($e1, $e2) {
+        usort($attendeesList[self::EVENTS_CONFIRM_NEEDS_ACTION], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
-        usort(&$attendeesList[self::EVENTS_CONFIRM_DECLINED], function($e1, $e2) {
+        usort($attendeesList[self::EVENTS_CONFIRM_DECLINED], function($e1, $e2) {
             return strcmp($e1->name, $e2->name);
         });
 
