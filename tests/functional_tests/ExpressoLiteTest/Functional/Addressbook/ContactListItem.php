@@ -38,4 +38,12 @@ class ContactListItem extends GenericPage
     {
         return $this->byCssSelector('.WidgetContactList_name')->text();
     }
+
+    /*
+     *  Return email of Contact
+     */
+    public function getEmailFromContact()
+    {
+        return $this->byCssSelector('.WidgetContactList_email')->text();
+    }
 }

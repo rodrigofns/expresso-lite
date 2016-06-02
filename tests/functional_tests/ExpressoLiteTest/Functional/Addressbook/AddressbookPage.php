@@ -90,4 +90,34 @@ class AddressbookPage extends GenericPage
         }
         return null;
     }
+
+    /**
+     * Returns a CatalogEntry that represents the item of the Catalog list that,
+     * contains a specific email. If there are noone with the specified email,
+     * it returns null
+     *
+     * @param string $name The name to be searched for
+     *
+     * @return CatalogEntry The Catalog that contains the specified name, null if
+     * noone with the specified name was found
+     */
+    public function getCatalogEntryByEmail($email)
+    {
+        foreach($this->byCssSelectorMultiple('#WidgetContactList_mainSection > .WidgetContactList_item') as $contactListItemDiv) {
+            $entry = new ContactListItem($this, $contactListItemDiv);
+            if ($entry->getEmailFromContact() == $email) {
+                return $entry;
+            }
+        }
+        return null;
+    }
+    /**
+     * Checks if this line separator in Address Book exist
+     *
+     * @return boolean True if the Letter separator is displayed in this entry, false otherwise
+     */
+    public function hasLetterSeparator($letter)
+    {
+        return $this->isElementPresent("#letterSeparator_".strtoupper($letter));
+    }
 }
