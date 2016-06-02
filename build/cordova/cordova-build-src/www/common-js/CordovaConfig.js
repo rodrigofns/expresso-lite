@@ -12,7 +12,7 @@
 
 define({
     isEnabled: true,
-    liteBackendUrl: 'https://m.expresso.serpro.gov.br'
+    liteBackendUrl: 'https://m.expressobr.serpro.gov.br'
     // This should be the address where Expresso Lite is
     // available (without trailing '/' )
 });
