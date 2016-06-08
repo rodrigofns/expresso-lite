@@ -234,8 +234,7 @@ return function(options) {
             }).always(function() {
                 $div.find('.throbber').replaceWith($check); // restore checkbox
             }).fail(function(resp) {
-                window.alert('Erro ao carregar email.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao carregar email.', resp);
             }).done(function(msg) {
                 headline.attachments = msg.attachments; // cache
                 headline.body = msg.body;
@@ -282,8 +281,7 @@ return function(options) {
                 THIS.clearChecked();
                 onMarkReadCB(curFolder);
             }).fail(function(resp) {
-                window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao alterar o estado de leitura das mensagens.', resp);
             }).done(function() {
                 if (curFolder.searchedFolder !== undefined) { // if a search result
                     curFolder.searchedFolder.messages.length = 0; // force cache rebuild
@@ -327,8 +325,7 @@ return function(options) {
 
         App.post('moveMessages', { messages:msgIds.join(','), folder:destFolder.id })
         .fail(function(resp) {
-            window.alert('Erro ao mover email.\n' +
-                'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            App.errorMessage('Erro ao mover email.', resp);
         }).done(function() {
             if (curFolder.searchedFolder !== undefined) { // if a search result
                 curFolder.searchedFolder.messages.length = 0; // force cache rebuild
@@ -368,8 +365,7 @@ return function(options) {
             $checkedDivs.find('.Headlines_loading').replaceWith(
                 (willStar ? $('#icons .icoHigh1') : $('#icons .icoHigh0')).clone() );
         }).fail(function(resp) {
-            window.alert('Erro ao alterar o flag de destaque das mensagens.\n' +
-                'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            App.errorMessage('Erro ao alterar o flag de destaque das mensagens.', resp);
         }).done(function() {
             THIS.clearChecked();
         });
@@ -407,8 +403,7 @@ return function(options) {
 
             App.post('deleteMessages', { messages:msgIds.join(','), forever:1 })
             .fail(function(resp) {
-                window.alert('Erro ao apagar email.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao apagar email.', resp);
             }).done(function(status) {
                 if (curFolder.searchedFolder !== undefined) { // if a search result
                     curFolder.searchedFolder.messages.length = 0; // force cache rebuild
@@ -439,7 +434,7 @@ return function(options) {
                     start: 0,
                     limit: howMany
                 }).fail(function(resp) {
-                    window.alert('Erro na consulta dos emails de "'+curFolder.localName+'"\n'+resp.responseText);
+                    App.errorMessage('Erro na consulta dos emails de "'+curFolder.localName+'".', resp);
                     $targetDiv.children('.Headlines_loading').remove();
                     defer.reject();
                 }).done(function(headlines) {
@@ -480,12 +475,12 @@ return function(options) {
             limit: howMany
         }).fail(function(resp) {
             if (resp.responseText.indexOf('please refine') !== -1) {
-                $loading.remove();
                 window.alert('A busca por "'+text+'" retornou muitos resultados.\n'+
                     'Pesquise por um termo mais específico.');
             } else {
-                window.alert('Erro na busca por "'+text+'".\n'+resp.responseText);
+                App.errorMessage('Erro na busca por "'+text+'".', resp);
             }
+            $loading.remove();
             defer.reject();
         }).done(function(resFolder) { // returns a virtual folder with search result, ID/globalName are null
             resFolder.searchedFolder = isSearchAfterSearch ? curFolder.searchedFolder : curFolder; // cache current folder being searched
@@ -517,7 +512,7 @@ return function(options) {
             limit: howMany
         }).always(function() { $divLoading.remove(); })
         .fail(function(resp) {
-            window.alert('Erro ao trazer mais emails de "'+curFolder.localName+'"\n'+resp.responseText);
+            App.errorMessage('Erro ao trazer mais emails de "'+curFolder.localName+'".', resp);
         }).done(function(mails2) {
             if (thisIsASearch) {
                 mails2 = mails2.messages; // search returns more data than we need for loadMore()
@@ -554,8 +549,7 @@ return function(options) {
         App.post('searchHeadlines', { folderIds:curFolder.id, start:0, limit:howMany })
         .always(function() { $divLoading.remove(); })
         .fail(function(resp) {
-            window.alert('Erro na consulta dos emails de "'+curFolder.localName+'".\n' +
-                'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            App.errorMessage('Erro na consulta dos emails de "' + curFolder.localName + '".', resp);
         }).done(function(headlines) {
             ThreadMail.Merge(curFolder.messages, ThreadMail.ParseTimestamps(headlines)); // insert into cache
             curFolder.threads = (curFolder.globalName === 'INBOX/Drafts') ?

@@ -81,8 +81,7 @@ return function(options) {
         App.post('updateMessageCache', { folderId:folder.id })
         .always(function() { $li.find('.throbber:first').replaceWith($counter); })
         .fail(function(resp) {
-            window.alert('Erro na consulta dos emails de "'+folder.localName+'".\n' +
-                'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            App.errorMessage('Erro na consulta dos emails de "'+folder.localName+'".', resp);
             defer.reject();
         }).done(function(stats) {
             var hasChanged = (folder.totalMails !== stats.totalMails) ||
@@ -136,8 +135,7 @@ return function(options) {
             App.post('searchFolders')
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
-                window.alert('Erro na primeira consulta das pastas.\n' +
-                    'Atualize a página para tentar novamente.\n' + resp.responseText);
+                App.errorMessage('Erro na primeira consulta das pastas.', resp);
                 defer.reject();
             }).done(function(folders) {
                 userOpts.folderCache.length = 0;
@@ -152,8 +150,7 @@ return function(options) {
             App.post('searchFolders', { parentFolder:parentFolder.globalName })
             .always(function() { $divLoading.remove(); })
             .fail(function(resp) {
-                window.alert('Erro na consulta das subpastas de '+parentFolder.localName+'\n' +
-                    resp.responseText);
+                App.errorMessage('Erro na consulta das subpastas de ' + parentFolder.localName + '.', resp);
                 defer.reject();
             }).done(function(subfolders) {
                 parentFolder.subfolders.length = 0;
@@ -263,8 +260,7 @@ return function(options) {
                 App.post('updateMessageCache', { folderId:curFolder.id })
                 .always(function() { $li.find('.throbber:first').replaceWith($counter); })
                 .fail(function(resp) {
-                    window.alert('Erro ao atualizar a pasta "'+curFolder.localName+'".\n' +
-                        'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                    App.errorMessage('Erro ao atualizar a pasta "' + curFolder.localName + '".', resp);
                 }).done(function(stats) {
                     var hasChanged = (curFolder.totalMails !== stats.totalMails) ||
                         (curFolder.unreadMails !== stats.unreadMails);

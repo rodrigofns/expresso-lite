@@ -178,8 +178,7 @@ return function(options) {
             App.post('markAsRead', { asRead:(asRead?1:0), ids:headline.id })
             .always(function() { $elem.find('.Messages_throbber').remove(); })
             .fail(function(resp) {
-                window.alert('Erro ao alterar o flag de leitura das mensagens.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao alterar o flag de leitura das mensagens.', resp);
             }).done(function() {
                 headline.unread = !headline.unread; // update cache
                 if (curFolder.id !== null) { // if not a search result
@@ -211,8 +210,7 @@ return function(options) {
             App.post('moveMessages', { messages:headline.id, folder:destFolder.id })
             .always(function() { $elem.find('.throbber').remove(); })
             .fail(function(resp) {
-                window.alert('Erro ao mover mensagem.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao mover mensagem.', resp);
             }).done(function() {
                 $elem.velocity('slideUp', {
                     duration: 200,
@@ -265,8 +263,7 @@ return function(options) {
                 App.post('deleteMessages', { messages:headline.id, forever:1 })
                 .always(function() { $elem.find('.throbber').remove(); })
                 .fail(function(resp) {
-                    window.alert('Erro ao apagar email.\n' +
-                        'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                    App.errorMessage('Erro ao apagar email.', resp);
                 }).done(function(status) {
                     $elem.velocity('slideUp', {
                         duration: 200,
@@ -432,8 +429,7 @@ return function(options) {
                 }).always(function() {
                     $divUnit.find('.Messages_loading').remove();
                 }).fail(function(resp) {
-                    window.alert('Erro ao carregar email.\n' +
-                        'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                    App.errorMessage('Erro ao carregar email.', resp);
                 }).done(function(msg) {
                     headline.attachments = msg.attachments; // cache
                     headline.body = msg.body;

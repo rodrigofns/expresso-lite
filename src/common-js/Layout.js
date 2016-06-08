@@ -149,6 +149,10 @@ return function(options) {
         return THIS;
     };
 
+    THIS.hideTop = function() {
+        $('#Layout_top').hide();
+    };
+
     THIS.onKeepAlive = function(callback) {
         onKeepAliveCB = callback; // onKeepAlive()
         return THIS;

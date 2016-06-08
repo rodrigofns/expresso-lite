@@ -131,6 +131,8 @@ then
   echo "Adding Android platform"
   cd $CORDOVA_APP_DIR
   cordova platform add android
+  echo "Adding network-information plugin"
+  cordova plugin add cordova-plugin-network-information
   echo "Adding AccountManager plugin"
   cordova plugin add https://github.com/polychrom/cordova-android-accountmanager.git
 fi

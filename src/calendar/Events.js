@@ -66,8 +66,8 @@ return function() {
                 until: DateCalc.makeQueryStr(period.pastUntil),
                 calendarId: calendarId
             }).fail(function(resp) {
-                window.alert('Erro na consulta dos eventos.\n' +
-                    resp.responseText);
+                App.errorMessage('Erro na consulta dos eventos.', resp);
+                THIS.clearMonthCache(calendarId, DateCalc.firstOfMonth(from));
                 defer.reject();
             }).done(function(resp) {
                 _StoreEvents(calendarId, resp.events);
@@ -128,8 +128,7 @@ return function() {
             id: eventId,
             confirmation: confirmation
         }).fail(function(resp) {
-            window.alert('Erro na consulta dos eventos.\n' +
-                resp.responseText);
+            App.errorMessage('Erro na consulta dos eventos.', resp);
             defer.reject();
         }).done(function(resp) {
             defer.resolve();
@@ -142,8 +141,7 @@ return function() {
         App.post('deleteEvent', {
             id: eventId
         }).fail(function(resp) {
-            window.alert('Erro ao remover evento.\n' +
-                resp.responseText);
+            App.errorMessage('Erro ao remover evento.', resp);
             defer.reject();
         }).done(function(resp) {
             defer.resolve();

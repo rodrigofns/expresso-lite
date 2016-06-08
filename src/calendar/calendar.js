@@ -17,6 +17,7 @@ require([
     'common-js/Layout',
     'common-js/SimpleMenu',
     'common-js/Contacts',
+    'common-js/SplashScreen',
     'calendar/DateCalc',
     'calendar/Events',
     'calendar/WidgetMonth',
@@ -24,7 +25,7 @@ require([
     'calendar/WidgetEvents',
     'calendar/WidgetEditEvent'
 ],
-function($, App, UrlStack, Layout, SimpleMenu, Contacts, DateCalc, Events,
+function($, App, UrlStack, Layout, SimpleMenu, Contacts, SplashScreen, DateCalc, Events,
     WidgetMonth, WidgetWeek, WidgetEvents, WidgetEditEvent) {
 window.Cache = {
     events: null, // Events object
@@ -36,7 +37,8 @@ window.Cache = {
     wndEditEvent: null, // WidgetEditEvent object, modeless popup
     curView: '', // 'month'|'week'
     curCalendar: null, // calendar object
-    curDate: DateCalc.today() // current date being displayed
+    curDate: DateCalc.today(), // current date being displayed
+    splashScreen: null // splash screen for displaying offline message
 };
 
 App.ready(function() {
@@ -54,6 +56,7 @@ App.ready(function() {
     Cache.viewWeek = new WidgetWeek({ events:Cache.events, $elem: $('#middleBody') });
     Cache.viewEvents = new WidgetEvents({ events:Cache.events, $elem: $('#rightBody') });
     Cache.wndEditEvent = new WidgetEditEvent({ });
+    Cache.splashScreen = new SplashScreen({ });
 
     // Some initial work.
     UrlStack.keepClean();
@@ -65,12 +68,18 @@ App.ready(function() {
         Cache.viewMonth.load(),
         Cache.viewWeek.load(),
         Cache.viewEvents.load(),
-        Cache.wndEditEvent.load()
+        Cache.wndEditEvent.load(),
+        Cache.splashScreen.load()
     ).done(function() {
         $('#btnRefresh,#btnCreateEvent').css('display', 'none');
         Cache.layout.setLeftMenuVisibleOnPhone(true).done(function() {
             LoadUserCalendars().done(function() {
                 $('#btnRefresh,#btnCreateEvent').css('display', '');
+            }).fail(function() {
+                Cache.layout.setLeftMenuVisibleOnPhone(false).done(function() {
+                    Cache.layout.hideTop();
+                    Cache.splashScreen.showNoInternetMessage();
+                });
             });
         });
 
@@ -102,8 +111,7 @@ function LoadUserCalendars() {
     $('#chooseViewMenu,#chooseCalendarMenu').hide();
     App.post('getCalendars')
         .fail(function(resp) {
-            window.alert('Erro ao carregar calendários pessoais.\n' +
-                'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+            App.errorMessage('Erro ao carregar calendários pessoais.', resp);
             defer.reject();
         }).done(function(cals) {
             $('#loadCalendars').hide();

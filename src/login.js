@@ -11,92 +11,119 @@
 require([
     'common-js/jQuery',
     'common-js/App',
-    'common-js/Cordova'
+    'common-js/Cordova',
+    'common-js/SplashScreen'
 ],
-function($, App, Cordova) {
+function($, App, Cordova, SplashScreen) {
+    window.Cache = {
+        splashScreen: null
+    };
+
     App.ready(function() {
-        if (Cordova) {
-            $('#splash-screen').appendTo($('body'));
-        } else {
-            var isBrowserValid = ValidateBrowserMinimumVersion([ // warning: the list order matters
-                { name:'SamsungBrowser', version:4 }, // Samsung Android browser
-                { name:'Firefox', version:38 },
-                { name:'CriOS', version:34 }, // Chrome on iOS
-                { name:'Version', version:7 }, // Safari
-                { name:'Chrome', version:34 }
-            ]);
+        Cache.splashScreen = new SplashScreen();
 
-            if (!isBrowserValid) {
-                $('#main-screen,#unsupportedMsg').show();
-                $('#frmLogin').hide();
-                return false; // won't load anything else
+        $.when( // using $.when just to be consistent with other modules
+            Cache.splashScreen.load()
+        ).done(function() {
+            if (Cordova) {
+                Cache.splashScreen.showThrobber();
+                if (Cordova.HasInternetConnection()) {
+                    CheckSessionStatus();
+                } else {
+                    HandlePhoneWithoutInternet();
+                }
+            } else {
+                var isBrowserValid = ValidateBrowserMinimumVersion([ // warning: the list order matters
+                    { name:'SamsungBrowser', version:4 }, // Samsung Android browser
+                    { name:'Firefox', version:38 },
+                    { name:'CriOS', version:34 }, // Chrome on iOS
+                    { name:'Version', version:7 }, // Safari
+                    { name:'Chrome', version:34 }
+                ]);
+
+                if (!isBrowserValid) {
+                    $('#main-screen,#unsupportedMsg').show();
+                    $('#frmLogin').hide();
+                } else {
+                    CheckSessionStatus();
+                }
             }
-        }
+        });
+    });
 
+    function CheckSessionStatus() {
         App.post('checkSessionStatus')
         .done(function(response) {
             if (response.status == 'active') {
                 App.goToFolder('./mail'); // there is an active session, go to mail module
-            } else if (Cordova) {
-                // no active session, but since we have Cordova
-                // we may have the credentials to start a new session
-                DoCordovaInit();
             } else {
-                // no active session and no Cordova, proceed with usual init
-                Init();
+                if (Cordova) {
+                    // no active session, but since we have Cordova
+                    // we may have the credentials to start a new session
+                    Cordova.GetCurrentAccount().done(function(account) {
+                        if (account != null) {
+                            TryImplicitLogin(account.login, account.password);
+                        } else {
+                            Init(); //no credential found, proceed with usual init
+                        }
+                    }).fail(function (error) {
+                        // This should not happen, but in case something goes wrong,
+                        // at least we'll have some information to work on
+                        App.errorMessage('Ocorreu um erro ao tentar localizar as credenciais do usuário.\n' +
+                            'Realize o login novamente.');
+                        console.log('Cordova.GetCurrentAccount failed: ' + error);
+                        Init();
+                    });
+                } else {
+                    Init();
+                }
             }
         }).fail(function(error) {
             window.alert('Ocorreu um erro ao realizar a conexão com o Expresso.\n'+
                 'É possível que o sistema esteja fora do ar.');
         });
-    });
-
-    function DoCordovaInit() {
-        Cordova.GetCurrentAccount()
-        .done(function(account) {
-            if (account == null) {
-                Init(); //no credential found, proceed with usual init
-            } else {
-                function CordovaLoginFailed() {
-                    window.alert('Não foi possível se reconectar ao Expresso com as credencias armazenadas.\n' +
-                        'É necessário realizar o login novamente.');
-                    Init();
-                }
-
-                // Use the credential to perform a new login.
-                // This will be transparent to the user,
-                // since no fields are yet being displayed on screen
-                App.post('login', {
-                    user: account.login,
-                    pwd: account.password
-                })
-                .fail(CordovaLoginFailed)
-                .done(function(response) {
-                    if (!response.success) {
-                        CordovaLoginFailed();
-                    } else {
-                        //since the only visible thing right now is the splash screen,
-                        //just go straight to the mail module, without any fancy animations
-                        App.goToFolder('./mail');
-                    }
-                });
-            }
-        })
-        .fail(function (error) {
-            // This should not happen, but in case something goes wrong,
-            // at least we'll have some information to work on
-            console.log('Cordova.GetCurrentAccount failed: ' + error);
-            Init();
-        });
     }
 
+    function HandlePhoneWithoutInternet() {
+        // For now, the only thing we can do is to show a message for the user.
+        // However, once we have e-mail data stored for offline access, we will
+        // be able to redirect to mail module to show that data (only if the
+        // user has a stored credential, of course)
+
+        Cache.splashScreen.showNoInternetMessage();
+    }
+
+    function TryImplicitLogin(user, pwd) {
+        function CordovaLoginFailed() {
+            window.alert('Não foi possível se reconectar ao Expresso com as credencias armazenadas.\n' +
+                'É necessário realizar o login novamente.');
+            Init();
+        }
+
+        // Use the credential to perform an implicit login.
+        // This will be transparent to the user,
+        // since no fields are yet being displayed on screen
+        App.post('login', {
+            user: user,
+            pwd: pwd
+        })
+        .fail(CordovaLoginFailed)
+        .done(function(response) {
+            if (!response.success) {
+                CordovaLoginFailed();
+            } else {
+                //since the only visible thing right now is the splash screen,
+                //just go straight to the mail module, without any fancy animations
+                App.goToFolder('./mail');
+            }
+        });
+    }
 
     function Init() {
         function ShowScreen() {
             $('#main-screen').velocity('fadeIn', {
                 duration: 300,
                 complete: function() {
-                    $('#splash-screen').hide();
                     LoadServerStatus(); // async
                     $('#user').focus();
                     $('#frmLogin').submit(DoLogin);
@@ -106,12 +133,7 @@ function($, App, Cordova) {
         }
 
         if (Cordova) {
-            $('#splash-screen')
-            .velocity({ top: '16px' }, {
-                duration: 300,
-                queue: false,
-                complete: ShowScreen
-            });
+            Cache.splashScreen.moveUpAndClose().done(ShowScreen);
         } else {
             var user = App.getCookie('user');
             if (user !== null) {

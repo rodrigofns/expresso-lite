@@ -162,7 +162,7 @@ var ContactsAutocomplete = function(options) {
                     $btn.show();
                     $tpl.find('.ContactsAutocomplete_throbber').hide();
                 }).fail(function(resp) {
-                    window.alert('Erro na pesquisa de contatos no catálogo do Expresso.\n'+resp.responseText);
+                    App.errorMessage('Erro na pesquisa de contatos no catálogo do Expresso.', resp);
                 }).done(function(resp) {
                     var entries = _FormatMoreResults(resp.contacts);
                     $outp.empty().append(entries.entries);

@@ -47,8 +47,7 @@ return function(options) {
 
             App.post('deleteMessages', { messages:draftMsgObj.id, forever:1 })
             .fail(function(resp) {
-                window.alert('Erro ao apagar o rascunho antigo.\n' +
-                    'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                App.errorMessage('Erro ao apagar o rascunho antigo.', resp);
             }).done(function(status) {
                 var draftFolder = ThreadMail.FindFolderByGlobalName('INBOX/Drafts', userOpts.folderCache);
                 --draftFolder.totalMails;
@@ -424,8 +423,7 @@ return function(options) {
 
                 App.post('saveMessage', message)
                 .fail(function(resp) {
-                    window.alert('Erro ao enviar email.\n' +
-                        'Sua interface está inconsistente, pressione F5.\n'+resp.responseText);
+                    App.errorMessage('Erro ao enviar email.', resp);
                     isSending = false;
                     popup.close();
                 }).done(function(status) {
@@ -454,8 +452,7 @@ return function(options) {
 
                 App.post('saveMessageDraft', $.extend({ draftFolderId:draftFolder.id }, message))
                 .fail(function(resp) {
-                    window.alert('Erro ao salvar rascunho.\n' +
-                        'Sua interface está inconsistente, pressione F5.\n' + resp.responseText);
+                    App.errorMessage('Erro ao salvar rascunho.', resp);
                     isSending = false;
                     popup.close();
                 }).done(function(status) {

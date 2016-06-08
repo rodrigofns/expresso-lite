@@ -17,13 +17,14 @@ require([
     'common-js/Layout',
     'common-js/ContextMenu',
     'common-js/Contacts',
+    'common-js/SplashScreen',
     'mail/ThreadMail',
     'mail/WidgetCompose',
     'mail/WidgetFolders',
     'mail/WidgetHeadlines',
     'mail/WidgetMessages'
 ],
-function($, App, UrlStack, Layout, ContextMenu, Contacts, ThreadMail,
+function($, App, UrlStack, Layout, ContextMenu, Contacts, SplashScreen, ThreadMail,
     WidgetCompose, WidgetFolders, WidgetHeadlines, WidgetMessages) {
 window.Cache = {
     MAILBATCH: App.getUserInfo('mailBatch'),
@@ -33,7 +34,8 @@ window.Cache = {
     listHeadlines: null, // headlines list rendering widget
     subjectMenu: null, // dropdown menu at right of subject text
     listMessages: null, // messages list rendering widget
-    wndCompose: null // compose modeless popup
+    wndCompose: null, // compose modeless popup
+    splashScreen: null //splash screen for displaying offline message
 };
 
 App.ready(function() {
@@ -53,6 +55,7 @@ App.ready(function() {
     Cache.listHeadlines = new WidgetHeadlines({ $elem:$('#headlinesArea'), folderCache:Cache.folders });
     Cache.listMessages = new WidgetMessages({ $elem:$('#messagesArea'), folderCache:Cache.folders, wndCompose:Cache.wndCompose });
     Cache.subjectMenu = new ContextMenu({ $btn:$('#subjectMenu') }); // actions for the whole opened thread
+    Cache.splashScreen = new SplashScreen({ });
 
     // Some initial work.
     UrlStack.keepClean();
@@ -65,7 +68,8 @@ App.ready(function() {
         Cache.treeFolders.load(),
         Cache.listHeadlines.load(),
         Cache.listMessages.load(),
-        Cache.wndCompose.load()
+        Cache.wndCompose.load(),
+        Cache.splashScreen.load()
     ).done(function() {
         $('#btnUpdateFolders,#btnCompose').css('display', 'none');
         Cache.layout.setLeftMenuVisibleOnPhone(true).done(function() {
@@ -73,6 +77,11 @@ App.ready(function() {
                 Cache.treeFolders.expand(Cache.folders[0]).done(function() { // expand 1st folder (probably inbox)...
                     Cache.treeFolders.setCurrent(Cache.folders[0]); // ...and select it
                     $('#btnUpdateFolders,#btnCompose').css('display', '');
+                });
+            }).fail(function() {
+                Cache.layout.setLeftMenuVisibleOnPhone(false).done(function () {
+                    Cache.layout.hideTop();
+                    Cache.splashScreen.showNoInternetMessage();
                 });
             });
         });

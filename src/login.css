@@ -67,7 +67,3 @@ input[type=submit] { margin:8px 0; }
 @media (min-height:351px) {
     #versionInfo { bottom:10px; right:8px; }
 }
-
-@media (max-width:1024px) { /* mobile */
-    #splash-screen { position:absolute; width: 100%; top:calc(50% - 48px - 8px); text-align: center;}
-}

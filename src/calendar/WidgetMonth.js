@@ -75,17 +75,23 @@ return function(options) {
     function _SetWidgetEvents() {
         $templateView.find('.Month_prev').on('click', function() {
             $(this).blur();
+            var oldDate = curDate;
             curDate = DateCalc.prevMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
                 onMonthChangedCB(); // invoke user callback
+            }).fail(function() {
+                curDate = oldDate;
             });
         });
 
         $templateView.find('.Month_next').on('click', function() {
             $(this).blur();
+            var oldDate = curDate;
             curDate = DateCalc.nextMonth(DateCalc.firstOfMonth(curDate));
             _LoadEventsOfCurMonth().done(function() {
                 onMonthChangedCB(); // invoke user callback
+            }).fail(function() {
+                curDate = oldDate;
             });
         });
 
@@ -136,6 +142,8 @@ return function(options) {
                 }
             });
         }).fail(function() {
+            $templateView.show();
+            //restore previous view
             defer.reject();
         });
         return defer.promise();

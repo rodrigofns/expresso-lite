@@ -146,8 +146,7 @@ return function(options) {
                 App.post('saveEvent',
                     fields
                 ).fail(function(resp) {
-                    window.alert('Erro ao salvar o evento.\n' +
-                        resp.responseText);
+                    App.errorMessage('Erro ao salvar o evento.', resp);
                 }).always(function() {
                     isSaving = false;
                     $tpl.find('.EditEvent_savingThrobber').remove();

@@ -80,7 +80,7 @@ function($, App) {
                 emails: addrs.join(','),
                 getPicture: '1'
             }).fail(function(resp) {
-                window.alert('Erro ao trazer a foto de um contato.\n' + resp.responseText);
+                App.errorMessage('Erro ao trazer a foto de um contato.', resp);
             }).done(function(contacts) {
                 var people = _ReadContactsList();
                 for (var i = 0; i < contacts.length; ++i) {

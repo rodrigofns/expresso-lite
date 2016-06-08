@@ -51,7 +51,7 @@ function($, CordovaConfig, AccountManager, App) {
             document.addEventListener('resume', _OnCordovaResume, false);
             isCordovaListenersRegistered = true;
         }
-    }
+    };
 
     Cordova.ClearAllCredentials = function() {
         var defer = $.Deferred();
@@ -77,7 +77,7 @@ function($, CordovaConfig, AccountManager, App) {
         });
 
         return defer.promise();
-    }
+    };
 
     Cordova.GetCurrentAccount = function() {
         var defer = $.Deferred();
@@ -111,7 +111,7 @@ function($, CordovaConfig, AccountManager, App) {
         });
 
         return defer.promise();
-    }
+    };
 
     Cordova.SaveAccount = function(login, password) {
         var defer = $.Deferred();
@@ -131,7 +131,11 @@ function($, CordovaConfig, AccountManager, App) {
         });
 
         return defer.promise();
-    }
+    };
+
+    Cordova.HasInternetConnection = function() {
+        return navigator.connection.type !== Connection.NONE;
+    };
 
     return Cordova;
 });

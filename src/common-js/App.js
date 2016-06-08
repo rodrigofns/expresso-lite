@@ -19,6 +19,9 @@ function($, Cordova) {
 
     var numberOfPendingAjax = 0;
 
+    var moduleUrlRegEx = /\b(\/mail|\/addressbook|\/calendar|\/debugger)(\/index.html)?\b/gi;
+    //a regex used to determine in which module we are on
+
     function _DisableRefreshOnPullDown() {
         var isFirefoxAndroid =
             navigator.userAgent.indexOf('Mozilla') !== -1 &&
@@ -58,6 +61,11 @@ function($, Cordova) {
                     App.setUserInfo(i, response[i]);
                 }
                 defer.resolve();
+            }).fail(function (error) {
+                // Probably means we are offline. The user will have to reload
+                // the page and this will restore our user info, so we resolve
+                // our deferred anyway
+                defer.resolve();
             });
         } else {
             defer.resolve();
@@ -94,6 +102,11 @@ function($, Cordova) {
         // Returns a promise object.
 
         var defer = $.Deferred();
+
+        if (Cordova && !Cordova.HasInternetConnection()) {
+            defer.reject({error: 'nointernet', responseText: 'Sem conexão à Internet.'});
+            return defer;
+        }
 
         numberOfPendingAjax++;
         $.post(
@@ -175,9 +188,20 @@ function($, Cordova) {
         return null;
     };
 
+    App.getCurrentModuleContext = function() {
+        var currHref = document.location.href.split('#')[0];
+        var res = moduleUrlRegEx.exec(currHref);
+
+        if (res === null) {
+            return '/'; // no module found, means we are at root context
+        } else {
+            return res[1]; // regex group with index 1 has the module
+        }
+    }
+
     App.returnToLoginScreen = function() {
         var currHref = document.location.href.split('#')[0]; //uses only the part before the first # (it there is one)
-        var destHref = currHref.replace(/\b(\/mail|\/addressbook|\/calendar|\/debugger)(\/index.html)?\b/gi, ''); //removes /module from the URL address
+        var destHref = currHref.replace(moduleUrlRegEx, ''); //removes /module from the URL address
 
         if (destHref.slice(-1) != '/') { //checks last char
             destHref += '/';
@@ -211,6 +235,15 @@ function($, Cordova) {
 
     App.getNumberOfPendingAjax = function() {
         return numberOfPendingAjax;
+    };
+
+    App.errorMessage = function (msg, resp) {
+        if (!Cordova) {
+            msg += '\nSua interface está inconsistente, pressione F5.';
+        }
+        msg += '\n' + resp.responseText;
+
+        window.alert(msg);
     };
 
     (function _Constructor() {
