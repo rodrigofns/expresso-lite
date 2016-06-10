@@ -298,7 +298,6 @@ class MailPage extends GenericPage
         $this->clickOnMenuItemByText($folderName);
     }
 
-
     /**
      * This method checks if an email with subject $subject has arrived. If
      * not, waits for 5 seconds, refreshes the screen and tries again. If the
@@ -321,4 +320,16 @@ class MailPage extends GenericPage
 
         throw new \Exception("Waited for e-mail with subject $subject but it never arrived");
     }
+
+    /**
+     * Checks if the contacts list was displayed after typing two character
+     * in the recipient field
+     *
+     * @return boolean
+     */
+    public function hasContactLoadMoreButton()
+    {
+        return $this->isElementPresent('.WidgetContactList_footer > #WidgetContactList_loadMoreButton');
+    }
+
 }

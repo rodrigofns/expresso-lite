@@ -111,6 +111,24 @@ class AddressbookPage extends GenericPage
         }
         return null;
     }
+
+    /**
+     * Returns the string of total entries in Catalog
+     */
+    public function getCatalogCountEntriesFooter()
+    {
+        return $this->byCssSelector('#WidgetContactList_footer > #WidgetContactList_loadedCountSpan')->text();
+    }
+
+    /*
+     * Return the count of total entries in catalog
+     */
+    public function getCounterTotal()
+    {
+        // splits the string using the white tab and returns to the search result counter
+        $counterList = explode(" ",$this->getCatalogCountEntriesFooter());
+        return $counterList[2];
+    }
     /**
      * Checks if this line separator in Address Book exist
      *
@@ -119,5 +137,15 @@ class AddressbookPage extends GenericPage
     public function hasLetterSeparator($letter)
     {
         return $this->isElementPresent("#letterSeparator_".strtoupper($letter));
+    }
+    /**
+     * Checks if the footer of contacts list was displayed at the end of Contact List and
+     * has load more buttom to click
+     *
+     * @return boolean
+     */
+    public function hasLoadMoreButton()
+    {
+        return $this->isElementPresent('#WidgetContactList_footer > #WidgetContactList_loadMoreButton');
     }
 }
