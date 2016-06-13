@@ -29,16 +29,6 @@ class TestData
     private $iniFileValues;
 
     /**
-     * @var string $globalIniFile The name of the .ini file that contains global test data
-     */
-    private $globalIniFile;
-
-    /**
-     * @var array Array with all the values loaded from the .ini global file
-     */
-    private $globalIniFileValues;
-
-    /**
      * @var ExpressoLiteTest The test case to which this test data belongs to.
      */
     private $testCase;
@@ -55,10 +45,6 @@ class TestData
 
         $testCaseClass = new \ReflectionClass($testCase);
         $testCaseName = $testCaseClass->getShortName();
-
-        $this->globalIniFile = TEST_ROOT_PATH . self::TEST_DATA_FOLDER . 'global_test_data.ini';
-        $this->globalIniFileValues = parse_ini_file($this->globalIniFile, false);
-
         $this->iniFile = TEST_ROOT_PATH . self::TEST_DATA_FOLDER . $testCaseName . '.ini';
         $this->iniFileValues = file_exists($this->iniFile) ?
             parse_ini_file($this->iniFile, true) :
@@ -85,15 +71,6 @@ class TestData
                     '$testId',
                     $this->testCase->getUniqueId(),
                     $this->iniFileValues[$sectionName][$key]);
-        }
-    }
-
-    public function getGlobalValue($key)
-    {
-        if (!isset($this->globalIniFileValues[$key])) {
-            throw new \Exception('Could not find a value with key ' . $key . ' in the global test data file');
-        } else {
-            return $this->globalIniFileValues[$key];
         }
     }
 }

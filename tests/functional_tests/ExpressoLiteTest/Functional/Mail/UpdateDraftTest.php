@@ -26,19 +26,19 @@ class UpdateDraftTest extends ExpressoLiteTest
      */
     public function test_CTV3_844_Change_Draft()
     {
-        $USER_LOGIN = $this->getGlobalValue('user.1.login');
-        $USER_PASSWORD = $this->getGlobalValue('user.1.password');
-        $RECIPIENT_1_MAIL = $this->getGlobalValue('user.2.email');
-        $RECIPIENT_2_MAIL = $this->getGlobalValue('user.3.email');
-        $BADGE_1 = $this->getGlobalValue('user.2.badge');
-        $BADGE_2 = $this->getGlobalValue('user.3.badge');
+        $USER_LOGIN = $this->getTestValue('user1.login');
+        $USER_PASSWORD = $this->getTestValue('user1.password');
+        $RECIPIENT1_MAIL = $this->getTestValue('recipent1.mail');
+        $RECIPIENT2_MAIL = $this->getTestValue('recipent2.mail');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
+        $BADGE1 = $this->getTestValue('badge1');
+        $BADGE2 = $this->getTestValue('badge2');
 
         TestScenarios::createMessageDraft($this, (object) array(
             'senderLogin' => $USER_LOGIN,
             'senderPassword' => $USER_PASSWORD,
-            'recipentMail' => $RECIPIENT_1_MAIL,
+            'recipentMail' => $RECIPIENT1_MAIL,
             'subject' => $MAIL_SUBJECT,
             'content' => $MAIL_CONTENT
         ));
@@ -52,7 +52,7 @@ class UpdateDraftTest extends ExpressoLiteTest
         $this->waitForAjaxAndAnimations();
 
         $widgetCompose = $mailPage->getWidgetCompose();
-        $widgetCompose->clickOnBadgeByName($BADGE_1);
+        $widgetCompose->clickOnBadgeByName($BADGE1);
         $this->waitForAjaxAndAnimations();
 
         $this->assertCount(0, $widgetCompose->getArrayOfCurrentBadges(),
@@ -60,9 +60,9 @@ class UpdateDraftTest extends ExpressoLiteTest
 
         $widgetCompose->clickOnRecipientField();
 
-        $widgetCompose->type($RECIPIENT_2_MAIL);
+        $widgetCompose->type($RECIPIENT2_MAIL);
         $widgetCompose->typeEnter();
-        $this->assertEquals(array($BADGE_2), $widgetCompose->getArrayOfCurrentBadges(),
+        $this->assertEquals(array($BADGE2), $widgetCompose->getArrayOfCurrentBadges(),
                 'The displayed badges do not match what was expected');
 
         $widgetCompose->typeSubject(' CHANGED');
@@ -86,7 +86,7 @@ class UpdateDraftTest extends ExpressoLiteTest
 
         $widgetCompose = $mailPage->getWidgetCompose();
 
-        $this->assertEquals(array($BADGE_2), $widgetCompose->getArrayOfCurrentBadges(),
+        $this->assertEquals(array($BADGE2), $widgetCompose->getArrayOfCurrentBadges(),
                 'The displayed badges do not match what was expected after open message second time');
         $this->assertEquals($MAIL_SUBJECT . ' CHANGED', $widgetCompose->getSubject(),
                 'The displayed subject do not match what was expected after open message second time');
@@ -106,16 +106,17 @@ class UpdateDraftTest extends ExpressoLiteTest
      */
     public function test_CTV3_845_Send_Draft()
     {
-        $USER_LOGIN = $this->getGlobalValue('user.1.login');
-        $USER_PASSWORD = $this->getGlobalValue('user.1.password');
-        $RECIPIENT_1_MAIL = $this->getGlobalValue('user.2.email');
+        $USER_LOGIN = $this->getTestValue('user1.login');
+        $USER_PASSWORD = $this->getTestValue('user1.password');
+        $RECIPIENT1_MAIL = $this->getTestValue('recipent1.mail');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
+        $BADGE1 = $this->getTestValue('badge1');
 
         TestScenarios::createMessageDraft($this, (object) array(
             'senderLogin' => $USER_LOGIN,
             'senderPassword' => $USER_PASSWORD,
-            'recipentMail' => $RECIPIENT_1_MAIL,
+            'recipentMail' => $RECIPIENT1_MAIL,
             'subject' => $MAIL_SUBJECT,
             'content' => $MAIL_CONTENT
         ));
@@ -155,16 +156,17 @@ class UpdateDraftTest extends ExpressoLiteTest
      */
     public function test_CTV3_846_Delete_Draft()
     {
-        $USER_LOGIN = $this->getGlobalValue('user.1.login');
-        $USER_PASSWORD = $this->getGlobalValue('user.1.password');
-        $RECIPIENT_1_MAIL = $this->getGlobalValue('user.2.email');
+        $USER_LOGIN = $this->getTestValue('user1.login');
+        $USER_PASSWORD = $this->getTestValue('user1.password');
+        $RECIPIENT1_MAIL = $this->getTestValue('recipent1.mail');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
+        $BADGE1 = $this->getTestValue('badge1');
 
         TestScenarios::createMessageDraft($this, (object) array(
             'senderLogin' => $USER_LOGIN,
             'senderPassword' => $USER_PASSWORD,
-            'recipentMail' => $RECIPIENT_1_MAIL,
+            'recipentMail' => $RECIPIENT1_MAIL,
             'subject' => $MAIL_SUBJECT,
             'content' => $MAIL_CONTENT
         ));

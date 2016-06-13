@@ -33,11 +33,11 @@ class MoveMailTest extends ExpressoLiteTest
     public function test_CTV3_1020_Move_Thread_Mail()
     {
         //load test data
-        $SENDER_LOGIN = $this->getGlobalValue('user.1.login');
-        $SENDER_PASSWORD = $this->getGlobalValue('user.1.password');
-        $RECIPIENT_LOGIN = $this->getGlobalValue('user.2.login');
-        $RECIPIENT_PASSWORD = $this->getGlobalValue('user.2.password');
-        $RECIPIENT_MAIL = $this->getGlobalValue('user.2.email');
+        $SENDER_LOGIN = $this->getTestValue('sender.login');
+        $SENDER_PASSWORD = $this->getTestValue('sender.password');
+        $RECIPIENT_LOGIN = $this->getTestValue('recipient.login');
+        $RECIPIENT_PASSWORD = $this->getTestValue('recipient.password');
+        $RECIPIENT_MAIL = $this->getTestValue('recipient.mail');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
 
@@ -54,7 +54,6 @@ class MoveMailTest extends ExpressoLiteTest
         $this->doLogin($RECIPIENT_LOGIN, $RECIPIENT_PASSWORD);
 
         $mailPage = new MailPage($this);
-        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $this->waitForAjaxAndAnimations();
 

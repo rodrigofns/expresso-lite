@@ -111,18 +111,6 @@ abstract class ExpressoLiteTest extends \PHPUnit_Extensions_Selenium2TestCase
     }
 
     /**
-     * Retrieves a value from the global test data file.
-     *
-     * @param string $key The key to the test value
-     *
-     * @return string The value associated with the key.
-     */
-    public function getGlobalValue($key)
-    {
-        return $this->testData->getGlobalValue($key);
-    }
-
-    /**
      * Asserts that a specific DOM element is present in the current page. It will try
      * to search the element once per DEFAULT_WAIT_INTERVAL milliseconds for $timeout seconds.
      *

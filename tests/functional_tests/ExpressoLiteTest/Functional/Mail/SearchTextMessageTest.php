@@ -39,7 +39,7 @@ class SearchTextMessageTest extends SingleLoginTest {
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPENT = $this->getGlobalValue('user.1.email');
+        $MAIL_RECIPENT = $this->getTestValue('mail.recipent');
         $MAIL1_SUBJECT = $this->getTestValue('mail1.subject');
         $MAIL1_CONTENT = $this->getTestValue('mail1.content');
         $MAIL2_SUBJECT = $this->getTestValue('mail2.subject');
@@ -58,10 +58,6 @@ class SearchTextMessageTest extends SingleLoginTest {
         $this->waitForAjaxAndAnimations();
         $mailPage->sendMail(array($MAIL_RECIPENT), $MAIL3_SUBJECT, $MAIL3_CONTENT);
         $this->waitForAjaxAndAnimations();
-
-        $mailPage->waitForEmailToArrive($MAIL1_SUBJECT);
-        $mailPage->waitForEmailToArrive($MAIL2_SUBJECT);
-        $mailPage->waitForEmailToArrive($MAIL3_SUBJECT);
 
         $mailPage->typeSearchText($COMMON_TEXT_FRAGMENT);
         $mailPage->clickSearchButton();
