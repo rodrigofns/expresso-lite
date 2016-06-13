@@ -46,6 +46,16 @@ class MailPage extends GenericPage
     }
 
     /**
+     * Clicks on the Calendar link on the left of the screen
+     * and waits for the Calendar window to be displayed
+     */
+    public function clickCalendar()
+    {
+        $this->byCssSelector('.Layout_iconCalendar')->click();
+        $this->testCase->waitForAjaxAndAnimations();
+    }
+
+    /**
      * Clicks on a folder contained on the folder tree based on its name
      *
      * @param string $folderName The name of the folder to be clicked
@@ -332,4 +342,13 @@ class MailPage extends GenericPage
         return $this->isElementPresent('.WidgetContactList_footer > #WidgetContactList_loadMoreButton');
     }
 
+    /**
+     * Checks if the Email container was displayed
+     *
+     * @return boolean
+     */
+    public function hasEmailScreenListed()
+    {
+        return $this->isElementPresent('#headlinesArea');
+    }
 }

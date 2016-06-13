@@ -129,6 +129,17 @@ class AddressbookPage extends GenericPage
         $counterList = explode(" ",$this->getCatalogCountEntriesFooter());
         return $counterList[2];
     }
+
+    /**
+     * Checks if the AddressBook container was displayed
+     *
+     * @return boolean
+     */
+    public function hasAddressbookScreenListed()
+    {
+        return $this->isElementPresent('#contactListSection');
+    }
+
     /**
      * Checks if this line separator in Address Book exist
      *
@@ -138,6 +149,7 @@ class AddressbookPage extends GenericPage
     {
         return $this->isElementPresent("#letterSeparator_".strtoupper($letter));
     }
+
     /**
      * Checks if the footer of contacts list was displayed at the end of Contact List and
      * has load more buttom to click
