@@ -7,5 +7,8 @@
         <testsuite name="Mail">
              <directory suffix="Test.php">ExpressoLiteTest/Functional/Mail</directory>
         </testsuite>
+        <testsuite name="Addressbook">
+             <directory suffix="Test.php">ExpressoLiteTest/Functional/Addressbook</directory>
+        </testsuite>
     </testsuites>
 </phpunit>

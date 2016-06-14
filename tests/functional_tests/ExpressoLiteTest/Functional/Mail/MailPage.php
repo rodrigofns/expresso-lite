@@ -297,4 +297,28 @@ class MailPage extends GenericPage
     {
         $this->clickOnMenuItemByText($folderName);
     }
+
+
+    /**
+     * This method checks if an email with subject $subject has arrived. If
+     * not, waits for 5 seconds, refreshes the screen and tries again. If the
+     * e-mail is not found after 3 attempts, an exception is thrown
+     *
+     * @param string $subject The subject of the expected e-mail
+     */
+    public function waitForEmailToArrive($subject)
+    {
+        for ($i=0; $i < 6; $i++) {
+            $headline = $this->getHeadlinesEntryBySubject($subject);
+            if ($headline != null) {
+                return;
+            } else {
+                sleep(5); //wait 5s and before trying again
+                $this->clickRefreshButton();
+                $this->waitForAjaxAndAnimations();
+            }
+        }
+
+        throw new \Exception("Waited for e-mail with subject $subject but it never arrived");
+    }
 }

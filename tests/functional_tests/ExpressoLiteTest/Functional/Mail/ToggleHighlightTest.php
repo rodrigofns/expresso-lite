@@ -39,7 +39,7 @@ class ToggleHighlightTest extends SingleLoginTest {
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPENT = $this->getTestValue('mail.recipent');
+        $MAIL_RECIPENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
        //testStart
@@ -47,6 +47,7 @@ class ToggleHighlightTest extends SingleLoginTest {
         $this->waitForAjaxAndAnimations();
 
         $mailPage->clickRefreshButton();
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
 
         $headlinesEntry->toggleCheckbox();

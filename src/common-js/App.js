@@ -122,6 +122,9 @@ function($, Cordova) {
                 // won't neither resolve or reject
             } else if (data.status === 500 && data.responseText == 'CurlNotInstalledException') {
                 window.alert('O pacote PHP cURL (php5-curl) não está instalado no servidor');
+            } else if (data.status === 500 && data.responseText == 'ConfPhpNotFound') {
+                window.alert('Não foi possível encontrar o arquivo conf.php no servidor.\n' +
+                             'Utilize o arquivo conf.php.dist como modelo para criá-lo e recarregue a página.');
             } else {
                 defer.reject(data);
             }

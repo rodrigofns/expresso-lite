@@ -29,6 +29,16 @@ class ComposeMailTest extends SingleLoginTest
     }
 
     /**
+     * Overwrites superclass getUserNumber.
+     *
+     * @see \ExpressoLiteTest\Functional\Generic\SingleLoginTest::getUserNumber()
+     */
+    public function getUserNumber()
+    {
+        return 2;
+    }
+
+    /**
      * Tests sending a simple e-mail, checking if the e-mail composition screen opens and
      * close as expected. Also checks if the sent e-mail data match what was originally typed
      *
@@ -40,7 +50,7 @@ class ComposeMailTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -83,8 +93,16 @@ class ComposeMailTest extends SingleLoginTest
      */
     public function testBadges()
     {
-        $MAIL_RECIPIENTS = $this->getTestValue('mail.recipients');
-        $BADGES = $this->getTestValue('badges');
+        $MAIL_RECIPIENTS = array(
+            $this->getGlobalValue('user.1.email'),
+            $this->getGlobalValue('user.3.email'),
+            $this->getGlobalValue('user.4.email')
+        ); 
+        $BADGES = array(
+            $this->getGlobalValue('user.1.badge'),
+            $this->getGlobalValue('user.3.badge'),
+            $this->getGlobalValue('user.4.badge')
+        );
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         $mailPage = new MailPage($this);
@@ -119,68 +137,6 @@ class ComposeMailTest extends SingleLoginTest
     }
 
     /**
-     * Tests sending a simple e-mail, checking if the e-mail composition screen opens and
-     * close as expected. Also checks the search in the catalog.
-     *
-     *   CTV3-759
-     *   http://comunidadeexpresso.serpro.gov.br/testlink/linkto.php?tprojectPrefix=CTV3&item=testcase&id=CTV3-759
-     */
-    public function test_CTV3_759_Search_Recipient()
-    {
-        $mailPage = new MailPage($this);
-        //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
-        $MAIL_SUBJECT = $this->getTestValue('mail.subject');
-        $MAIL_CONTENT = $this->getTestValue('mail.content');
-        $PART_NAME_SEARCH = $this->getTestValue('part.name.search');
-        $NAME_SEARCH = $this->getTestValue('name.search');
-        $NAME2_SEARCH = $this->getTestValue('name.2.search');
-
-        //testStart
-        $mailPage->clickWriteEmailButton();
-
-        $widgetCompose = $mailPage->getWidgetCompose();
-        $this->assertTrue($widgetCompose->isDisplayed(), 'Compose Window should be displayed, but it is not');
-
-        $widgetCompose->clickOnRecipientField();
-        $widgetCompose->type($PART_NAME_SEARCH);
-        $this->waitForAjaxAndAnimations();
-
-        $contactsAutoComplete = $mailPage->getContactsAutoComplete();
-        $this->assertTrue($contactsAutoComplete->hasContactsListed(), 'The contacts list is visible, but it is not');
-        $contactsAutoComplete->clickOnContactsListByName($NAME_SEARCH);
-
-        $widgetCompose->clickOnRecipientField();
-        $widgetCompose->type($PART_NAME_SEARCH);
-        $this->waitForAjaxAndAnimations();
-        $contactsAutoComplete->clickMoreResults();
-
-        $this->assertTrue($contactsAutoComplete->hasContactscounted(), 'The counter is visible, but it is not');
-
-        $contactsAutoComplete->clickOnContactsListByName($NAME2_SEARCH);
-        $widgetCompose->typeSubject($MAIL_SUBJECT);
-        $widgetCompose->typeMessageBodyBeforeSignature($MAIL_CONTENT);
-        $widgetCompose->clickSendMailButton();
-        $this->waitForAjaxAndAnimations();
-
-        $this->assertFalse($widgetCompose->isDisplayed(), 'Compose Window should have been closed, but it is still visible');
-
-        $mailPage->clickOnFolderByName('Enviados');
-
-        $headlinesEntry = $mailPage->getHeadlinesEntryBySubject($MAIL_SUBJECT);
-        $this->assertNotNull($headlinesEntry, "A mail with subject $MAIL_SUBJECT was sent, but it could not be found on Sent folder");
-
-        $headlinesEntry->click();
-        $this->waitForAjaxAndAnimations();
-
-        $widgetMessages = $mailPage->getWidgetMessages();
-        $this->assertEquals($MAIL_SUBJECT, $widgetMessages->getHeader(), 'The header in the right body header does not match the expected mail subject: ' . $MAIL_SUBJECT);
-
-        $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
-        $this->assertContains($MAIL_CONTENT, $messageUnit->getContent(), 'The message content differs from the expected');
-    }
-
-    /**
      * Checks if an e-mail marked with the "Important" flag is being sent and displayed correctly
      *
      * CTV3-890
@@ -191,7 +147,7 @@ class ComposeMailTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         //testStart
@@ -268,7 +224,7 @@ class ComposeMailTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_RECIPIENT = $this->getTestValue('mail.recipient');
+        $MAIL_RECIPIENT = $this->getGlobalValue('user.1.email');
 
         //testStart
         $mailPage->clickWriteEmailButton();
@@ -297,11 +253,27 @@ class ComposeMailTest extends SingleLoginTest
      */
     public function test_CTV3_975_Edit_Badge()
     {
-        $INITAL_MAIL_RECIPIENTS = $this->getTestValue('initial.mail.recipients');
-        $INITIAL_BADGES = $this->getTestValue('initial.badges');
-        $EXTRA_RECIPIENT = $this->getTestValue('extra.recipient');
-        $FINAL_BADGES = $this->getTestValue('final.badges');
-        $FINAL_MAIL_RECIPIENTS = $this->getTestValue('final.mail.recipients');
+        $INITAL_MAIL_RECIPIENTS = array(
+            $this->getGlobalValue('user.1.email'),
+            $this->getGlobalValue('user.3.email'),
+            $this->getGlobalValue('user.4.email')
+        );
+        $INITIAL_BADGES = array(
+            $this->getGlobalValue('user.1.badge'),
+            $this->getGlobalValue('user.3.badge'),
+            $this->getGlobalValue('user.4.badge')
+        );
+        $EXTRA_RECIPIENT = $this->getGlobalValue('user.5.email');
+        $FINAL_BADGES = array(
+            $this->getGlobalValue('user.1.badge'),
+            $this->getGlobalValue('user.3.badge'),
+            $this->getGlobalValue('user.5.badge')
+        );
+        $FINAL_MAIL_RECIPIENTS = array(
+            $this->getGlobalValue('user.1.email'),
+            $this->getGlobalValue('user.3.email'),
+            $this->getGlobalValue('user.5.email')
+        );
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         $mailPage = new MailPage($this);
@@ -354,11 +326,22 @@ class ComposeMailTest extends SingleLoginTest
      */
     public function test_CTV3_977_Delete_Badge()
     {
-        $INITAL_MAIL_RECIPIENTS = $this->getTestValue('initial.mail.recipients');
-        $INITIAL_BADGES = $this->getTestValue('initial.badges');
-        $DELETED_BADGES = $this->getTestValue('deleted.badges');
-        $FINAL_BADGE = $this->getTestValue('final.badge');
-        $FINAL_MAIL_RECIPIENT = $this->getTestValue('final.mail.recipient');
+        $INITAL_MAIL_RECIPIENTS = array(
+            $this->getGlobalValue('user.1.email'),
+            $this->getGlobalValue('user.3.email'),
+            $this->getGlobalValue('user.4.email')
+        );
+        $INITIAL_BADGES = array(
+            $this->getGlobalValue('user.1.badge'),
+            $this->getGlobalValue('user.3.badge'),
+            $this->getGlobalValue('user.4.badge')
+        );
+        $DELETED_BADGES = array(
+            $this->getGlobalValue('user.1.badge'),
+            $this->getGlobalValue('user.3.badge')
+        );
+        $FINAL_BADGE = $this->getGlobalValue('user.4.badge');
+        $FINAL_MAIL_RECIPIENT = $this->getGlobalValue('user.4.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
 
         $mailPage = new MailPage($this);
@@ -411,8 +394,8 @@ class ComposeMailTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_CC_RECIPIENT = $this->getTestValue('mail.cc.recipient');
-        $MAIL_SENDER = $this->getTestValue('mail.sender');
+        $MAIL_CC_RECIPIENT = $this->getGlobalValue('user.2.email');
+        $MAIL_SENDER = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -464,8 +447,8 @@ class ComposeMailTest extends SingleLoginTest
         $mailPage = new MailPage($this);
 
         //load test data
-        $MAIL_BCC_RECIPIENT = $this->getTestValue('mail.bcc.recipient');
-        $MAIL_SENDER = $this->getTestValue('mail.sender');
+        $MAIL_BCC_RECIPIENT = $this->getGlobalValue('user.2.email');
+        $MAIL_SENDER = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $MAIL_CONTENT = $this->getTestValue('mail.content');
 
@@ -490,6 +473,7 @@ class ComposeMailTest extends SingleLoginTest
 
         $mailPage->clickRefreshButton();
         $this->waitForAjaxAndAnimations();
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $headlinesEntry = $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();

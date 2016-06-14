@@ -54,6 +54,7 @@ abstract class TestScenarios
 
         $test->doLogin($params->user2, $params->password2);
 
+        $mailPage->waitForEmailToArrive($params->subject);
         $mailPage->clickOnHeadlineBySubject($params->subject);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -74,7 +75,9 @@ abstract class TestScenarios
 
         $test->doLogin($params->user1, $params->password1);
 
-        $mailPage->clickOnHeadlineBySubject('Re: ' . $params->subject);
+        $reSubject = 'Re: ' . $params->subject;
+        $mailPage->waitForEmailToArrive($reSubject);
+        $mailPage->clickOnHeadlineBySubject($reSubject);
 
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();

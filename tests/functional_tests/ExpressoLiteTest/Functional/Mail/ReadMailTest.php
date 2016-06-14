@@ -29,13 +29,13 @@ class ReadMailTest extends ExpressoLiteTest
     public function test_CTV3_752_ReadSimpleMail()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_1_MAIL = $this->getTestValue('user.1.mail');
-        $USER_1_NAME = $this->getTestValue('user.1.name');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_1_MAIL = $this->getGlobalValue('user.1.email');
+        $USER_1_NAME = $this->getGlobalValue('user.1.name');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
 
@@ -48,6 +48,7 @@ class ReadMailTest extends ExpressoLiteTest
 
         // Second user
         $this->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -78,11 +79,11 @@ class ReadMailTest extends ExpressoLiteTest
     public function test_CTV3_1047_ReadCitationMail()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
         $REPLY_MAIL_CONTENT = $this->getTestValue('reply.mail.content');
@@ -96,6 +97,7 @@ class ReadMailTest extends ExpressoLiteTest
 
         // Second user
         $this->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
         $widgetMessages = $mailPage->getWidgetMessages();
         $messageUnit = $widgetMessages->getSingleMessageUnitInConversation();
@@ -111,6 +113,7 @@ class ReadMailTest extends ExpressoLiteTest
         $mailPage->clickLogout();
 
         $this->doLogin($USER_1_LOGIN, $USER_1_PASSWORD);
+        $mailPage->waitForEmailToArrive($REPLY_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($REPLY_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();
@@ -139,11 +142,11 @@ class ReadMailTest extends ExpressoLiteTest
     public function test_CTV3_1048_ReadThreadMail()
     {
         //load test data
-        $USER_1_LOGIN = $this->getTestValue('user.1.login');
-        $USER_1_PASSWORD = $this->getTestValue('user.1.password');
-        $USER_2_LOGIN = $this->getTestValue('user.2.login');
-        $USER_2_PASSWORD = $this->getTestValue('user.2.password');
-        $USER_2_MAIL = $this->getTestValue('user.2.mail');
+        $USER_1_LOGIN = $this->getGlobalValue('user.1.login');
+        $USER_1_PASSWORD = $this->getGlobalValue('user.1.password');
+        $USER_2_LOGIN = $this->getGlobalValue('user.2.login');
+        $USER_2_PASSWORD = $this->getGlobalValue('user.2.password');
+        $USER_2_MAIL = $this->getGlobalValue('user.2.email');
         $MAIL_SUBJECT = $this->getTestValue('mail.subject');
         $ORIGINAL_MAIL_CONTENT = $this->getTestValue('original.mail.content');
         $REPLY_SECOND_MAIL_CONTENT = $this->getTestValue('reply.second.mail.content');
@@ -161,6 +164,7 @@ class ReadMailTest extends ExpressoLiteTest
         $this->doLogin($USER_2_LOGIN, $USER_2_PASSWORD);
 
         $mailPage = new MailPage($this);
+        $mailPage->waitForEmailToArrive($MAIL_SUBJECT);
         $mailPage->clickOnHeadlineBySubject($MAIL_SUBJECT);
 
         $widgetMessages = $mailPage->getWidgetMessages();

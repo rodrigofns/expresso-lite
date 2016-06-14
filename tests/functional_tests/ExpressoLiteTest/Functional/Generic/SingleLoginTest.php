@@ -40,12 +40,12 @@ class SingleLoginTest extends ExpressoLiteTest
 
     /**
      * Performs the login steps in the current window. The user and password to be
-     * used will be searched in a section named [login] in the test data file.
+     * used will be searched in the global test data.
      */
     private function doLoginWithIniFileValues()
     {
-        $user = $this->testData->getTestValue('login', 'user');
-        $password = $this->testData->getTestValue('login', 'password');
+        $user = $this->testData->getGlobalValue('user.'.$this->getUserNumber().'.login');
+        $password = $this->testData->getGlobalValue('user.'.$this->getUserNumber().'.password');
 
         $this->doLogin($user, $password);
         self::$isLoggedIn = true;
@@ -73,6 +73,19 @@ class SingleLoginTest extends ExpressoLiteTest
     public function getTestUrl()
     {
         return LITE_URL;
+    }
+
+    /**
+     * Returns the user number to be used for each login. (1, 2, etc...).
+     * This user login and password will be searched in the global test data file
+     * using the following format: user.1.login and user.1.password.
+     * This method is supposed to be overwritten in subclasses
+     *
+     * @return int The number to be used in the begining of each test
+     */
+    public function getUserNumber()
+    {
+        return 1;
     }
 
     /**
