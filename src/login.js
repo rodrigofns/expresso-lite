@@ -5,7 +5,7 @@
  * @package   Lite
  * @license   http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author    Rodrigo Dias <rodrigo.dias@serpro.gov.br>
- * @copyright Copyright (c) 2013-2015 Serpro (http://www.serpro.gov.br)
+ * @copyright Copyright (c) 2013-2016 Serpro (http://www.serpro.gov.br)
  */
 
 require([
@@ -18,10 +18,12 @@ function($, App, Cordova) {
         if (Cordova) {
             $('#splash-screen').appendTo($('body'));
         } else {
-            var isBrowserValid = ValidateBrowser([
-                { name:'Firefox', version:24 },
-                { name:'Chrome', version:25 },
-                { name:'Safari', version:7 }
+            var isBrowserValid = ValidateBrowserMinimumVersion([ // warning: the list order matters
+                { name:'SamsungBrowser', version:4 }, // Samsung Android browser
+                { name:'Firefox', version:38 },
+                { name:'CriOS', version:34 }, // Chrome on iOS
+                { name:'Version', version:7 }, // Safari
+                { name:'Chrome', version:34 }
             ]);
 
             if (!isBrowserValid) {
@@ -123,34 +125,12 @@ function($, App, Cordova) {
         }
     }
 
-    function ValidateBrowser(minBrowsers) {
+    function ValidateBrowserMinimumVersion(allowedBrowsers) {
         var ua = navigator.userAgent;
-        for (var m = 0; m < minBrowsers.length; ++m) {
-            var bname = minBrowsers[m].name,
-                bver = minBrowsers[m].version;
-            var browserPrefixIndex = ua.indexOf(bname+'/');
-            if (browserPrefixIndex !== -1) {
-                // We found the browser within the user agent, let's check its version.
-                var ver;
-                if (bname !== 'Safari') {
-                    ver = ua.substr(browserPrefixIndex + (bname+'/').length);
-                    if (ver.indexOf(' ') !== -1) {
-                        ver = ver.substr(0, ver.indexOf(' '));
-                    }
-                } else {
-                    // Safari is a bit of a special case, its major version is
-                    // expressed after the Version\ prefix.
-                    var versionPrefixIndex = ua.indexOf('Version/');
-                    if (versionPrefixIndex !== -1) {
-                        ver = ua.substr(versionPrefixIndex + 'Version/'.length);
-                        if (ver.indexOf(' ') !== -1) {
-                            ver = ver.substr(0, ver.indexOf(' '));
-                        }
-                    } else {
-                        bver = '-1'; // may happen when using Google Chrome on iPhone
-                    }
-                }
-                return (bver <= parseInt(ver));
+        for (var i = 0; i < allowedBrowsers.length; ++i) {
+            var navData = ua.match(new RegExp(allowedBrowsers[i].name+'/(\\d+)\\.'));
+            if (navData !== null) {
+                return parseInt(navData[1]) >= allowedBrowsers[i].version;
             }
         }
         return false;
