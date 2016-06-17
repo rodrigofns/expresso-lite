@@ -168,4 +168,12 @@ class GenericPage
     {
         $this->testCase->waitForAjaxAndAnimations();
     }
+
+    /**
+     * Clicks on the element
+     */
+    public function click()
+    {
+        $this->rootContext->click();
+    }
 }

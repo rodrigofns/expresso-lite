@@ -151,6 +151,17 @@ class AddressbookPage extends GenericPage
     }
 
     /**
+     * Returns the WidgetContactDetails Page Object that represents the contact details
+     * currently being displayed in the Addressbook module
+     *
+     * @return WidgetContactDetails
+     */
+    public function getWidgetContactDetails()
+    {
+        return new WidgetContactDetails($this, $this->byCssSelector('#Layout_rightContent'));
+    }
+
+    /**
      * Checks if the footer of contacts list was displayed at the end of Contact List and
      * has load more buttom to click
      *

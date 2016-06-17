@@ -49,14 +49,6 @@ class HeadlinesEntry extends GenericPage
     }
 
     /**
-     * Clicks on the headline entry
-     */
-    public function click()
-    {
-        $this->rootContext->click();
-    }
-
-    /**
      * Returns the subject displyed on this entry
      *
      * @return string The entry subject
