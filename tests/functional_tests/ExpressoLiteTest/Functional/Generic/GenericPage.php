@@ -87,6 +87,19 @@ class GenericPage
     }
 
     /**
+     * Returns an array of multiple DOM elements contained in the
+     * root context of this page object based on an XPath expression
+     *
+     * @param string $xpath The xpath expression to be searched
+     * @return array An array of references to the DOM elements that
+     * match the specified $xpath
+     */
+    public function byXPathMultiple($xpath)
+    {
+        return $this->rootContext->elements($this->rootContext->using('xpath')->value($xpath));
+    }
+
+    /**
      * Returns the value of an attribute of the DOM element to which this
      * GenericPage instance corresponds
      *
