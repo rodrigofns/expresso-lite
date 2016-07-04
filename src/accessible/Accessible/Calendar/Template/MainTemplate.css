@@ -12,14 +12,14 @@
 #menu ul { margin-left:-30px; margin-right:10px; }
 
 /* --- HEADLINES --- */
-#eventsTable { width:calc(100% - 20px); margin-bottom:1em; }
-#eventsTable { border:1px solid #FFF; border-collapse:collapse; }
-#eventsTable caption { padding:5px 10px; font-size:110%; font-weight:600; }
+.eventsTable { width:calc(100% - 20px); margin-bottom:1em; border:1; }
+.eventsTable { border:1px solid #FFF; border-collapse:collapse; }
+.eventsTable caption { padding:5px 10px; font-size:110%; font-weight:600; }
 
-#eventsTable th, td { border:2px solid #FFF; background-color:#F4F4F4; }
-#eventsTable th { font-weight:400; font-size:110%; padding:5px; background-color:#005076; color:#FFF; }
-#eventsTable th:first-of-type { border-top-left-radius:6px; }
-#eventsTable th:last-of-type { border-top-right-radius:6px; }
+.eventsTable th, td { border:2px solid #FFF; background-color:#F4F4F4; }
+.eventsTable th { font-weight:400; font-size:110%; padding:5px; background-color:#005076; color:#FFF; }
+.eventsTable th:first-of-type { border-top-left-radius:6px; }
+.eventsTable th:last-of-type { border-top-right-radius:6px; }
 
 .alignCenter { text-align:center; }
 .alignLeft { padding:10px 10px; text-align:left; }

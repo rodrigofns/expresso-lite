@@ -20,8 +20,8 @@
 </head>
 <body>
 
-<div id="top" name="top" >
-    <div id="anchors" name="anchors" class="links systemLinks">
+<div id="top">
+    <div id="anchors" class="links systemLinks">
         <nav class="contentAlign">
             <ul>
                 <li><a href="#menu" accesskey="1">Ir para o menu [1]</a></li>
@@ -37,7 +37,7 @@
     </div>
 </div>
 
-<div id="menu" name="menu">
+<div id="menu">
     <h2 class="anchorsTitle">Menu</h2>
     <div class="links systemLinks">
         <ul>
@@ -64,10 +64,10 @@
 </div>
 
 <form action="<?= $VIEW->lnkConfirmMessageAction ?>" method="post">
-<div id="headlines" name="headlines">
+<div id="headlines">
     <h2 class="anchorsTitle">Lista de emails</h2>
     <?php IF ($VIEW->curFolder->totalMails > 0) : ?>
-        <table id="headlinesTable" border="1" class="clickableCell contentAlign">
+        <table id="headlinesTable" class="clickableCell contentAlign">
             <caption>
                 A pasta <?= $VIEW->curFolder->localName ?> contém <?= $VIEW->curFolder->totalMails ?> emails,
                 <?php IF ($VIEW->curFolder->unreadMails > 0) : ?>
@@ -138,7 +138,7 @@
 </div>
 
 <?php IF ($VIEW->curFolder->totalMails > 0) : ?>
-<div id="actions" name="actions">
+<div id="actions">
     <h2 class="anchorsTitle">Ações</h2>
     <div class="contentAlign">
         <button type="submit" name="actionProcess" value="<?= $VIEW->action_mark_unread ?>">Marcar como não lido</button>
@@ -155,7 +155,7 @@
 </form>
 
 <?php IF ($VIEW->curFolder->totalMails > $VIEW->requestLimit) : ?>
-<div id="pagination" name="pagination">
+<div id="pagination">
     <h2 class="anchorsTitle">Paginação</h2>
     <div class="links linkAsButton">
         <ul>

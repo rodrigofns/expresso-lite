@@ -19,9 +19,9 @@
 </head>
 <body>
 
-<div id="top" name="top">
+<div id="top">
     <div id="logomark"></div>
-    <div id="anchors" name="anchors" class="links systemLinks">
+    <div id="anchors" class="links systemLinks">
         <nav class="contentAlign">
             <ul>
                 <li><a href="#calendars" accesskey="1">Ir para listagem de calendários [1]</a></li>
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-<div id="calendars" name="calendars">
+<div id="calendars">
 <h2 class="anchorsTitle">Calendários</h2>
     <div class="links systemLinks">
         <ul >

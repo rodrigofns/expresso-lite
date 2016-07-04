@@ -59,7 +59,7 @@
 <div id="dayEvents" name="dayEvents">
     <h2 class="anchorsTitle">Eventos de hoje</h2>
     <?php IF($VIEW->hasTodayEvents) : ?>
-    <table id="eventsTable" border="1" class="clickableCell contentAlign">
+    <table id="dailyEventsTable" name="dailyEventsTable" class="clickableCell contentAlign eventsTable">
         <caption><?= $VIEW->dateRangeTodayEventsSummary; ?></caption>
         <thead>
             <tr>
@@ -107,7 +107,7 @@
 <div id="monthEvents" name="monthEvents">
     <h2 class="anchorsTitle">Eventos do mês</h2>
     <?php IF($VIEW->hasEvents) : ?>
-    <table id="eventsTable" border="1" class="clickableCell contentAlign">
+    <table id="monthlyEventsTable" name="monthlyEventsTable" class="clickableCell contentAlign eventsTable">
         <caption><?= $VIEW->dateRangeEventsSummary ?></caption>
         <thead>
             <tr>

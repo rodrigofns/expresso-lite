@@ -20,8 +20,8 @@
 </head>
 <body>
 
-<div id="top" name="top">
-    <div id="anchors" name="anchors" class="links systemLinks">
+<div id="top">
+    <div id="anchors" class="links systemLinks">
         <nav class="contentAlign">
             <ul>
                 <li><a href="#eventInfo" accesskey="1">Ir para informações do evento [1]</a></li>
@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div id="eventInfo" name="eventInfo">
+<div id="eventInfo">
     <h2 class="anchorsTitle">Informações do evento</h2>
     <div class="contentAlign">
         <div><span class="fieldName">Assunto:     </span><?= $VIEW->summary ?></div>
@@ -61,7 +61,7 @@
     </ul>
 </div>
 
-<div id="eventDescription" name="eventDescription">
+<div id="eventDescription">
     <h2 class="anchorsTitle">Descrição do evento</h2>
     <div class="contentAlign"><span class="fieldName"></span> <?= $VIEW->description ?></div>
 </div>
@@ -72,7 +72,7 @@
     </ul>
 </div>
 
-<div id="eventPartners" name="eventPartners">
+<div id="eventPartners">
     <h2 class="anchorsTitle">Participantes do evento</h2>
     <div class="contentAlign">
     <?php FOREACH($VIEW->attendeesInformation AS $confirmType) : ?>
@@ -93,7 +93,7 @@
 </div>
 
 <?php IF($VIEW->isUserAllowedToConfirm) : ?>
-<div id="eventActions" name="eventActions">
+<div id="eventActions">
     <h2 class="anchorsTitle">Ações de evento</h2>
     <div class="links linkAsButton">
         <ul>
